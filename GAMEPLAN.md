@@ -135,6 +135,24 @@ with a console-error check.
 Phases 2–4 are backend/data and low-UI-risk; 5–7 are the frontend arc and each
 gets a browser check; 8 is a stretch.
 
+### Execution status
+- **Phase 2 — DONE** (commit: data pipeline). clean_text, clean previews +
+  index, catalog-summary.json, verify, CLI hardening.
+- **Phase 3 — DONE** (commit: BM25 v2 index). Quantized tf + doc lengths, 0.70 MB
+  gzip, frontend BM25 consumer.
+- **Phase 4 — DONE** (commit: repo hygiene). Junk removed, orphan resolved,
+  .gitattributes freezes .txt hashes.
+- **Phases 5–7 — DONE** (one commit: frontend rebuild). IIFE structure, full
+  DOM-API rendering (innerHTML eliminated), hash routing, summary-first paint,
+  a11y foundation, mobile off-canvas sidebar, keyboard shortcuts, reader
+  text-size/progress/resume/TOC/find-in-text. Browser-verified, zero console
+  errors.
+- **Phase 8 — FLAGGED, not implemented.** The preload hint for
+  catalog-summary.json shipped inside index.html (no new file). True offline
+  reading needs a service worker, which by spec is a separate sw.js — that
+  crosses the soft "single index.html / no external JS" constraint, so it is
+  written up as FLAG 2 below rather than built.
+
 ---
 
 ## Part 3 — Constraint decisions & flagged proposals
@@ -194,10 +212,30 @@ gets a browser check; 8 is a stretch.
   ~10-minute change: `git rm` the 8 files (the 2 untracked ones just get deleted),
   drop their catalog entries, `python3 corpus.py build`, update branding, verify.
 
-- Aside from FLAG 1, **nothing else blocks the plan.** If Phase 3's index
-  measurement comes back larger than ~1 MB gzipped, I'll *keep the presence-only
-  index* rather than blow the size budget — a fallback within the plan, not a
-  constraint crossing.
+- **FLAG 2 — service worker for offline reading (Phase 8) crosses the
+  single-file constraint, so it's designed here, not built.** A service worker
+  must, by web spec, live in its own top-level script (e.g. `sw.js`) — it cannot
+  be inlined in index.html. That crosses the soft "single index.html / no
+  external JS files" constraint, so per the working rules it is flagged for
+  sign-off rather than implemented. The case for crossing: offline reading is
+  genuinely valuable for a corpus of primary texts (read on a plane, in the
+  field, with no connection), the content is immutable and public-domain (ideal
+  for aggressive caching), and vercel.json already serves .txt as
+  `immutable`. **Recommended design** (drop-in once approved):
+  - `sw.js`: on `install`, precache the app shell — `/`, `index.html`,
+    `favicon.svg`, `catalog-summary.json`, `catalog.json`, `search-index.json`
+    (~2.5 MB, mostly the index). On `fetch`, serve `.txt` cache-first (they're
+    immutable) and everything else stale-while-revalidate. Version the cache
+    name and delete old caches on `activate` so a redeploy can't get stuck stale.
+  - In index.html, a ~5-line `navigator.serviceWorker.register('/sw.js')` guard.
+  - Net: full offline reading of any already-opened text plus instant repeat
+    loads, no CDN, no tracking, one new ~40-line file. If you'd rather hold the
+    single-file line absolutely, the app already works fully online without it —
+    this is purely additive.
+
+- Aside from FLAG 1 and FLAG 2, **nothing else blocks the plan**, and both index
+  size (0.70 MB gzip, under the ~1 MB budget) and the single-file frontend line
+  held without needing any other crossing.
 
 **Local decisions recorded (reversible, non-destructive, within constraints):**
 - *eucharist-b orphan* (`abrahamic/nag-hammadi-on-the-eucharist-b.txt`, 451 B, on
