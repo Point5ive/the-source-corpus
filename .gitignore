@@ -1,16 +1,29 @@
-# Ancient texts collection
-# Ignore non-text artifacts, scripts, embedded repos, duplicates
-*.json
-*.html
-*.xhtml
-*.pdf
-*.sh
-*.py.bak
-*.js
-**/.git/
-deuterocanonical/
-enoch-repo/
+# Ancient texts collection — ignore non-corpus artifacts, not by broad extension
+__pycache__/
+.vercel/
 manifest.json
+
+# Embedded/duplicate source dumps
+abrahamic/deuterocanonical/
+abrahamic/enoch-repo/
+
+# Stray scrape artifacts (not corpus texts, not catalog/app files)
+abrahamic/*.json
+eastern/*.json
+abrahamic/*.html
+eastern/*.html
+mythology/*.html
+abrahamic/*.js
+eastern/*.xhtml
+mythology/*.xhtml
+eastern/*.pdf
+esoteric/*.sh
+esoteric/download_zohar.py
+esoteric/strip_html.py
+abrahamic/nag-hammadi-README.md
+*.py.bak
+
+# Duplicate/archive/backup text dumps
 *.wiki3.txt
 *_arch-gut.txt
 *_arch3.txt

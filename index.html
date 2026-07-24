@@ -5,6 +5,30 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>The Source Corpus — Humanity's Wisdom Traditions</title>
 <meta name="description" content="159 primary texts. 13 million words. Every major world tradition. Unmediated. Free.">
+<link rel="canonical" href="https://ancient-texts-weld.vercel.app/">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="The Source Corpus">
+<meta property="og:title" content="The Source Corpus — Humanity's Wisdom Traditions">
+<meta property="og:description" content="159 primary texts. 13 million words. Every major world tradition. Unmediated. Free.">
+<meta property="og:url" content="https://ancient-texts-weld.vercel.app/">
+<meta property="og:image" content="https://ancient-texts-weld.vercel.app/favicon.svg">
+
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="The Source Corpus — Humanity's Wisdom Traditions">
+<meta name="twitter:description" content="159 primary texts. 13 million words. Every major world tradition. Unmediated. Free.">
+<meta name="twitter:image" content="https://ancient-texts-weld.vercel.app/favicon.svg">
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": "The Source Corpus",
+  "description": "159 primary texts. 13 million words. Every major world tradition. Unmediated. Free.",
+  "url": "https://ancient-texts-weld.vercel.app/"
+}
+</script>
 <style>
 :root {
   --bg: #0a0e1a;
@@ -282,11 +306,11 @@ body::after {
     <aside class="sidebar">
       <div class="nav-section">
         <div class="nav-label">Traditions</div>
-        <div class="nav-item active" onclick="filterCategory('all')">All Texts <span class="count" id="countAll">159</span></div>
-        <div class="nav-item" onclick="filterCategory('abrahamic')">Abrahamic <span class="count" id="countAbrahamic">90</span></div>
-        <div class="nav-item" onclick="filterCategory('eastern')">Eastern <span class="count" id="countEastern">33</span></div>
-        <div class="nav-item" onclick="filterCategory('esoteric')">Esoteric <span class="count" id="countEsoteric">11</span></div>
-        <div class="nav-item" onclick="filterCategory('mythology')">Mythology <span class="count" id="countMythology">25</span></div>
+        <div class="nav-item active" onclick="filterCategory('all', event)">All Texts <span class="count" id="countAll">159</span></div>
+        <div class="nav-item" onclick="filterCategory('abrahamic', event)">Abrahamic <span class="count" id="countAbrahamic">90</span></div>
+        <div class="nav-item" onclick="filterCategory('eastern', event)">Eastern <span class="count" id="countEastern">33</span></div>
+        <div class="nav-item" onclick="filterCategory('esoteric', event)">Esoteric <span class="count" id="countEsoteric">11</span></div>
+        <div class="nav-item" onclick="filterCategory('mythology', event)">Mythology <span class="count" id="countMythology">25</span></div>
       </div>
     </aside>
 
@@ -311,6 +335,7 @@ body::after {
 
 <script>
 let catalog = null;
+let searchIndex = null;
 let currentFilter = 'all';
 let textCache = {};
 
@@ -320,6 +345,58 @@ async function loadCatalog() {
   document.getElementById('statTexts').textContent = catalog.total_texts;
   document.getElementById('statWords').textContent = (catalog.total_words / 1e6).toFixed(1) + 'M';
   renderTexts();
+}
+
+async function loadSearchIndex() {
+  try {
+    const res = await fetch('search-index.json');
+    searchIndex = await res.json();
+  } catch (e) {
+    searchIndex = null; // full-text index unavailable — search falls back to titles/previews
+  }
+}
+
+// Strip Project Gutenberg header/footer boilerplate and wiki markup so the
+// reader shows the text itself, not the scrape artifacts around it.
+function cleanText(raw) {
+  let text = raw;
+
+  const start = text.match(/\*\*\*\s*START OF (?:THIS |THE )?PROJECT GUTENBERG[^\n]*\*\*\*/i);
+  if (start) text = text.slice(start.index + start[0].length);
+  const end = text.match(/\*\*\*\s*END OF (?:THIS |THE )?PROJECT GUTENBERG[^\n]*\*\*\*/i);
+  if (end) text = text.slice(0, end.index);
+
+  text = text
+    .replace(/\{\{[^{}]*\}\}/g, '')
+    .replace(/\[\[([^\]|]*)\|([^\]]*)\]\]/g, '$2')
+    .replace(/\[\[([^\]]*)\]\]/g, '$1')
+    .replace(/\n{3,}/g, '\n\n');
+
+  return text.trim();
+}
+
+async function ensureTextLoaded(id) {
+  if (textCache[id]) return textCache[id];
+  const text = catalog.texts.find(t => t.id === id);
+  if (!text) return null;
+  try {
+    const res = await fetch(text.path);
+    textCache[id] = cleanText(await res.text());
+  } catch (e) {
+    try {
+      const res = await fetch(encodeURIComponent(text.path));
+      textCache[id] = cleanText(await res.text());
+    } catch (e2) {
+      return null;
+    }
+  }
+  return textCache[id];
+}
+
+function tokenizeQuery(query) {
+  const STOPWORDS = new Set(['the','and','of','to','a','in','is','it','that','this','for','on','with','as','was','were']);
+  return (query.toLowerCase().match(/[a-z']+/g) || [])
+    .filter(w => w.length > 2 && !STOPWORDS.has(w));
 }
 
 function renderTexts() {
@@ -341,10 +418,10 @@ function renderTexts() {
   `).join('');
 }
 
-function filterCategory(cat) {
+function filterCategory(cat, evt) {
   currentFilter = cat;
   document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-  event.currentTarget.classList.add('active');
+  evt.currentTarget.classList.add('active');
   showBrowse();
   renderTexts();
 }
@@ -374,24 +451,13 @@ async function openReader(id) {
   const content = document.getElementById('readerContent');
   content.innerHTML = '<div style="color:var(--text-faint)">Loading...</div>';
 
-  // Load text file
-  if (!textCache[id]) {
-    try {
-      const res = await fetch(text.path);
-      textCache[id] = await res.text();
-    } catch(e) {
-      // Try alternate path encoding
-      try {
-        const res = await fetch(encodeURIComponent(text.path));
-        textCache[id] = await res.text();
-      } catch(e2) {
-        content.innerHTML = '<div style="color:#ef4444">Failed to load text. The file may need to be served from the same directory as this app.</div>';
-        return;
-      }
-    }
+  const loaded = await ensureTextLoaded(id);
+  if (loaded === null) {
+    content.innerHTML = '<div style="color:#ef4444">Failed to load text. The file may need to be served from the same directory as this app.</div>';
+    return;
   }
 
-  content.textContent = textCache[id];
+  content.textContent = loaded;
 }
 
 function closeReader() {
@@ -413,44 +479,48 @@ document.getElementById('searchInput').addEventListener('input', (e) => {
 });
 
 async function doSearch(query) {
-  // First search in previews (fast)
-  const previewMatches = catalog.texts.filter(t =>
-    t.title.toLowerCase().includes(query.toLowerCase()) ||
-    t.preview.toLowerCase().includes(query.toLowerCase())
-  );
-
-  // Then search in full text (loaded ones)
-  const fullTextMatches = [];
-  for (const id in textCache) {
-    const text = catalog.texts.find(t => t.id === id);
-    if (!text) continue;
-    const content = textCache[id].toLowerCase();
-    const idx = content.indexOf(query.toLowerCase());
-    if (idx !== -1) {
-      const start = Math.max(0, idx - 100);
-      const end = Math.min(content.length, idx + query.length + 100);
-      const context = textCache[id].substring(start, end);
-      fullTextMatches.push({ text, context, index: idx });
-    }
-  }
-
-  // Combine results — title matches first, then full-text, then preview
+  const qLower = query.toLowerCase();
   const seen = new Set();
   const results = [];
 
-  // Title matches first
-  for (const t of previewMatches.filter(t => t.title.toLowerCase().includes(query.toLowerCase()))) {
-    if (!seen.has(t.id)) { seen.add(t.id); results.push({ text: t, context: t.preview }); }
+  // Title matches first (strongest signal)
+  for (const t of catalog.texts) {
+    if (t.title.toLowerCase().includes(qLower)) {
+      seen.add(t.id);
+      results.push({ text: t, context: t.preview });
+    }
   }
 
-  // Full-text matches
-  for (const m of fullTextMatches) {
-    if (!seen.has(m.text.id)) { seen.add(m.text.id); results.push(m); }
+  // Full-text matches via the prebuilt search index — instant, across all 159 texts
+  const queryTerms = tokenizeQuery(query);
+  if (searchIndex && queryTerms.length) {
+    const N = searchIndex.docs.length;
+    const scores = new Map();
+    for (const term of queryTerms) {
+      const postings = searchIndex.index[term];
+      if (!postings) continue;
+      const idf = Math.log(N / postings.length);
+      for (const docIdx of postings) scores.set(docIdx, (scores.get(docIdx) || 0) + idf);
+    }
+    const ranked = [...scores.entries()].sort((a, b) => b[1] - a[1]);
+    for (const [docIdx] of ranked) {
+      const id = searchIndex.docs[docIdx];
+      if (seen.has(id)) continue;
+      const t = catalog.texts.find(x => x.id === id);
+      if (!t) continue;
+      seen.add(id);
+      results.push({ text: t, context: null }); // context filled in lazily below
+      if (results.length >= 40) break;
+    }
   }
 
-  // Preview matches (non-title)
-  for (const t of previewMatches) {
-    if (!seen.has(t.id)) { seen.add(t.id); results.push({ text: t, context: t.preview }); }
+  // Preview matches (catalog-only fallback, e.g. short/stopword queries)
+  for (const t of catalog.texts) {
+    if (seen.has(t.id)) continue;
+    if (t.preview.toLowerCase().includes(qLower)) {
+      seen.add(t.id);
+      results.push({ text: t, context: t.preview });
+    }
   }
 
   // Switch to search view
@@ -461,29 +531,49 @@ async function doSearch(query) {
 
   const list = document.getElementById('searchResultsList');
   if (results.length === 0) {
-    list.innerHTML = '<div class="empty">No results found. Try a different term — or load more texts to search their full content.</div>';
+    list.innerHTML = '<div class="empty">No results found. Try a different term.</div>';
     return;
   }
 
-  const qLower = query.toLowerCase();
-  list.innerHTML = `<div style="color:var(--text-faint);font-size:13px;margin-bottom:16px">${results.length} result${results.length>1?'s':''}</div>` +
-    results.map(r => {
-      const highlighted = highlightText(r.context, query);
-      return `
-        <div class="search-result" onclick="openReader('${r.text.id}')">
-          <div class="search-result-title">${r.text.title}</div>
-          <div class="text-meta">
-            <span class="badge">${r.text.tradition}</span>
-            <span>${r.text.word_count.toLocaleString()} words</span>
-          </div>
-          <div class="search-result-context">...${highlighted}...</div>
+  list.innerHTML = `<div style="color:var(--text-faint);font-size:13px;margin-bottom:16px">${results.length} result${results.length > 1 ? 's' : ''}</div>` +
+    results.map(r => `
+      <div class="search-result" onclick="openReader('${r.text.id}')">
+        <div class="search-result-title">${r.text.title}</div>
+        <div class="text-meta">
+          <span class="badge">${r.text.tradition}</span>
+          <span>${r.text.word_count.toLocaleString()} words</span>
         </div>
-      `;
-    }).join('');
+        <div class="search-result-context" data-context-for="${r.text.id}">${
+          r.context !== null ? '...' + highlightText(r.context, query) + '...' : 'Loading excerpt&hellip;'
+        }</div>
+      </div>
+    `).join('');
+
+  // Fetch excerpts for full-text-only matches (bounded — avoid a fetch storm)
+  const needsContext = results.filter(r => r.context === null).slice(0, 20);
+  for (const r of needsContext) {
+    const content = await ensureTextLoaded(r.text.id);
+    const el = list.querySelector(`[data-context-for="${r.text.id}"]`);
+    if (!el) continue;
+    if (!content) { el.textContent = r.text.preview; continue; }
+    const contentLower = content.toLowerCase();
+    let anchor = contentLower.indexOf(qLower);
+    if (anchor === -1) {
+      for (const term of queryTerms) {
+        anchor = contentLower.indexOf(term);
+        if (anchor !== -1) break;
+      }
+    }
+    if (anchor === -1) { el.textContent = r.text.preview; continue; }
+    const start = Math.max(0, anchor - 100);
+    const end = Math.min(content.length, anchor + qLower.length + 100);
+    el.innerHTML = '...' + highlightText(content.substring(start, end), query) + '...';
+  }
 }
 
 function highlightText(text, query) {
-  const regex = new RegExp('(' + escapeRegex(query) + ')', 'gi');
+  const terms = [query, ...tokenizeQuery(query)].filter(Boolean).map(escapeRegex);
+  const regex = new RegExp('(' + [...new Set(terms)].join('|') + ')', 'gi');
   return escapeHtml(text).replace(regex, '<mark>$1</mark>');
 }
 
@@ -493,6 +583,7 @@ function escapeHtml(s) {
 }
 
 loadCatalog();
+loadSearchIndex();
 </script>
 </body>
 </html>

@@ -10,9 +10,21 @@ Usage:
 """
 
 import sys, os, json, re, argparse
+from collections import defaultdict
 
 CORPUS_ROOT = os.path.dirname(os.path.abspath(__file__))
 CATALOG_PATH = os.path.join(CORPUS_ROOT, "catalog.json")
+SEARCH_INDEX_PATH = os.path.join(CORPUS_ROOT, "search-index.json")
+
+STOPWORDS = set("""
+the and of to a in is it that this for on with as was were be by an at or
+which from his her their its they he she we you i not but if all any so
+than then there here when where who whom whose what how why can could
+would should will shall may might must do does did done have has had
+also very more most such into out up down over under again further
+these those am are been being other some no nor own too thou thee
+thy ye unto shalt hath one upon
+""".split())
 
 def load_catalog():
     with open(CATALOG_PATH) as f:
@@ -117,6 +129,45 @@ def cmd_read(catalog, query):
     with open(fp, 'r', errors='ignore') as f:
         print(f.read())
 
+def tokenize(text):
+    return re.findall(r"[a-z']+", text.lower())
+
+MIN_DOC_FREQUENCY = 2  # a word must appear in >=2 texts to make the index — see note below
+
+def cmd_build_index(catalog):
+    doc_sets = defaultdict(set)
+    docs = []
+
+    for doc_idx, t in enumerate(catalog['texts']):
+        docs.append(t['id'])
+        fp = os.path.join(CORPUS_ROOT, t['path'])
+        with open(fp, 'r', errors='ignore') as f:
+            content = f.read()
+
+        for w in tokenize(content):
+            if len(w) > 2 and w not in STOPWORDS:
+                doc_sets[w].add(doc_idx)
+
+    # Full per-doc term frequency (for real TF-IDF) makes the index ~6MB —
+    # far past the 2MB budget for a corpus this size. Storing presence only
+    # (which texts contain the word, not how often) keeps the index small
+    # while still answering the question the search bar exists to answer:
+    # "which of these 159 texts mention this term?". Words confined to a
+    # single text (typos, OCR noise, one-off proper nouns) are dropped —
+    # they're findable via title/preview search or in-reader browser find.
+    inverted = {w: sorted(ds) for w, ds in doc_sets.items() if len(ds) >= MIN_DOC_FREQUENCY}
+
+    out = {
+        "docs": docs,
+        "index": inverted,
+    }
+    with open(SEARCH_INDEX_PATH, 'w') as f:
+        json.dump(out, f, separators=(',', ':'), ensure_ascii=False)
+
+    size_mb = os.path.getsize(SEARCH_INDEX_PATH) / (1024 * 1024)
+    print(f"Wrote {SEARCH_INDEX_PATH}")
+    print(f"  {len(inverted):,} unique words, {len(docs)} docs, {size_mb:.2f} MB")
+
 def main():
     parser = argparse.ArgumentParser(description='The Source Corpus CLI')
     subparsers = parser.add_subparsers(dest='command')
@@ -132,7 +183,9 @@ def main():
     
     p_read = subparsers.add_parser('read', help='Read a text by title')
     p_read.add_argument('title', help='Text title (partial match)')
-    
+
+    p_build_index = subparsers.add_parser('build-index', help='Build the client-side search index')
+
     args = parser.parse_args()
     catalog = load_catalog()
     
@@ -144,6 +197,8 @@ def main():
         cmd_search(catalog, args.query, args.max)
     elif args.command == 'read':
         cmd_read(catalog, args.title)
+    elif args.command == 'build-index':
+        cmd_build_index(catalog)
     else:
         parser.print_help()
 
