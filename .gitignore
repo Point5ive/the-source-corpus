@@ -1,0 +1,23 @@
+# Ancient texts collection
+# Ignore non-text artifacts, scripts, embedded repos, duplicates
+*.json
+*.html
+*.xhtml
+*.pdf
+*.sh
+*.py.bak
+*.js
+**/.git/
+deuterocanonical/
+enoch-repo/
+manifest.json
+*.wiki3.txt
+*_arch-gut.txt
+*_arch3.txt
+*_arch5.txt
+*_archive2.txt
+*_missing.txt
+*wayback*
+tibetan-wb*
+tibetan-st*
+tibetan-archive*
