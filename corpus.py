@@ -415,26 +415,64 @@ def cmd_rebuild_catalog(catalog: dict[str, Any]) -> None:
     print(f"Wrote {CATALOG_SUMMARY_PATH} ({os.path.getsize(CATALOG_SUMMARY_PATH)/1024:.0f} KB)")
 
 
+def _tf_code(tf: int) -> int:
+    """Log-quantize a raw term frequency into a small monotonic code (1..63).
+    BM25 saturates tf anyway, so geometric buckets cost almost no ranking quality
+    while keeping the JSON integers tiny. Reconstruct with tf ~= 2**(code-1)."""
+    return min(63, tf.bit_length())  # bit_length(1)=1, (2..3)=2, (4..7)=3, ...
+
+
 def cmd_build_index(catalog: dict[str, Any]) -> None:
-    """Presence-based inverted index built from CLEANED text, so MediaWiki/
-    Gutenberg scaffolding tokens never enter the vocabulary."""
-    doc_sets: dict[str, set[int]] = defaultdict(set)
+    """Inverted index (v2) built from CLEANED text with per-posting quantized
+    term frequency + per-doc length, enabling real BM25 ranking client-side.
+
+    Postings are stored as a flat, delta-encoded array per term:
+        index[word] = [doc0, code0, ddoc1, code1, ddoc2, code2, ...]
+    where ddoc is the gap from the previous doc id (smaller ints -> better gzip)
+    and code is the log-quantized tf. `doclen`/`avglen` drive length
+    normalization. Source .txt files are never read raw here — cleaning first
+    keeps scaffolding tokens out of the vocabulary and out of IDF."""
+    tf_maps: dict[str, dict[int, int]] = defaultdict(dict)
     docs: list[str] = []
+    doclen: list[int] = []
 
     for doc_idx, t, cleaned in _iter_cleaned(catalog):
         docs.append(t["id"])
+        counts: dict[str, int] = defaultdict(int)
+        n = 0
         for w in tokenize(cleaned):
             if len(w) > 2 and w not in STOPWORDS:
-                doc_sets[w].add(doc_idx)
+                counts[w] += 1
+                n += 1
+        doclen.append(n)
+        for w, c in counts.items():
+            tf_maps[w][doc_idx] = c
 
-    inverted = {
-        w: sorted(ds) for w, ds in doc_sets.items() if len(ds) >= MIN_DOC_FREQUENCY
+    index: dict[str, list[int]] = {}
+    for w, docmap in tf_maps.items():
+        if len(docmap) < MIN_DOC_FREQUENCY:
+            continue
+        flat: list[int] = []
+        prev = 0
+        for d in sorted(docmap):
+            flat.append(d - prev)
+            flat.append(_tf_code(docmap[d]))
+            prev = d
+        index[w] = flat
+
+    avglen = sum(doclen) / len(doclen) if doclen else 0
+    out = {
+        "v": 2,
+        "docs": docs,
+        "doclen": doclen,
+        "avglen": round(avglen, 1),
+        "index": index,
     }
-    write_json(SEARCH_INDEX_PATH, {"docs": docs, "index": inverted}, compact=True)
+    write_json(SEARCH_INDEX_PATH, out, compact=True)
 
     size_mb = os.path.getsize(SEARCH_INDEX_PATH) / (1024 * 1024)
     print(f"Wrote {SEARCH_INDEX_PATH}")
-    print(f"  {len(inverted):,} unique words, {len(docs)} docs, {size_mb:.2f} MB")
+    print(f"  {len(index):,} unique words, {len(docs)} docs, {size_mb:.2f} MB raw")
 
 
 def cmd_build(catalog: dict[str, Any]) -> None:

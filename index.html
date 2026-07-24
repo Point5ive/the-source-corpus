@@ -399,6 +399,33 @@ function tokenizeQuery(query) {
     .filter(w => w.length > 2 && !STOPWORDS.has(w));
 }
 
+// BM25 ranking over the v2 search index. Postings for a term are a flat array
+// [doc0, code0, ddoc1, code1, ...] where ddoc is the gap from the previous doc
+// id and code is a log-quantized term frequency (tf ≈ 2^(code-1)).
+const BM25_K1 = 1.2, BM25_B = 0.5;
+function bm25Rank(queryTerms) {
+  const idx = searchIndex.index;
+  const N = searchIndex.docs.length;
+  const doclen = searchIndex.doclen;
+  const avglen = searchIndex.avglen || 1;
+  const scores = new Map();
+  for (const term of queryTerms) {
+    const flat = idx[term];
+    if (!flat) continue;
+    const df = flat.length / 2;
+    const idf = Math.log(1 + (N - df + 0.5) / (df + 0.5));
+    let d = 0;
+    for (let i = 0; i < flat.length; i += 2) {
+      d += flat[i];
+      const tf = Math.pow(2, flat[i + 1] - 1);
+      const len = (doclen && doclen[d]) || avglen;
+      const denom = tf + BM25_K1 * (1 - BM25_B + BM25_B * len / avglen);
+      scores.set(d, (scores.get(d) || 0) + idf * (tf * (BM25_K1 + 1)) / denom);
+    }
+  }
+  return [...scores.entries()].sort((a, b) => b[1] - a[1]);
+}
+
 function renderTexts() {
   const grid = document.getElementById('textGrid');
   const texts = currentFilter === 'all'
@@ -491,18 +518,12 @@ async function doSearch(query) {
     }
   }
 
-  // Full-text matches via the prebuilt search index — instant, across all 159 texts
+  // Full-text matches via the prebuilt search index — instant, across all 159
+  // texts, ranked by BM25 over the v2 index (delta-encoded postings carrying a
+  // log-quantized term frequency, plus per-doc lengths for normalization).
   const queryTerms = tokenizeQuery(query);
   if (searchIndex && queryTerms.length) {
-    const N = searchIndex.docs.length;
-    const scores = new Map();
-    for (const term of queryTerms) {
-      const postings = searchIndex.index[term];
-      if (!postings) continue;
-      const idf = Math.log(N / postings.length);
-      for (const docIdx of postings) scores.set(docIdx, (scores.get(docIdx) || 0) + idf);
-    }
-    const ranked = [...scores.entries()].sort((a, b) => b[1] - a[1]);
+    const ranked = bm25Rank(queryTerms);
     for (const [docIdx] of ranked) {
       const id = searchIndex.docs[docIdx];
       if (seen.has(id)) continue;
