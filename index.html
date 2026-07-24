@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Source Corpus — Humanity's Wisdom Traditions</title>
+<meta name="description" content="159 primary texts. 13 million words. Every major world tradition. Unmediated. Free.">
+<style>
+:root {
+  --bg: #0a0e1a;
+  --bg-card: #111729;
+  --bg-hover: #1a2138;
+  --text: #e2e8f0;
+  --text-dim: #94a3b8;
+  --text-faint: #64748b;
+  --accent: #06b6d4;
+  --accent-dim: #0e7490;
+  --violet: #8b5cf6;
+  --border: #1e293b;
+  --radius: 8px;
+  --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  --mono: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+.container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+
+/* Header */
+header {
+  border-bottom: 1px solid var(--border);
+  padding: 20px 0;
+  position: sticky; top: 0;
+  background: rgba(10,14,26,0.95);
+  backdrop-filter: blur(12px);
+  z-index: 100;
+}
+.header-inner { display: flex; align-items: center; justify-content: space-between; gap: 24px; }
+.logo { display: flex; align-items: center; gap: 12px; cursor: pointer; }
+.logo-mark {
+  width: 32px; height: 32px;
+  border: 2px solid var(--accent);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  position: relative;
+}
+.logo-mark::after {
+  content: ''; position: absolute;
+  width: 8px; height: 8px;
+  background: var(--accent);
+  border-radius: 50%;
+}
+.logo-text { font-size: 18px; font-weight: 600; letter-spacing: -0.3px; }
+.logo-text span { color: var(--accent); }
+
+/* Search */
+.search-wrap { flex: 1; max-width: 500px; position: relative; }
+.search-input {
+  width: 100%;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text);
+  padding: 10px 16px 10px 40px;
+  font-size: 14px;
+  font-family: var(--font);
+  outline: none;
+  transition: border-color 0.2s;
+}
+.search-input:focus { border-color: var(--accent-dim); }
+.search-input::placeholder { color: var(--text-faint); }
+.search-icon {
+  position: absolute; left: 14px; top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-faint);
+  font-size: 14px;
+}
+
+/* Stats */
+.stats { display: flex; gap: 20px; font-size: 13px; color: var(--text-dim); }
+.stats b { color: var(--accent); font-weight: 600; }
+
+/* Layout */
+.layout { display: grid; grid-template-columns: 240px 1fr; gap: 24px; padding: 24px 0; }
+
+/* Sidebar */
+.sidebar { position: sticky; top: 80px; max-height: calc(100vh - 100px); overflow-y: auto; }
+.nav-section { margin-bottom: 24px; }
+.nav-label {
+  font-size: 11px; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 1px;
+  color: var(--text-faint);
+  margin-bottom: 8px; padding-left: 12px;
+}
+.nav-item {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 8px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  color: var(--text-dim);
+  transition: all 0.15s;
+}
+.nav-item:hover { background: var(--bg-card); color: var(--text); }
+.nav-item.active { background: var(--bg-card); color: var(--accent); }
+.nav-item .count {
+  font-size: 11px; color: var(--text-faint);
+  background: var(--bg);
+  padding: 2px 8px; border-radius: 10px;
+}
+
+/* Content */
+.content { min-height: 60vh; }
+
+/* Text cards */
+.text-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 16px; }
+.text-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+  overflow: hidden;
+}
+.text-card:hover { border-color: var(--accent-dim); background: var(--bg-hover); }
+.text-card::before {
+  content: ''; position: absolute;
+  top: 0; left: 0; width: 3px; height: 100%;
+  background: var(--accent);
+  opacity: 0; transition: opacity 0.2s;
+}
+.text-card:hover::before { opacity: 0.6; }
+.text-title { font-size: 15px; font-weight: 600; margin-bottom: 6px; }
+.text-meta { display: flex; gap: 12px; font-size: 12px; color: var(--text-faint); margin-bottom: 8px; }
+.text-meta .badge {
+  background: var(--bg);
+  padding: 2px 8px; border-radius: 4px;
+  color: var(--text-dim);
+}
+.text-preview {
+  font-size: 13px; color: var(--text-dim);
+  line-height: 1.5;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Reader view */
+.reader { display: none; }
+.reader.active { display: block; }
+.reader-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 20px;
+}
+.reader-back {
+  background: none; border: none; color: var(--text-dim);
+  cursor: pointer; font-size: 14px;
+  display: flex; align-items: center; gap: 6px;
+}
+.reader-back:hover { color: var(--accent); }
+.reader-title { font-size: 22px; font-weight: 700; }
+.reader-meta { font-size: 13px; color: var(--text-faint); margin-bottom: 20px; }
+.reader-content {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 32px 40px;
+  font-size: 15px;
+  line-height: 1.8;
+  max-height: calc(100vh - 280px);
+  overflow-y: auto;
+  white-space: pre-wrap;
+  font-family: 'Georgia', 'Times New Roman', serif;
+}
+.reader-content mark {
+  background: rgba(6,182,212,0.25);
+  color: var(--accent);
+  border-radius: 2px;
+  padding: 0 2px;
+}
+
+/* Search results */
+.search-results { display: none; }
+.search-results.active { display: block; }
+.search-result {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px 20px;
+  margin-bottom: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.search-result:hover { border-color: var(--accent-dim); }
+.search-result-title { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+.search-result-context {
+  font-size: 13px; color: var(--text-dim);
+  line-height: 1.5;
+}
+.search-result-context mark {
+  background: rgba(6,182,212,0.25); color: var(--accent);
+  border-radius: 2px; padding: 0 2px;
+}
+
+/* Empty state */
+.empty { text-align: center; padding: 60px 20px; color: var(--text-faint); }
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--text-faint); }
+
+/* Film grain */
+body::after {
+  content: ''; position: fixed; top: 0; left: 0;
+  width: 100%; height: 100%;
+  pointer-events: none; z-index: 9999;
+  opacity: 0.015;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .layout { grid-template-columns: 1fr; }
+  .sidebar { position: static; max-height: none; }
+  .stats { display: none; }
+  .text-grid { grid-template-columns: 1fr; }
+  .reader-content { padding: 20px; font-size: 14px; }
+}
+
+/* Hero */
+.hero {
+  padding: 40px 0 20px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 0;
+}
+.hero h1 {
+  font-size: 28px; font-weight: 700;
+  letter-spacing: -0.5px;
+  margin-bottom: 8px;
+}
+.hero h1 span { color: var(--accent); }
+.hero p { color: var(--text-dim); font-size: 15px; max-width: 600px; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="container header-inner">
+    <div class="logo" onclick="showBrowse()">
+      <div class="logo-mark"></div>
+      <div class="logo-text">The Source <span>Corpus</span></div>
+    </div>
+    <div class="search-wrap">
+      <span class="search-icon">&#128269;</span>
+      <input class="search-input" id="searchInput" placeholder="Search across 159 texts, 13 million words..." />
+    </div>
+    <div class="stats">
+      <span><b id="statTexts">159</b> texts</span>
+      <span><b id="statWords">13M</b> words</span>
+      <span><b id="statCats">4</b> traditions</span>
+    </div>
+  </div>
+</header>
+
+<div class="container">
+  <div class="hero" id="hero">
+    <h1>Humanity's wisdom, <span>unmediated</span></h1>
+    <p>159 primary texts spanning every major world tradition. From the Rig Veda to the Nag Hammadi codices, from Gilgamesh to the Zohar. Not summaries. Not interpretations. The actual texts.</p>
+  </div>
+
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="nav-section">
+        <div class="nav-label">Traditions</div>
+        <div class="nav-item active" onclick="filterCategory('all')">All Texts <span class="count" id="countAll">159</span></div>
+        <div class="nav-item" onclick="filterCategory('abrahamic')">Abrahamic <span class="count" id="countAbrahamic">90</span></div>
+        <div class="nav-item" onclick="filterCategory('eastern')">Eastern <span class="count" id="countEastern">33</span></div>
+        <div class="nav-item" onclick="filterCategory('esoteric')">Esoteric <span class="count" id="countEsoteric">11</span></div>
+        <div class="nav-item" onclick="filterCategory('mythology')">Mythology <span class="count" id="countMythology">25</span></div>
+      </div>
+    </aside>
+
+    <main class="content">
+      <div id="browseView">
+        <div class="text-grid" id="textGrid"></div>
+      </div>
+      <div id="readerView" class="reader">
+        <div class="reader-header">
+          <button class="reader-back" onclick="closeReader()">&#8592; Back to corpus</button>
+        </div>
+        <div class="reader-title" id="readerTitle"></div>
+        <div class="reader-meta" id="readerMeta"></div>
+        <div class="reader-content" id="readerContent"></div>
+      </div>
+      <div id="searchView" class="search-results">
+        <div id="searchResultsList"></div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<script>
+let catalog = null;
+let currentFilter = 'all';
+let textCache = {};
+
+async function loadCatalog() {
+  const res = await fetch('catalog.json');
+  catalog = await res.json();
+  document.getElementById('statTexts').textContent = catalog.total_texts;
+  document.getElementById('statWords').textContent = (catalog.total_words / 1e6).toFixed(1) + 'M';
+  renderTexts();
+}
+
+function renderTexts() {
+  const grid = document.getElementById('textGrid');
+  const texts = currentFilter === 'all'
+    ? catalog.texts
+    : catalog.texts.filter(t => t.category === currentFilter);
+
+  grid.innerHTML = texts.map(t => `
+    <div class="text-card" onclick="openReader('${t.id}')">
+      <div class="text-title">${t.title}</div>
+      <div class="text-meta">
+        <span class="badge">${t.tradition}</span>
+        <span>${t.size_human}</span>
+        <span>${t.word_count.toLocaleString()} words</span>
+      </div>
+      <div class="text-preview">${escapeHtml(t.preview)}</div>
+    </div>
+  `).join('');
+}
+
+function filterCategory(cat) {
+  currentFilter = cat;
+  document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+  event.currentTarget.classList.add('active');
+  showBrowse();
+  renderTexts();
+}
+
+function showBrowse() {
+  document.getElementById('browseView').style.display = 'block';
+  document.getElementById('readerView').classList.remove('active');
+  document.getElementById('searchView').classList.remove('active');
+  document.getElementById('hero').style.display = 'block';
+}
+
+async function openReader(id) {
+  const text = catalog.texts.find(t => t.id === id);
+  if (!text) return;
+
+  document.getElementById('browseView').style.display = 'none';
+  document.getElementById('searchView').classList.remove('active');
+  document.getElementById('readerView').classList.add('active');
+  document.getElementById('hero').style.display = 'none';
+
+  document.getElementById('readerTitle').textContent = text.title;
+  document.getElementById('readerMeta').innerHTML = `
+    <strong>${text.tradition}</strong> &middot; ${text.size_human} &middot; ${text.word_count.toLocaleString()} words &middot;
+    <span style="font-family:var(--mono);font-size:11px">SHA256: ${text.sha256.substring(0,16)}...</span>
+  `;
+
+  const content = document.getElementById('readerContent');
+  content.innerHTML = '<div style="color:var(--text-faint)">Loading...</div>';
+
+  // Load text file
+  if (!textCache[id]) {
+    try {
+      const res = await fetch(text.path);
+      textCache[id] = await res.text();
+    } catch(e) {
+      // Try alternate path encoding
+      try {
+        const res = await fetch(encodeURIComponent(text.path));
+        textCache[id] = await res.text();
+      } catch(e2) {
+        content.innerHTML = '<div style="color:#ef4444">Failed to load text. The file may need to be served from the same directory as this app.</div>';
+        return;
+      }
+    }
+  }
+
+  content.textContent = textCache[id];
+}
+
+function closeReader() {
+  showBrowse();
+}
+
+// Search
+let searchTimer = null;
+document.getElementById('searchInput').addEventListener('input', (e) => {
+  clearTimeout(searchTimer);
+  const query = e.target.value.trim();
+
+  if (query.length < 2) {
+    showBrowse();
+    return;
+  }
+
+  searchTimer = setTimeout(() => doSearch(query), 300);
+});
+
+async function doSearch(query) {
+  // First search in previews (fast)
+  const previewMatches = catalog.texts.filter(t =>
+    t.title.toLowerCase().includes(query.toLowerCase()) ||
+    t.preview.toLowerCase().includes(query.toLowerCase())
+  );
+
+  // Then search in full text (loaded ones)
+  const fullTextMatches = [];
+  for (const id in textCache) {
+    const text = catalog.texts.find(t => t.id === id);
+    if (!text) continue;
+    const content = textCache[id].toLowerCase();
+    const idx = content.indexOf(query.toLowerCase());
+    if (idx !== -1) {
+      const start = Math.max(0, idx - 100);
+      const end = Math.min(content.length, idx + query.length + 100);
+      const context = textCache[id].substring(start, end);
+      fullTextMatches.push({ text, context, index: idx });
+    }
+  }
+
+  // Combine results — title matches first, then full-text, then preview
+  const seen = new Set();
+  const results = [];
+
+  // Title matches first
+  for (const t of previewMatches.filter(t => t.title.toLowerCase().includes(query.toLowerCase()))) {
+    if (!seen.has(t.id)) { seen.add(t.id); results.push({ text: t, context: t.preview }); }
+  }
+
+  // Full-text matches
+  for (const m of fullTextMatches) {
+    if (!seen.has(m.text.id)) { seen.add(m.text.id); results.push(m); }
+  }
+
+  // Preview matches (non-title)
+  for (const t of previewMatches) {
+    if (!seen.has(t.id)) { seen.add(t.id); results.push({ text: t, context: t.preview }); }
+  }
+
+  // Switch to search view
+  document.getElementById('browseView').style.display = 'none';
+  document.getElementById('readerView').classList.remove('active');
+  document.getElementById('searchView').classList.add('active');
+  document.getElementById('hero').style.display = 'none';
+
+  const list = document.getElementById('searchResultsList');
+  if (results.length === 0) {
+    list.innerHTML = '<div class="empty">No results found. Try a different term — or load more texts to search their full content.</div>';
+    return;
+  }
+
+  const qLower = query.toLowerCase();
+  list.innerHTML = `<div style="color:var(--text-faint);font-size:13px;margin-bottom:16px">${results.length} result${results.length>1?'s':''}</div>` +
+    results.map(r => {
+      const highlighted = highlightText(r.context, query);
+      return `
+        <div class="search-result" onclick="openReader('${r.text.id}')">
+          <div class="search-result-title">${r.text.title}</div>
+          <div class="text-meta">
+            <span class="badge">${r.text.tradition}</span>
+            <span>${r.text.word_count.toLocaleString()} words</span>
+          </div>
+          <div class="search-result-context">...${highlighted}...</div>
+        </div>
+      `;
+    }).join('');
+}
+
+function highlightText(text, query) {
+  const regex = new RegExp('(' + escapeRegex(query) + ')', 'gi');
+  return escapeHtml(text).replace(regex, '<mark>$1</mark>');
+}
+
+function escapeRegex(s) { return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
+function escapeHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+loadCatalog();
+</script>
+</body>
+</html>

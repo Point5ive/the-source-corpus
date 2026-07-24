@@ -1,0 +1,1129 @@
+{
+  "texts": [
+    {
+      "category": "abrahamic",
+      "filename": "bible-asv.txt",
+      "path": "abrahamic/bible-asv.txt",
+      "size_bytes": 4624970,
+      "size_human": "4.4MB"
+    },
+    {
+      "category": "abrahamic",
+      "filename": "bible-bbe.txt",
+      "path": "abrahamic/bible-bbe.txt",
+      "size_bytes": 4593040,
+      "size_human": "4.4MB"
+    },
+    {
+      "category": "abrahamic",
+      "filename": "bible-ylt.txt",
+      "path": "abrahamic/bible-ylt.txt",
+      "size_bytes": 4581911,
+      "size_human": "4.4MB"
+    },
+    {
+      "category": "abrahamic",
+      "filename": "bible-darby.txt",
+      "path": "abrahamic/bible-darby.txt",
+      "size_bytes": 4528110,
+      "size_human": "4.3MB"
+    },
+    {
+      "category": "abrahamic",
+      "filename": "bible-kjv.txt",
+      "path": "abrahamic/bible-kjv.txt",
+      "size_bytes": 4436268,
+      "size_human": "4.2MB"
+    },
+    {
+      "category": "abrahamic",
+      "filename": "hadith-full.txt",
+      "path": "abrahamic/hadith-full.txt",
+      "size_bytes": 3929718,
+      "size_human": "3.7MB"
+    },
+    {
+      "category": "abrahamic",
+      "filename": "hadith-bukhari.txt",
+      "path": "abrahamic/hadith-bukhari.txt",
+      "size_bytes": 3594514,
+      "size_human": "3.4MB"
+    },
+    {
+      "category": "abrahamic",
+      "filename": "dead_sea_scrolls.txt",
+      "path": "abrahamic/dead_sea_scrolls.txt",
+      "size_bytes": 1968481,
+      "size_human": "1.9MB"
+    },
+    {
+      "category": "abrahamic",
+      "filename": "quran-pickthall.txt",
+      "path": "abrahamic/quran-pickthall.txt",
+      "size_bytes": 1159923,
+      "size_human": "1.1MB"
+    },
+    {
+      "category": "abrahamic",
+      "filename": "quran-english.txt",
+      "path": "abrahamic/quran-english.txt",
+      "size_bytes": 1147261,
+      "size_human": "1.1MB"
+    },
+    {
+      "category": "abrahamic",
+      "filename": "nag-hammadi-library.txt",
+      "path": "abrahamic/nag-hammadi-library.txt",
+      "size_bytes": 951981,
+      "size_human": "930KB"
+    },
+    {
+      "category": "abrahamic",
+      "filename": "book-of-jasher.txt",
+      "path": "abrahamic/book-of-jasher.txt",
+      "size_bytes": 776162,
+      "size_human": "758KB"
+    },
+    {
+      "category": "abrahamic",
+      "filename": "apocrypha.txt",
+      "path": "abrahamic/apocrypha.txt",
+      "size_bytes": 775235,
+      "size_human": "757KB"
+    },
+    {
+      "category": "abrahamic",
+      "filename": "nag-hammadi-supplement-pistis-sophia.txt",
+      "path": "abrahamic/nag-hammadi-supplement-pistis-sophia.txt",
+      "size_bytes": 694996,
+      "size_human": "679KB"
+    },
+    {
+      "category": "abrahamic",
+      "filename": "book_of_enoch.txt",
+      "path": "abrahamic/book_of_enoch.txt",
+      "size_bytes": 289555,
+      "size_human": "283KB"
+    },
+    {
+      "category": "abrahamic",
+      "filename": "book-of-jubilees.txt",
+      "path": "abrahamic/book-of-jubilees.txt",
+      "size_bytes": 281373,
+      "size_human": "275KB"
+    },
+    {
+      "category": "abrahamic",
+      "filename": "apoc-Ecclesiasticus.txt",
+      "path": "abrahamic/apoc-Ecclesiasticus.txt",
+      "size_bytes": 197639,
+      "size_human": "193KB"
+    },
+    {
+      "category": "abrahamic",
+      "filename": "apoc-I_Maccabees.txt",
+      "path": "abrahamic/apoc-I_Maccabees.txt",
+      "size_bytes": 156261,
+      "size_human": "153KB"
+    },
+    {
+      "category": "abrahamic",
+      "filename": "nag-hammadi-supplement-gnosis-of-the-light.txt",
+      "path": "abrahamic/nag-hammadi-supplement-gnosis-of-the-light.txt",
+      "size_bytes": 143964,
+      "size_human": "141KB"
+    },
+    {
+      "category": "abrahamic",
+      "filename": "apoc-II_Esdras.txt",
+      "path": "abrahamic/apoc-II_Esdras.txt",
+      "size_bytes": 134916,
+      "size_human": "132KB"
+    },
+    {
+      "category": "abrahamic",
+      "filename": "bible-web.txt",
+      "path": "abrahamic/bible-web.txt",
+      "size_bytes": 126129,
+      "size_human": "123KB"
+    },
+    {
+      "category": "abrahamic",
+      "filename": "nag-hammadi-the-tripartite-tractate.txt",
+      "path": "abrahamic/nag-hammadi-the-tripartite-tractate.txt",
+      "size_bytes": 114726,
+      "size_human": "112KB"
+    },
+    {
+      "category": "abrahamic",
+      "filename": "apoc-II_Maccabees.txt",
+      "path": "abrahamic/apoc-II_Maccabees.txt",
+      "size_bytes": 108393,
+      "size_human": "106KB"
+    },
+    {
+      "category": "abrahamic",
+      "filename": "nag-hammadi-supplement-gnostic-crucifixion.txt",
+      "path": "abrahamic/nag-hammadi-supplement-gnostic-crucifixion.txt",
+      "size_bytes": 90645,
+      "size_human": "89KB"
+    },
+    {
+      "category": "abrahamic",
+      "filename": "apoc-I_Esdras.txt",
+      "path": "abrahamic/apoc-I_Esdras.txt",
+      "size_bytes": 77853,
+      "size_human": "76KB"
+    },
+    {
+      "category": "abrahamic",
+      "filename": "apocrypha-1esdras.txt",
+      "path": "abrahamic/apocrypha-1esdras.txt",
+      "size_bytes": 77853,
+      "size_human": "76KB"
+    },
+    {
+      "category": "abrahamic",
+      "filename": "gospel-of-pseudo-matthew.txt",
+      "path": "abrahamic/gospel-of-pseudo-matthew.txt",
+      "size_bytes": 76775,
+      "size_human": "75KB"
+    },
+    {
+      "category": "abrahamic",
+      "filename": "nag-hammadi-zostrianos.txt",
+      "path": "abrahamic/nag-hammadi-zostrianos.txt",
+      "size_bytes": 75467,
+      "size_human": "74KB"
+    },
+    {
+      "category": "abrahamic",
+      "filename": "apoc-Wisdom_of_Solomon.txt",
+      "path": "abrahamic/apoc-Wisdom_of_Solomon.txt",
+      "size_bytes": 72851,
+      "size_human": "71KB"
+    },
+    {
+      "category": "abrahamic",
+      "filename": "apoc-Judith.txt",
+      "path": "abrahamic/apoc-Judith.txt",
+      "size_bytes": 70007,
+      "size_human": "68KB"
+    },
+    {
+      "category": "abrahamic",
+      "filename": "nag-hammadi-the-gospel-of-philip.txt",
+      "path": "abrahamic/nag-hammadi-the-gospel-of-philip.txt",
+      "size_bytes": 51671,
+      "size_human": "50KB"
+    },
+    {
+      "category": "abrahamic",
+      "filename": "nag-hammadi-the-apocryphon-of-john.txt",
+      "path": "abrahamic/nag-hammadi-the-apocryphon-of-john.txt",
+      "size_bytes": 48539,
+      "size_human": "47KB"
+    },
+    {
+      "category": "abrahamic",
+      "filename": "nag-hammadi-on-the-origin-of-the-world.txt",
+      "path": "abrahamic/nag-hammadi-on-the-origin-of-the-world.txt",
+      "size_bytes": 47385,
+      "size_human": "46KB"
+    },
+    {
+      "category": "abrahamic",
+      "filename": "apocryphon-of-john.txt",
+      "path": "abrahamic/apocryphon-of-john.txt",
+      "size_bytes": 44826,
+      "size_human": "44KB"
+    },
+    {
+      "category": "abrahamic",
+      "filename": "apoc-Tobit.txt",
+      "path": "abrahamic/apoc-Tobit.txt",
+      "size_bytes": 44084,
+      "size_human": "43KB"
+    },
+    {
+      "category": "abrahamic",
+      "filename": "nag-hammadi-the-teachings-of-silvanus.txt",
+      "path": "abrahamic/nag-hammadi-the-teachings-of-silvanus.txt",
+      "size_bytes": 37425,
+      "size_human": "37KB"
+    },
+    {
+      "category": "abrahamic",
+      "filename": "apoc-Baruch.txt",
+      "path": "abrahamic/apoc-Baruch.txt",
+      "size_bytes": 34003,
+      "size_human": "33KB"
+    },
+    {
+      "category": "abrahamic",
+      "filename": "gospel-of-nativity-of-mary.txt",
+      "path": "abrahamic/gospel-of-nativity-of-mary.txt",
+      "size_bytes": 32511,
+      "size_human": "32KB"
+    },
+    {
+      "category": "abrahamic",
+      "filename": "nag-hammadi-the-gospel-of-truth.txt",
+      "path": "abrahamic/nag-hammadi-the-gospel-of-truth.txt",
+      "size_bytes": 32307,
+      "size_human": "32KB"
+    },
+    {
+      "category": "abrahamic",
+      "filename": "nag-hammadi-gospel-of-thomas.txt",
+      "path": "abrahamic/nag-hammadi-gospel-of-thomas.txt",
+      "size_bytes": 29259,
+      "size_human": "29KB"
+    },
+    {
+      "category": "abrahamic",
+      "filename": "nag-hammadi-the-gospel-of-the-egyptians.txt",
+      "path": "abrahamic/nag-hammadi-the-gospel-of-the-egyptians.txt",
+      "size_bytes": 26438,
+      "size_human": "26KB"
+    },
+    {
+      "category": "abrahamic",
+      "filename": "nag-hammadi-the-testimony-of-truth.txt",
+      "path": "abrahamic/nag-hammadi-the-testimony-of-truth.txt",
+      "size_bytes": 26369,
+      "size_human": "26KB"
+    },
+    {
+      "category": "abrahamic",
+      "filename": "nag-hammadi-trimorphic-protennoia.txt",
+      "path": "abrahamic/nag-hammadi-trimorphic-protennoia.txt",
+      "size_bytes": 23449,
+      "size_human": "23KB"
+    },
+    {
+      "category": "abrahamic",
+      "filename": "nag-hammadi-allogenes.txt",
+      "path": "abrahamic/nag-hammadi-allogenes.txt",
+      "size_bytes": 23341,
+      "size_human": "23KB"
+    },
+    {
+      "category": "abrahamic",
+      "filename": "nag-hammadi-marsanes.txt",
+      "path": "abrahamic/nag-hammadi-marsanes.txt",
+      "size_bytes": 22371,
+      "size_human": "22KB"
+    },
+    {
+      "category": "abrahamic",
+      "filename": "nag-hammadi-the-sophia-of-jesus-christ.txt",
+      "path": "abrahamic/nag-hammadi-the-sophia-of-jesus-christ.txt",
+      "size_bytes": 22277,
+      "size_human": "22KB"
+    },
+    {
+      "category": "abrahamic",
+      "filename": "nag-hammadi-the-second-treatise-of-the-great-seth.txt",
+      "path": "abrahamic/nag-hammadi-the-second-treatise-of-the-great-seth.txt",
+      "size_bytes": 22099,
+      "size_human": "22KB"
+    },
+    {
+      "category": "abrahamic",
+      "filename": "gospel-of-thomas-latin.txt",
+      "path": "abrahamic/gospel-of-thomas-latin.txt",
+      "size_bytes": 20834,
+      "size_human": "20KB"
+    },
+    {
+      "category": "abrahamic",
+      "filename": "nag-hammadi-the-dialogue-of-the-savior.txt",
+      "path": "abrahamic/nag-hammadi-the-dialogue-of-the-savior.txt",
+      "size_bytes": 19771,
+      "size_human": "19KB"
+    },
+    {
+      "category": "abrahamic",
+      "filename": "nag-hammadi-the-interpretation-of-knowledge.txt",
+      "path": "abrahamic/nag-hammadi-the-interpretation-of-knowledge.txt",
+      "size_bytes": 19007,
+      "size_human": "19KB"
+    },
+    {
+      "category": "abrahamic",
+      "filename": "apoc-Additions_to_Esther.txt",
+      "path": "abrahamic/apoc-Additions_to_Esther.txt",
+      "size_bytes": 18548,
+      "size_human": "18KB"
+    },
+    {
+      "category": "abrahamic",
+      "filename": "nag-hammadi-the-apocryphon-of-james.txt",
+      "path": "abrahamic/nag-hammadi-the-apocryphon-of-james.txt",
+      "size_bytes": 18138,
+      "size_human": "18KB"
+    },
+    {
+      "category": "abrahamic",
+      "filename": "nag-hammadi-the-hypostasis-of-the-archons.txt",
+      "path": "abrahamic/nag-hammadi-the-hypostasis-of-the-archons.txt",
+      "size_bytes": 17858,
+      "size_human": "17KB"
+    },
+    {
+      "category": "abrahamic",
+      "filename": "nag-hammadi-asclepius-21-29.txt",
+      "path": "abrahamic/nag-hammadi-asclepius-21-29.txt",
+      "size_bytes": 17079,
+      "size_human": "17KB"
+    },
+    {
+      "category": "abrahamic",
+      "filename": "nag-hammadi-the-apocalypse-of-adam.txt",
+      "path": "abrahamic/nag-hammadi-the-apocalypse-of-adam.txt",
+      "size_bytes": 16824,
+      "size_human": "16KB"
+    },
+    {
+      "category": "abrahamic",
+      "filename": "gospel-of-thomas.txt",
+      "path": "abrahamic/gospel-of-thomas.txt",
+      "size_bytes": 16101,
+      "size_human": "16KB"
+    },
+    {
+      "category": "abrahamic",
+      "filename": "nag-hammadi-the-exegesis-on-the-soul.txt",
+      "path": "abrahamic/nag-hammadi-the-exegesis-on-the-soul.txt",
+      "size_bytes": 16045,
+      "size_human": "16KB"
+    },
+    {
+      "category": "abrahamic",
+      "filename": "apocalypse-of-sedrach.txt",
+      "path": "abrahamic/apocalypse-of-sedrach.txt",
+      "size_bytes": 15976,
+      "size_human": "16KB"
+    },
+    {
+      "category": "abrahamic",
+      "filename": "nag-hammadi-the-book-of-thomas-the-contender.txt",
+      "path": "abrahamic/nag-hammadi-the-book-of-thomas-the-contender.txt",
+      "size_bytes": 15805,
+      "size_human": "15KB"
+    },
+    {
+      "category": "abrahamic",
+      "filename": "nag-hammadi-eugnostos-the-blessed.txt",
+      "path": "abrahamic/nag-hammadi-eugnostos-the-blessed.txt",
+      "size_bytes": 15561,
+      "size_human": "15KB"
+    },
+    {
+      "category": "abrahamic",
+      "filename": "nag-hammadi-the-first-apocalypse-of-james.txt",
+      "path": "abrahamic/nag-hammadi-the-first-apocalypse-of-james.txt",
+      "size_bytes": 14710,
+      "size_human": "14KB"
+    },
+    {
+      "category": "abrahamic",
+      "filename": "nag-hammadi-the-apocalypse-of-peter.txt",
+      "path": "abrahamic/nag-hammadi-the-apocalypse-of-peter.txt",
+      "size_bytes": 13199,
+      "size_human": "13KB"
+    },
+    {
+      "category": "abrahamic",
+      "filename": "nag-hammadi-authoritative-teaching.txt",
+      "path": "abrahamic/nag-hammadi-authoritative-teaching.txt",
+      "size_bytes": 13040,
+      "size_human": "13KB"
+    },
+    {
+      "category": "abrahamic",
+      "filename": "nag-hammadi-the-second-apocalypse-of-james.txt",
+      "path": "abrahamic/nag-hammadi-the-second-apocalypse-of-james.txt",
+      "size_bytes": 12959,
+      "size_human": "13KB"
+    },
+    {
+      "category": "abrahamic",
+      "filename": "nag-hammadi-a-valentinian-exposition.txt",
+      "path": "abrahamic/nag-hammadi-a-valentinian-exposition.txt",
+      "size_bytes": 12863,
+      "size_human": "13KB"
+    },
+    {
+      "category": "abrahamic",
+      "filename": "nag-hammadi-melchizedek.txt",
+      "path": "abrahamic/nag-hammadi-melchizedek.txt",
+      "size_bytes": 12738,
+      "size_human": "12KB"
+    },
+    {
+      "category": "abrahamic",
+      "filename": "nag-hammadi-the-concept-of-our-great-power.txt",
+      "path": "abrahamic/nag-hammadi-the-concept-of-our-great-power.txt",
+      "size_bytes": 12679,
+      "size_human": "12KB"
+    },
+    {
+      "category": "abrahamic",
+      "filename": "nag-hammadi-the-acts-of-peter-and-the-twelve-apostles.txt",
+      "path": "abrahamic/nag-hammadi-the-acts-of-peter-and-the-twelve-apostles.txt",
+      "size_bytes": 12471,
+      "size_human": "12KB"
+    },
+    {
+      "category": "abrahamic",
+      "filename": "nag-hammadi-the-discourse-on-the-eighth-and-ninth.txt",
+      "path": "abrahamic/nag-hammadi-the-discourse-on-the-eighth-and-ninth.txt",
+      "size_bytes": 11716,
+      "size_human": "11KB"
+    },
+    {
+      "category": "abrahamic",
+      "filename": "apoc-Story_of_Susanna.txt",
+      "path": "abrahamic/apoc-Story_of_Susanna.txt",
+      "size_bytes": 10243,
+      "size_human": "10KB"
+    },
+    {
+      "category": "abrahamic",
+      "filename": "nag-hammadi-the-three-steles-of-seth.txt",
+      "path": "abrahamic/nag-hammadi-the-three-steles-of-seth.txt",
+      "size_bytes": 10064,
+      "size_human": "10KB"
+    },
+    {
+      "category": "abrahamic",
+      "filename": "nag-hammadi-the-sentences-of-sextus.txt",
+      "path": "abrahamic/nag-hammadi-the-sentences-of-sextus.txt",
+      "size_bytes": 9737,
+      "size_human": "10KB"
+    },
+    {
+      "category": "abrahamic",
+      "filename": "apoc-Song_of_the_Three_Children.txt",
+      "path": "abrahamic/apoc-Song_of_the_Three_Children.txt",
+      "size_bytes": 9603,
+      "size_human": "9KB"
+    },
+    {
+      "category": "abrahamic",
+      "filename": "nag-hammadi-the-thunder--perfect-mind.txt",
+      "path": "abrahamic/nag-hammadi-the-thunder--perfect-mind.txt",
+      "size_bytes": 8762,
+      "size_human": "9KB"
+    },
+    {
+      "category": "abrahamic",
+      "filename": "gospel-of-peter.txt",
+      "path": "abrahamic/gospel-of-peter.txt",
+      "size_bytes": 8685,
+      "size_human": "8KB"
+    },
+    {
+      "category": "abrahamic",
+      "filename": "nag-hammadi-the-letter-of-peter-to-philip.txt",
+      "path": "abrahamic/nag-hammadi-the-letter-of-peter-to-philip.txt",
+      "size_bytes": 8099,
+      "size_human": "8KB"
+    },
+    {
+      "category": "abrahamic",
+      "filename": "nag-hammadi-the-treatise-on-the-resurrection.txt",
+      "path": "abrahamic/nag-hammadi-the-treatise-on-the-resurrection.txt",
+      "size_bytes": 8018,
+      "size_human": "8KB"
+    },
+    {
+      "category": "abrahamic",
+      "filename": "apocalypse-of-peter.txt",
+      "path": "abrahamic/apocalypse-of-peter.txt",
+      "size_bytes": 7902,
+      "size_human": "8KB"
+    },
+    {
+      "category": "abrahamic",
+      "filename": "apoc-Bel_and_the_Dragon.txt",
+      "path": "abrahamic/apoc-Bel_and_the_Dragon.txt",
+      "size_bytes": 7351,
+      "size_human": "7KB"
+    },
+    {
+      "category": "abrahamic",
+      "filename": "nag-hammadi-the-apocalypse-of-paul.txt",
+      "path": "abrahamic/nag-hammadi-the-apocalypse-of-paul.txt",
+      "size_bytes": 5682,
+      "size_human": "6KB"
+    },
+    {
+      "category": "abrahamic",
+      "filename": "nag-hammadi-plato--republic-588a-589b.txt",
+      "path": "abrahamic/nag-hammadi-plato--republic-588a-589b.txt",
+      "size_bytes": 3061,
+      "size_human": "3KB"
+    },
+    {
+      "category": "abrahamic",
+      "filename": "nag-hammadi-second-apocalypse-of-james-verses.txt",
+      "path": "abrahamic/nag-hammadi-second-apocalypse-of-james-verses.txt",
+      "size_bytes": 2595,
+      "size_human": "3KB"
+    },
+    {
+      "category": "abrahamic",
+      "filename": "nag-hammadi-the-prayer-of-thanksgiving.txt",
+      "path": "abrahamic/nag-hammadi-the-prayer-of-thanksgiving.txt",
+      "size_bytes": 1879,
+      "size_human": "2KB"
+    },
+    {
+      "category": "abrahamic",
+      "filename": "nag-hammadi-the-thought-of-norea.txt",
+      "path": "abrahamic/nag-hammadi-the-thought-of-norea.txt",
+      "size_bytes": 1623,
+      "size_human": "2KB"
+    },
+    {
+      "category": "abrahamic",
+      "filename": "nag-hammadi-the-prayer-of-the-apostle-paul.txt",
+      "path": "abrahamic/nag-hammadi-the-prayer-of-the-apostle-paul.txt",
+      "size_bytes": 1457,
+      "size_human": "1KB"
+    },
+    {
+      "category": "abrahamic",
+      "filename": "nag-hammadi-hypsiphrone.txt",
+      "path": "abrahamic/nag-hammadi-hypsiphrone.txt",
+      "size_bytes": 1352,
+      "size_human": "1KB"
+    },
+    {
+      "category": "abrahamic",
+      "filename": "nag-hammadi-on-the-baptism-a.txt",
+      "path": "abrahamic/nag-hammadi-on-the-baptism-a.txt",
+      "size_bytes": 915,
+      "size_human": "1KB"
+    },
+    {
+      "category": "abrahamic",
+      "filename": "nag-hammadi-on-the-baptism-b.txt",
+      "path": "abrahamic/nag-hammadi-on-the-baptism-b.txt",
+      "size_bytes": 875,
+      "size_human": "1KB"
+    },
+    {
+      "category": "abrahamic",
+      "filename": "nag-hammadi-on-the-anointing.txt",
+      "path": "abrahamic/nag-hammadi-on-the-anointing.txt",
+      "size_bytes": 620,
+      "size_human": "1KB"
+    },
+    {
+      "category": "abrahamic",
+      "filename": "nag-hammadi-on-the-eucharist-a.txt",
+      "path": "abrahamic/nag-hammadi-on-the-eucharist-a.txt",
+      "size_bytes": 515,
+      "size_human": "1KB"
+    },
+    {
+      "category": "eastern",
+      "filename": "mahabharata-core.txt",
+      "path": "eastern/mahabharata-core.txt",
+      "size_bytes": 4050785,
+      "size_human": "3.9MB"
+    },
+    {
+      "category": "eastern",
+      "filename": "rig-veda.txt",
+      "path": "eastern/rig-veda.txt",
+      "size_bytes": 3510584,
+      "size_human": "3.3MB"
+    },
+    {
+      "category": "eastern",
+      "filename": "atharva-veda.txt",
+      "path": "eastern/atharva-veda.txt",
+      "size_bytes": 2020785,
+      "size_human": "1.9MB"
+    },
+    {
+      "category": "eastern",
+      "filename": "lotus-sutra.txt",
+      "path": "eastern/lotus-sutra.txt",
+      "size_bytes": 1331342,
+      "size_human": "1.3MB"
+    },
+    {
+      "category": "eastern",
+      "filename": "upanishads-full.txt",
+      "path": "eastern/upanishads-full.txt",
+      "size_bytes": 1112149,
+      "size_human": "1.1MB"
+    },
+    {
+      "category": "eastern",
+      "filename": "ramayana.txt",
+      "path": "eastern/ramayana.txt",
+      "size_bytes": 911323,
+      "size_human": "890KB"
+    },
+    {
+      "category": "eastern",
+      "filename": "yajur-veda.txt",
+      "path": "eastern/yajur-veda.txt",
+      "size_bytes": 776657,
+      "size_human": "758KB"
+    },
+    {
+      "category": "eastern",
+      "filename": "sama-veda.txt",
+      "path": "eastern/sama-veda.txt",
+      "size_bytes": 705668,
+      "size_human": "689KB"
+    },
+    {
+      "category": "eastern",
+      "filename": "tibetan-arch3.txt",
+      "path": "eastern/tibetan-arch3.txt",
+      "size_bytes": 669358,
+      "size_human": "654KB"
+    },
+    {
+      "category": "eastern",
+      "filename": "all-vedas-combined.txt",
+      "path": "eastern/all-vedas-combined.txt",
+      "size_bytes": 659783,
+      "size_human": "644KB"
+    },
+    {
+      "category": "eastern",
+      "filename": "laws-of-manu.txt",
+      "path": "eastern/laws-of-manu.txt",
+      "size_bytes": 622933,
+      "size_human": "608KB"
+    },
+    {
+      "category": "eastern",
+      "filename": "vishnu-purana.txt",
+      "path": "eastern/vishnu-purana.txt",
+      "size_bytes": 578537,
+      "size_human": "565KB"
+    },
+    {
+      "category": "eastern",
+      "filename": "tibetan-book-of-dead.txt",
+      "path": "eastern/tibetan-book-of-dead.txt",
+      "size_bytes": 489459,
+      "size_human": "478KB"
+    },
+    {
+      "category": "eastern",
+      "filename": "kojiki.txt",
+      "path": "eastern/kojiki.txt",
+      "size_bytes": 421825,
+      "size_human": "412KB"
+    },
+    {
+      "category": "eastern",
+      "filename": "mencius.txt",
+      "path": "eastern/mencius.txt",
+      "size_bytes": 269140,
+      "size_human": "263KB"
+    },
+    {
+      "category": "eastern",
+      "filename": "analects-confucius.txt",
+      "path": "eastern/analects-confucius.txt",
+      "size_bytes": 213026,
+      "size_human": "208KB"
+    },
+    {
+      "category": "eastern",
+      "filename": "nihon-shoki.txt",
+      "path": "eastern/nihon-shoki.txt",
+      "size_bytes": 183445,
+      "size_human": "179KB"
+    },
+    {
+      "category": "eastern",
+      "filename": "guru-granth-sahib.txt",
+      "path": "eastern/guru-granth-sahib.txt",
+      "size_bytes": 171887,
+      "size_human": "168KB"
+    },
+    {
+      "category": "eastern",
+      "filename": "i-ching.txt",
+      "path": "eastern/i-ching.txt",
+      "size_bytes": 156326,
+      "size_human": "153KB"
+    },
+    {
+      "category": "eastern",
+      "filename": "bhagavad-gita.txt",
+      "path": "eastern/bhagavad-gita.txt",
+      "size_bytes": 147501,
+      "size_human": "144KB"
+    },
+    {
+      "category": "eastern",
+      "filename": "ramayana-arch-gut.txt",
+      "path": "eastern/ramayana-arch-gut.txt",
+      "size_bytes": 146097,
+      "size_human": "143KB"
+    },
+    {
+      "category": "eastern",
+      "filename": "tibetan-arch5.txt",
+      "path": "eastern/tibetan-arch5.txt",
+      "size_bytes": 141112,
+      "size_human": "138KB"
+    },
+    {
+      "category": "eastern",
+      "filename": "tibetan-archive2.txt",
+      "path": "eastern/tibetan-archive2.txt",
+      "size_bytes": 141111,
+      "size_human": "138KB"
+    },
+    {
+      "category": "eastern",
+      "filename": "great-learning.txt",
+      "path": "eastern/great-learning.txt",
+      "size_bytes": 92804,
+      "size_human": "91KB"
+    },
+    {
+      "category": "eastern",
+      "filename": "zhuangzi.txt",
+      "path": "eastern/zhuangzi.txt",
+      "size_bytes": 80453,
+      "size_human": "79KB"
+    },
+    {
+      "category": "eastern",
+      "filename": "ramayana_missing.txt",
+      "path": "eastern/ramayana_missing.txt",
+      "size_bytes": 74046,
+      "size_human": "72KB"
+    },
+    {
+      "category": "eastern",
+      "filename": "dhammapada.txt",
+      "path": "eastern/dhammapada.txt",
+      "size_bytes": 68652,
+      "size_human": "67KB"
+    },
+    {
+      "category": "eastern",
+      "filename": "tao-te-ching-nrrb.txt",
+      "path": "eastern/tao-te-ching-nrrb.txt",
+      "size_bytes": 59982,
+      "size_human": "59KB"
+    },
+    {
+      "category": "eastern",
+      "filename": "tao-te-ching-legge.txt",
+      "path": "eastern/tao-te-ching-legge.txt",
+      "size_bytes": 57764,
+      "size_human": "56KB"
+    },
+    {
+      "category": "eastern",
+      "filename": "ramayana-wiki3.txt",
+      "path": "eastern/ramayana-wiki3.txt",
+      "size_bytes": 37432,
+      "size_human": "37KB"
+    },
+    {
+      "category": "eastern",
+      "filename": "diamond-sutra.txt",
+      "path": "eastern/diamond-sutra.txt",
+      "size_bytes": 34743,
+      "size_human": "34KB"
+    },
+    {
+      "category": "eastern",
+      "filename": "yoga-sutras.txt",
+      "path": "eastern/yoga-sutras.txt",
+      "size_bytes": 21569,
+      "size_human": "21KB"
+    },
+    {
+      "category": "eastern",
+      "filename": "heart-sutra.txt",
+      "path": "eastern/heart-sutra.txt",
+      "size_bytes": 3340,
+      "size_human": "3KB"
+    },
+    {
+      "category": "esoteric",
+      "filename": "zohar-full.txt",
+      "path": "esoteric/zohar-full.txt",
+      "size_bytes": 4238853,
+      "size_human": "4.0MB"
+    },
+    {
+      "category": "esoteric",
+      "filename": "picatrix-full.txt",
+      "path": "esoteric/picatrix-full.txt",
+      "size_bytes": 812043,
+      "size_human": "793KB"
+    },
+    {
+      "category": "esoteric",
+      "filename": "pistis-sophia.txt",
+      "path": "esoteric/pistis-sophia.txt",
+      "size_bytes": 694996,
+      "size_human": "679KB"
+    },
+    {
+      "category": "esoteric",
+      "filename": "corpus-hermeticum.txt",
+      "path": "esoteric/corpus-hermeticum.txt",
+      "size_bytes": 186017,
+      "size_human": "182KB"
+    },
+    {
+      "category": "esoteric",
+      "filename": "ars-goetia.txt",
+      "path": "esoteric/ars-goetia.txt",
+      "size_bytes": 146592,
+      "size_human": "143KB"
+    },
+    {
+      "category": "esoteric",
+      "filename": "kybalion.txt",
+      "path": "esoteric/kybalion.txt",
+      "size_bytes": 132856,
+      "size_human": "130KB"
+    },
+    {
+      "category": "esoteric",
+      "filename": "kybalion-hraban.txt",
+      "path": "esoteric/kybalion-hraban.txt",
+      "size_bytes": 132856,
+      "size_human": "130KB"
+    },
+    {
+      "category": "esoteric",
+      "filename": "key-of-solomon.txt",
+      "path": "esoteric/key-of-solomon.txt",
+      "size_bytes": 81954,
+      "size_human": "80KB"
+    },
+    {
+      "category": "esoteric",
+      "filename": "sepher-bahir.txt",
+      "path": "esoteric/sepher-bahir.txt",
+      "size_bytes": 58928,
+      "size_human": "58KB"
+    },
+    {
+      "category": "esoteric",
+      "filename": "emerald-tablet.txt",
+      "path": "esoteric/emerald-tablet.txt",
+      "size_bytes": 48293,
+      "size_human": "47KB"
+    },
+    {
+      "category": "esoteric",
+      "filename": "sefer-yetzirah.txt",
+      "path": "esoteric/sefer-yetzirah.txt",
+      "size_bytes": 22979,
+      "size_human": "22KB"
+    },
+    {
+      "category": "mythology",
+      "filename": "heimskringla.txt",
+      "path": "mythology/heimskringla.txt",
+      "size_bytes": 1748859,
+      "size_human": "1.7MB"
+    },
+    {
+      "category": "mythology",
+      "filename": "metamorphoses.txt",
+      "path": "mythology/metamorphoses.txt",
+      "size_bytes": 1633793,
+      "size_human": "1.6MB"
+    },
+    {
+      "category": "mythology",
+      "filename": "iliad-homer.txt",
+      "path": "mythology/iliad-homer.txt",
+      "size_bytes": 1115936,
+      "size_human": "1.1MB"
+    },
+    {
+      "category": "mythology",
+      "filename": "epic-of-gilgamesh.txt",
+      "path": "mythology/epic-of-gilgamesh.txt",
+      "size_bytes": 1032430,
+      "size_human": "1008KB"
+    },
+    {
+      "category": "mythology",
+      "filename": "egyptian-book-of-dead.txt",
+      "path": "mythology/egyptian-book-of-dead.txt",
+      "size_bytes": 870001,
+      "size_human": "850KB"
+    },
+    {
+      "category": "mythology",
+      "filename": "popol-vuh.txt",
+      "path": "mythology/popol-vuh.txt",
+      "size_bytes": 810245,
+      "size_human": "791KB"
+    },
+    {
+      "category": "mythology",
+      "filename": "aeneid.txt",
+      "path": "mythology/aeneid.txt",
+      "size_bytes": 746759,
+      "size_human": "729KB"
+    },
+    {
+      "category": "mythology",
+      "filename": "odyssey-homer.txt",
+      "path": "mythology/odyssey-homer.txt",
+      "size_bytes": 717663,
+      "size_human": "701KB"
+    },
+    {
+      "category": "mythology",
+      "filename": "hesiod_theogony_works_days.txt",
+      "path": "mythology/hesiod_theogony_works_days.txt",
+      "size_bytes": 547932,
+      "size_human": "535KB"
+    },
+    {
+      "category": "mythology",
+      "filename": "poetic-edda.txt",
+      "path": "mythology/poetic-edda.txt",
+      "size_bytes": 507210,
+      "size_human": "495KB"
+    },
+    {
+      "category": "mythology",
+      "filename": "golden-ass-apuleius.txt",
+      "path": "mythology/golden-ass-apuleius.txt",
+      "size_bytes": 467133,
+      "size_human": "456KB"
+    },
+    {
+      "category": "mythology",
+      "filename": "meditations-aurelius.txt",
+      "path": "mythology/meditations-aurelius.txt",
+      "size_bytes": 425304,
+      "size_human": "415KB"
+    },
+    {
+      "category": "mythology",
+      "filename": "prose-edda-brodeur.txt",
+      "path": "mythology/prose-edda-brodeur.txt",
+      "size_bytes": 407617,
+      "size_human": "398KB"
+    },
+    {
+      "category": "mythology",
+      "filename": "mabinogion.txt",
+      "path": "mythology/mabinogion.txt",
+      "size_bytes": 407015,
+      "size_human": "397KB"
+    },
+    {
+      "category": "mythology",
+      "filename": "volsung_saga.txt",
+      "path": "mythology/volsung_saga.txt",
+      "size_bytes": 350775,
+      "size_human": "343KB"
+    },
+    {
+      "category": "mythology",
+      "filename": "tain_bo_cuailnge.txt",
+      "path": "mythology/tain_bo_cuailnge.txt",
+      "size_bytes": 258390,
+      "size_human": "252KB"
+    },
+    {
+      "category": "mythology",
+      "filename": "homeric_hymns.txt",
+      "path": "mythology/homeric_hymns.txt",
+      "size_bytes": 253450,
+      "size_human": "248KB"
+    },
+    {
+      "category": "mythology",
+      "filename": "de-natura-deorum.txt",
+      "path": "mythology/de-natura-deorum.txt",
+      "size_bytes": 200597,
+      "size_human": "196KB"
+    },
+    {
+      "category": "mythology",
+      "filename": "kebra-nagast.txt",
+      "path": "mythology/kebra-nagast.txt",
+      "size_bytes": 182808,
+      "size_human": "179KB"
+    },
+    {
+      "category": "mythology",
+      "filename": "orphic-hymns.txt",
+      "path": "mythology/orphic-hymns.txt",
+      "size_bytes": 157486,
+      "size_human": "154KB"
+    },
+    {
+      "category": "mythology",
+      "filename": "egyptian-pyramid-texts.txt",
+      "path": "mythology/egyptian-pyramid-texts.txt",
+      "size_bytes": 146278,
+      "size_human": "143KB"
+    },
+    {
+      "category": "mythology",
+      "filename": "enuma_elish.txt",
+      "path": "mythology/enuma_elish.txt",
+      "size_bytes": 129487,
+      "size_human": "126KB"
+    },
+    {
+      "category": "mythology",
+      "filename": "fragments-pre-socratics.txt",
+      "path": "mythology/fragments-pre-socratics.txt",
+      "size_bytes": 115728,
+      "size_human": "113KB"
+    },
+    {
+      "category": "mythology",
+      "filename": "hammurabi-wiki3.txt",
+      "path": "mythology/hammurabi-wiki3.txt",
+      "size_bytes": 67234,
+      "size_human": "66KB"
+    },
+    {
+      "category": "mythology",
+      "filename": "code-of-hammurabi.txt",
+      "path": "mythology/code-of-hammurabi.txt",
+      "size_bytes": 66670,
+      "size_human": "65KB"
+    }
+  ],
+  "metadata": {
+    "total_texts": 159,
+    "total_size_bytes": 80763076,
+    "total_size_mb": 77.0,
+    "categories": [
+      "abrahamic",
+      "eastern",
+      "esoteric",
+      "mythology"
+    ],
+    "generated": "2026-07-24"
+  }
+}
