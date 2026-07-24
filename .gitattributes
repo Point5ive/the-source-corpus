@@ -1,0 +1,15 @@
+# Corpus text files are frozen exactly as stored — their SHA256 is a product
+# feature (printed in the reader, verified by `corpus.py verify`). Marking them
+# -text stops git from ever normalizing line endings, which would change hashes.
+*.txt -text
+
+# Normalize tooling and source files to LF.
+*.py   text eol=lf
+*.html text eol=lf
+*.json text eol=lf
+*.md   text eol=lf
+*.svg  text eol=lf
+*.css  text eol=lf
+*.js   text eol=lf
+.gitignore   text eol=lf
+.gitattributes text eol=lf
