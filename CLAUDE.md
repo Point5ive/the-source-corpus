@@ -1,12 +1,12 @@
 # The Source Corpus — Project Context
 
 ## What This Is
-A static web reader + CLI for 159 ancient texts spanning every major world tradition. Layer 1 of a consciousness infrastructure protocol. No framework, no build step, no dependencies.
+A static web reader + CLI for 151 ancient texts spanning every major world tradition. Layer 1 of a consciousness infrastructure protocol. No framework, no build step, no dependencies.
 
 ## Architecture
 - `index.html` — Single-file web app (vanilla JS/CSS, dark mode, full-text search, reader view)
 - `corpus.py` — Python CLI for search and browse (`python3 corpus.py stats|list|search|read`)
-- `catalog.json` — Metadata for 159 texts (title, tradition, category, word count, SHA256, preview)
+- `catalog.json` — Metadata for 151 texts (title, tradition, category, word count, SHA256, preview)
 - `*.txt` — 158 plain text files (77 MiB) across 4 categories: abrahamic/, eastern/, esoteric/, mythology/
 - Deployed to Vercel (static hosting, no server)
 
@@ -34,4 +34,4 @@ A static web reader + CLI for 159 ancient texts spanning every major world tradi
 - Live at https://ancient-texts-weld.vercel.app
 - GitHub: https://github.com/Point5ive/the-source-corpus
 - Full audit completed: see AUDIT.md for all findings (0 P0, 9 P1, 25 P2, 8 P3)
-- Verification: 159/159 SHA256 hashes verified, CLI passes all behavior checks
+- Verification: 151/151 SHA256 hashes verified, CLI passes all behavior checks

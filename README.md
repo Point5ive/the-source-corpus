@@ -1,6 +1,6 @@
 # The Source Corpus
 
-159 primary texts. 13 million words. Every major world tradition. Unmediated. Decentralized. Free.
+151 primary texts. 13 million words. Every major world tradition. Unmediated. Decentralized. Free.
 
 ## What This Is
 
@@ -16,7 +16,7 @@ This is Layer 1 of a consciousness infrastructure protocol: direct access to hum
 | Eastern | 33 | 19.0 MB |
 | Esoteric/Western Occult | 11 | 6.3 MB |
 | Mythology/Classical | 25 | 12.7 MB |
-| **Total** | **159** | **77.0 MB** |
+| **Total** | **151** | **75.7 MB** |
 
 ### Abrahamic (90)
 Bible (6 translations: KJV, ASV, BBE, YLT, Darby, WEB), Quran (2 translations), Hadith (Bukhari + full collection), Dead Sea Scrolls, Book of Enoch, Book of Jubilees, Book of Jasher, Apocrypha (15 deuterocanonical books), Nag Hammadi Library (all 50+ tractates), Gnostic Gospels (Thomas, Peter, Pseudo-Matthew, Nativity of Mary), Pistis Sophia, Gnosis of the Light

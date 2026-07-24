@@ -1,16 +1,16 @@
 {
   "name": "The Source Corpus",
-  "description": "The world's wisdom traditions as unmediated primary sources. 159 texts spanning every major tradition — from the Rig Veda to the Nag Hammadi codices, from Gilgamesh to the Zohar. Decentralized. Forkable. Free.",
-  "total_texts": 159,
-  "total_words": 13043209,
-  "total_size_mb": 77.0,
+  "description": "The world's wisdom traditions as unmediated primary sources. 151 texts spanning every major tradition — from the Rig Veda to the Nag Hammadi codices, from Gilgamesh to the Zohar. Decentralized. Forkable. Free.",
+  "total_texts": 151,
+  "total_words": 12875937,
+  "total_size_mb": 75.7,
   "categories": {
     "abrahamic": {
       "count": 90,
       "label": "Abrahamic"
     },
     "eastern": {
-      "count": 33,
+      "count": 27,
       "label": "Eastern"
     },
     "esoteric": {
@@ -18,7 +18,7 @@
       "label": "Esoteric/Western Occult"
     },
     "mythology": {
-      "count": 25,
+      "count": 23,
       "label": "Mythology/Classical"
     }
   },
@@ -1415,45 +1415,6 @@
       "preview": "THE RAMAYANA OF VALMIKI Translated by Ralph T.H. Griffith (1870-1874) === The Ramayana/Book I/Canto I: Nárad sa:रामायणम्/बालकाण्डम्/सर्गः १ The Ramayana/Book I/Canto II: Brahmá's Visit sa:रामायणम्/बालकाण्डम्/सर्गः २ The…"
     },
     {
-      "id": "eastern__ramayana-arch-gut",
-      "filename": "ramayana-arch-gut.txt",
-      "path": "eastern/ramayana-arch-gut.txt",
-      "category": "eastern",
-      "tradition": "Eastern",
-      "title": "Ramayana Arch Gut",
-      "size_bytes": 146097,
-      "size_human": "143KB",
-      "word_count": 7130,
-      "sha256": "0d79eb0ffc1c913e60e599996debc33d0097e5e089b39479907dcd57d9882c91",
-      "preview": "Internet Archive: Error <meta name=\"baggage\" content=\"sentry-trace_id=dd869524f7724258b688a48b1b179780,sentry-sample_rate=0.001,sentry-transaction=%2Fdownload.php,sentry-public_key=94bf3037c1e245c8a927aaa4daad2dbb,sentry…"
-    },
-    {
-      "id": "eastern__ramayana_missing",
-      "filename": "ramayana_missing.txt",
-      "path": "eastern/ramayana_missing.txt",
-      "category": "eastern",
-      "tradition": "Eastern",
-      "title": "Ramayana Missing",
-      "size_bytes": 74046,
-      "size_human": "72KB",
-      "word_count": 12928,
-      "sha256": "0300bafbbf72675402f7e847c6b13ee1f236a292fc951c81d29ae669c9a43680",
-      "preview": "The Ramayana/Book III/Canto LI: The Combat The Ramayana/Book III/Canto LII: Rávan's Flight The Ramayana/Book III/Canto LIII: Sitá's Threats The Ramayana/Book III/Canto LIV: Lanká The Ramayana/Book III/Canto LIX: Ráma's…"
-    },
-    {
-      "id": "eastern__ramayana-wiki3",
-      "filename": "ramayana-wiki3.txt",
-      "path": "eastern/ramayana-wiki3.txt",
-      "category": "eastern",
-      "tradition": "Eastern",
-      "title": "Ramayana Wiki3",
-      "size_bytes": 37432,
-      "size_human": "37KB",
-      "word_count": 5048,
-      "sha256": "978311b42b17f0c7341b4fbaac2342a6d56abe08e4644b63913b729dedf144f4",
-      "preview": "category:Translations into English verse from Sanskrit literature The Ramayana * Invocation Image:75%.png Book ICalled in Sanskrit also Bála-Kánda, and in Hindi Bál-Kánd, i. e. the Book describing Ráma's childhood, bála…"
-    },
-    {
       "id": "eastern__rig-veda",
       "filename": "rig-veda.txt",
       "path": "eastern/rig-veda.txt",
@@ -1504,45 +1465,6 @@
       "word_count": 10070,
       "sha256": "34a2c2e8dc21f9d0f1159dec705f3207cf34ac127fe44c84c1a5ef9a27f046a6",
       "preview": "# 10 - TECHNIQUES Can you keep your soul in its body, hold fast to the one, and so learn to be whole? Can you center your energy, be soft, tender, and so learn to be a baby? Can you keep the deep water still and clear,…"
-    },
-    {
-      "id": "eastern__tibetan-arch3",
-      "filename": "tibetan-arch3.txt",
-      "path": "eastern/tibetan-arch3.txt",
-      "category": "eastern",
-      "tradition": "Eastern",
-      "title": "Tibetan Arch3",
-      "size_bytes": 669358,
-      "size_human": "654KB",
-      "word_count": 107958,
-      "sha256": "143152b5498924e2a795e08e6e88afbf09e397e8294dc194e71f21ef02bdde3b",
-      "preview": "ya he, Me e Pee iT g \"Saige tila if PA A Digitized by the Internet Archive in 2022 with funding from Kahle/Austin Foundation https://archive.org/details/tibetanbookofdea0000unse_w2j5 Eee BE LAN PBOOK- OF EHE. DEAD…"
-    },
-    {
-      "id": "eastern__tibetan-arch5",
-      "filename": "tibetan-arch5.txt",
-      "path": "eastern/tibetan-arch5.txt",
-      "category": "eastern",
-      "tradition": "Eastern",
-      "title": "Tibetan Arch5",
-      "size_bytes": 141112,
-      "size_human": "138KB",
-      "word_count": 7062,
-      "sha256": "79aa3cce9993be8dfc3c8fc9d7380d81b8fd1668810c3e4d060297fc0a3eb6a4",
-      "preview": "Internet Archive: Error <meta name=\"baggage\" content=\"sentry-trace_id=a14249e7253e4c8992306a178dc8f8cd,sentry-sample_rate=0.001,sentry-transaction=%2Fdownload.php,sentry-public_key=94bf3037c1e245c8a927aaa4daad2dbb,sentry…"
-    },
-    {
-      "id": "eastern__tibetan-archive2",
-      "filename": "tibetan-archive2.txt",
-      "path": "eastern/tibetan-archive2.txt",
-      "category": "eastern",
-      "tradition": "Eastern",
-      "title": "Tibetan Archive2",
-      "size_bytes": 141111,
-      "size_human": "138KB",
-      "word_count": 7062,
-      "sha256": "f1a2bec40b80172fbef703c368383d5291036cb35564c6cca31927e66a3b903e",
-      "preview": "Internet Archive: Error <meta name=\"baggage\" content=\"sentry-trace_id=ce91331df43c4bf7b2950248b54862ab,sentry-sample_rate=0.001,sentry-transaction=%2Fdownload.php,sentry-public_key=94bf3037c1e245c8a927aaa4daad2dbb,sentry…"
     },
     {
       "id": "eastern__tibetan-book-of-dead",
@@ -1792,19 +1714,6 @@
       "preview": ";Prologue When the lofty Anu, king of the Anunnaki, and Bel, lord of heaven and earth, he who determines the destiny of the land, committed the rule of all mankind to Marduk, the chief son of Ea; when they made him…"
     },
     {
-      "id": "mythology__hammurabi-wiki3",
-      "filename": "hammurabi-wiki3.txt",
-      "path": "mythology/hammurabi-wiki3.txt",
-      "category": "mythology",
-      "tradition": "Mythology/Classical",
-      "title": "Code of Hammurabi (Wiki)",
-      "size_bytes": 67234,
-      "size_human": "66KB",
-      "word_count": 12952,
-      "sha256": "87468267cd42aa549ec67dacd848b92c9b75803b619638860049c9ab1a786890",
-      "preview": ";Prologue When the lofty Anu, king of the Anunnaki, and Bel, lord of heaven and earth, he who determines the destiny of the land, committed the rule of all mankind to Marduk, the chief son of Ea; when they made him…"
-    },
-    {
       "id": "mythology__de-natura-deorum",
       "filename": "de-natura-deorum.txt",
       "path": "mythology/de-natura-deorum.txt",
@@ -1829,19 +1738,6 @@
       "word_count": 139244,
       "sha256": "3ac04b55080286653c66b1f631a5d2ef66b16ea956b51c96d9767cf25f8a98a4",
       "preview": "Transcriber’s Note This version of the text cannot represent certain typographical effects. Italics are delimited with the ‘_’ character as _italic_. Superscripted characters are noted using a carat as ‘XV^e’, or for…"
-    },
-    {
-      "id": "mythology__egyptian-pyramid-texts",
-      "filename": "egyptian-pyramid-texts.txt",
-      "path": "mythology/egyptian-pyramid-texts.txt",
-      "category": "mythology",
-      "tradition": "Mythology/Classical",
-      "title": "Egyptian Pyramid Texts",
-      "size_bytes": 146278,
-      "size_human": "143KB",
-      "word_count": 7130,
-      "sha256": "8a8eddf4124330e5f1031386767c4f59f68c97f82062e9458b89f8e7ab0dbcbf",
-      "preview": "Internet Archive: Error <meta name=\"baggage\" content=\"sentry-trace_id=0fc4ed9592154ba6b709f50876c5ad1a,sentry-sample_rate=0.001,sentry-transaction=%2Fdownload.php,sentry-public_key=94bf3037c1e245c8a927aaa4daad2dbb,sentry…"
     },
     {
       "id": "mythology__enuma_elish",
