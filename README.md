@@ -75,7 +75,7 @@ The texts themselves are public domain (ancient works). The catalog, tooling, an
 
 ## Origin
 
-Seed corpus from a personal library of 159 ancient texts, compiled for the study of consciousness across traditions. Published as protocol infrastructure — Layer 1 of a consciousness infrastructure designed to be uncapturable.
+Seed corpus from a personal library of 151 ancient texts, compiled for the study of consciousness across traditions. Published as protocol infrastructure — Layer 1 of a consciousness infrastructure designed to be uncapturable.
 
 > "Separate the earth from the fire, the subtle from the gross, acting prudently and with understanding."
 > — Emerald Tablet of Hermes

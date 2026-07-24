@@ -7,7 +7,7 @@ A static web reader + CLI for 151 ancient texts spanning every major world tradi
 - `index.html` — Single-file web app (vanilla JS/CSS, dark mode, full-text search, reader view)
 - `corpus.py` — Python CLI for search and browse (`python3 corpus.py stats|list|search|read`)
 - `catalog.json` — Metadata for 151 texts (title, tradition, category, word count, SHA256, preview)
-- `*.txt` — 158 plain text files (77 MiB) across 4 categories: abrahamic/, eastern/, esoteric/, mythology/
+- `*.txt` — 151 plain text files (75.7 MiB) across 4 categories: abrahamic/, eastern/, esoteric/, mythology/
 - Deployed to Vercel (static hosting, no server)
 
 ## Key Commands
