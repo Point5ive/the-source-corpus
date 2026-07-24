@@ -7,6 +7,7 @@
 <meta name="description" content="159 primary texts. 13 million words. Every major world tradition. Unmediated. Free.">
 <link rel="canonical" href="https://ancient-texts-weld.vercel.app/">
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="preload" href="catalog-summary.json" as="fetch" crossorigin>
 
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="The Source Corpus">
@@ -39,33 +40,56 @@
   --text-faint: #64748b;
   --accent: #06b6d4;
   --accent-dim: #0e7490;
-  --violet: #8b5cf6;
+  --accent-soft: rgba(6,182,212,0.14);
   --border: #1e293b;
+  --danger: #ef4444;
   --radius: 8px;
+  --reader-size: 17px;
   --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
-  --mono: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+  --serif: 'Iowan Old Style', 'Palatino Linotype', 'Georgia', 'Times New Roman', serif;
+  --mono: 'SF Mono', 'Fira Code', 'Cascadia Code', ui-monospace, monospace;
 }
 * { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
 body {
   background: var(--bg);
   color: var(--text);
   font-family: var(--font);
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
 }
 .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+
+/* Accessibility helpers */
+.sr-only {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0;
+}
+.skip-link {
+  position: absolute; left: 12px; top: -60px; z-index: 200;
+  background: var(--accent); color: #04212b; font-weight: 600;
+  padding: 10px 16px; border-radius: var(--radius);
+  transition: top 0.15s;
+}
+.skip-link:focus { top: 12px; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
 
 /* Header */
 header {
   border-bottom: 1px solid var(--border);
-  padding: 20px 0;
+  padding: 16px 0;
   position: sticky; top: 0;
   background: rgba(10,14,26,0.95);
   backdrop-filter: blur(12px);
   z-index: 100;
 }
-.header-inner { display: flex; align-items: center; justify-content: space-between; gap: 24px; }
-.logo { display: flex; align-items: center; gap: 12px; cursor: pointer; }
+.header-inner { display: flex; align-items: center; gap: 20px; }
+.logo {
+  display: flex; align-items: center; gap: 12px; cursor: pointer;
+  background: none; border: none; color: inherit; font-family: inherit; padding: 0;
+  flex-shrink: 0;
+}
 .logo-mark {
   width: 32px; height: 32px;
   border: 2px solid var(--accent);
@@ -79,18 +103,25 @@ header {
   background: var(--accent);
   border-radius: 50%;
 }
-.logo-text { font-size: 18px; font-weight: 600; letter-spacing: -0.3px; }
+.logo-text { font-size: 18px; font-weight: 600; letter-spacing: -0.3px; white-space: nowrap; }
 .logo-text span { color: var(--accent); }
 
+.menu-toggle {
+  display: none;
+  background: var(--bg-card); border: 1px solid var(--border); color: var(--text);
+  width: 40px; height: 40px; border-radius: var(--radius); cursor: pointer;
+  font-size: 18px; flex-shrink: 0;
+}
+
 /* Search */
-.search-wrap { flex: 1; max-width: 500px; position: relative; }
+.search-wrap { flex: 1; max-width: 520px; position: relative; }
 .search-input {
   width: 100%;
   background: var(--bg-card);
   border: 1px solid var(--border);
   border-radius: var(--radius);
   color: var(--text);
-  padding: 10px 16px 10px 40px;
+  padding: 10px 40px 10px 40px;
   font-size: 14px;
   font-family: var(--font);
   outline: none;
@@ -102,19 +133,26 @@ header {
   position: absolute; left: 14px; top: 50%;
   transform: translateY(-50%);
   color: var(--text-faint);
-  font-size: 14px;
+  font-size: 14px; pointer-events: none;
 }
+.search-clear {
+  position: absolute; right: 8px; top: 50%; transform: translateY(-50%);
+  background: none; border: none; color: var(--text-faint); cursor: pointer;
+  width: 26px; height: 26px; border-radius: 50%; font-size: 15px;
+  display: none; align-items: center; justify-content: center;
+}
+.search-clear:hover { color: var(--text); background: var(--bg-hover); }
+.search-clear.show { display: flex; }
 
 /* Stats */
-.stats { display: flex; gap: 20px; font-size: 13px; color: var(--text-dim); }
+.stats { display: flex; gap: 18px; font-size: 13px; color: var(--text-dim); flex-shrink: 0; }
 .stats b { color: var(--accent); font-weight: 600; }
 
 /* Layout */
 .layout { display: grid; grid-template-columns: 240px 1fr; gap: 24px; padding: 24px 0; }
 
 /* Sidebar */
-.sidebar { position: sticky; top: 80px; max-height: calc(100vh - 100px); overflow-y: auto; }
-.nav-section { margin-bottom: 24px; }
+.sidebar { position: sticky; top: 80px; max-height: calc(100vh - 100px); overflow-y: auto; align-self: start; }
 .nav-label {
   font-size: 11px; font-weight: 600;
   text-transform: uppercase; letter-spacing: 1px;
@@ -122,16 +160,18 @@ header {
   margin-bottom: 8px; padding-left: 12px;
 }
 .nav-item {
-  display: flex; align-items: center; justify-content: space-between;
+  display: flex; align-items: center; justify-content: space-between; gap: 8px;
+  width: 100%;
   padding: 8px 12px;
   border-radius: 6px;
   cursor: pointer;
   font-size: 14px;
   color: var(--text-dim);
-  transition: all 0.15s;
+  transition: background 0.15s, color 0.15s;
+  background: none; border: none; font-family: inherit; text-align: left;
 }
 .nav-item:hover { background: var(--bg-card); color: var(--text); }
-.nav-item.active { background: var(--bg-card); color: var(--accent); }
+.nav-item[aria-current="true"] { background: var(--bg-card); color: var(--accent); }
 .nav-item .count {
   font-size: 11px; color: var(--text-faint);
   background: var(--bg);
@@ -144,14 +184,16 @@ header {
 /* Text cards */
 .text-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 16px; }
 .text-card {
+  display: block; text-align: left; width: 100%;
   background: var(--bg-card);
   border: 1px solid var(--border);
   border-radius: var(--radius);
   padding: 20px;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: border-color 0.2s, background 0.2s, transform 0.2s;
   position: relative;
   overflow: hidden;
+  color: inherit; font-family: inherit; text-decoration: none;
 }
 .text-card:hover { border-color: var(--accent-dim); background: var(--bg-hover); }
 .text-card::before {
@@ -161,8 +203,8 @@ header {
   opacity: 0; transition: opacity 0.2s;
 }
 .text-card:hover::before { opacity: 0.6; }
-.text-title { font-size: 15px; font-weight: 600; margin-bottom: 6px; }
-.text-meta { display: flex; gap: 12px; font-size: 12px; color: var(--text-faint); margin-bottom: 8px; }
+.text-title { font-size: 15px; font-weight: 600; margin-bottom: 6px; color: var(--text); }
+.text-meta { display: flex; gap: 12px; font-size: 12px; color: var(--text-faint); margin-bottom: 8px; flex-wrap: wrap; }
 .text-meta .badge {
   background: var(--bg);
   padding: 2px 8px; border-radius: 4px;
@@ -175,72 +217,112 @@ header {
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
+  min-height: 3.9em; /* reserve space so previews filling in cause no layout shift */
 }
 
 /* Reader view */
 .reader { display: none; }
 .reader.active { display: block; }
-.reader-header {
-  display: flex; align-items: center; justify-content: space-between;
-  margin-bottom: 20px;
+.reader-progress {
+  position: sticky; top: 0; height: 3px; background: transparent; z-index: 5;
+  margin-bottom: 4px;
+}
+.reader-progress span { display: block; height: 100%; width: 0; background: var(--accent); transition: width 0.1s linear; }
+.reader-toolbar {
+  display: flex; align-items: center; justify-content: space-between; gap: 16px;
+  margin-bottom: 16px; flex-wrap: wrap;
 }
 .reader-back {
   background: none; border: none; color: var(--text-dim);
   cursor: pointer; font-size: 14px;
-  display: flex; align-items: center; gap: 6px;
+  display: flex; align-items: center; gap: 6px; padding: 6px 4px;
 }
 .reader-back:hover { color: var(--accent); }
-.reader-title { font-size: 22px; font-weight: 700; }
-.reader-meta { font-size: 13px; color: var(--text-faint); margin-bottom: 20px; }
+.reader-tools { display: flex; align-items: center; gap: 8px; }
+.tool-btn {
+  background: var(--bg-card); border: 1px solid var(--border); color: var(--text-dim);
+  border-radius: 6px; cursor: pointer; height: 32px; min-width: 32px; padding: 0 10px;
+  font-size: 13px; display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+}
+.tool-btn:hover { color: var(--text); border-color: var(--accent-dim); }
+.tool-btn[aria-pressed="true"] { color: var(--accent); border-color: var(--accent-dim); }
+.reader-title { font-size: 24px; font-weight: 700; letter-spacing: -0.4px; }
+.reader-meta { font-size: 13px; color: var(--text-faint); margin: 6px 0 18px; }
+.reader-layout { display: grid; grid-template-columns: 1fr; gap: 20px; }
+.reader-layout.has-toc { grid-template-columns: 220px 1fr; }
+.reader-toc {
+  display: none;
+  position: sticky; top: 80px; align-self: start;
+  max-height: calc(100vh - 160px); overflow-y: auto;
+  font-size: 13px; border-left: 1px solid var(--border); padding-left: 4px;
+}
+.reader-layout.has-toc .reader-toc { display: block; }
+.reader-toc-label { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: var(--text-faint); margin: 0 0 8px 12px; }
+.reader-toc a {
+  display: block; padding: 5px 12px; color: var(--text-dim); text-decoration: none;
+  border-radius: 5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.reader-toc a:hover { background: var(--bg-card); color: var(--text); }
+.reader-main { min-width: 0; }
+.reader-find {
+  display: flex; align-items: center; gap: 8px; margin-bottom: 12px;
+}
+.reader-find input {
+  flex: 1; max-width: 320px; background: var(--bg-card); border: 1px solid var(--border);
+  color: var(--text); border-radius: 6px; padding: 7px 12px; font-size: 13px; font-family: var(--font);
+}
+.reader-find input:focus { outline: none; border-color: var(--accent-dim); }
+.reader-find .find-count { font-size: 12px; color: var(--text-faint); white-space: nowrap; }
 .reader-content {
   background: var(--bg-card);
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  padding: 32px 40px;
-  font-size: 15px;
-  line-height: 1.8;
-  max-height: calc(100vh - 280px);
+  padding: 40px clamp(20px, 5vw, 56px);
+  font-size: var(--reader-size);
+  line-height: 1.85;
+  max-height: calc(100vh - 260px);
   overflow-y: auto;
   white-space: pre-wrap;
-  font-family: 'Georgia', 'Times New Roman', serif;
+  overflow-wrap: break-word;
+  font-family: var(--serif);
 }
-.reader-content mark {
-  background: rgba(6,182,212,0.25);
+.reader-content .measure { max-width: 68ch; margin: 0 auto; }
+.reader-content mark, .search-result-context mark {
+  background: var(--accent-soft);
   color: var(--accent);
   border-radius: 2px;
   padding: 0 2px;
 }
+.reader-content mark.current { background: var(--accent); color: #04212b; }
 
 /* Search results */
 .search-results { display: none; }
 .search-results.active { display: block; }
+.results-count { color: var(--text-faint); font-size: 13px; margin-bottom: 16px; }
 .search-result {
+  display: block; width: 100%; text-align: left;
   background: var(--bg-card);
   border: 1px solid var(--border);
   border-radius: var(--radius);
   padding: 16px 20px;
   margin-bottom: 12px;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: border-color 0.2s;
+  color: inherit; font-family: inherit; text-decoration: none;
 }
 .search-result:hover { border-color: var(--accent-dim); }
-.search-result-title { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+.search-result-title { font-size: 14px; font-weight: 600; margin-bottom: 4px; color: var(--text); }
 .search-result-context {
-  font-size: 13px; color: var(--text-dim);
-  line-height: 1.5;
-}
-.search-result-context mark {
-  background: rgba(6,182,212,0.25); color: var(--accent);
-  border-radius: 2px; padding: 0 2px;
+  font-size: 13px; color: var(--text-dim); line-height: 1.5; margin-top: 6px;
 }
 
-/* Empty state */
+/* Empty / loading state */
 .empty { text-align: center; padding: 60px 20px; color: var(--text-faint); }
 
 /* Scrollbar */
-::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar { width: 8px; height: 8px; }
 ::-webkit-scrollbar-track { background: var(--bg); }
-::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--text-faint); }
 
 /* Film grain */
@@ -252,49 +334,73 @@ body::after {
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
-/* Responsive */
-@media (max-width: 768px) {
-  .layout { grid-template-columns: 1fr; }
-  .sidebar { position: static; max-height: none; }
-  .stats { display: none; }
-  .text-grid { grid-template-columns: 1fr; }
-  .reader-content { padding: 20px; font-size: 14px; }
-}
-
 /* Hero */
 .hero {
   padding: 40px 0 20px;
   border-bottom: 1px solid var(--border);
-  margin-bottom: 0;
 }
-.hero h1 {
-  font-size: 28px; font-weight: 700;
-  letter-spacing: -0.5px;
-  margin-bottom: 8px;
-}
+.hero h1 { font-size: 30px; font-weight: 700; letter-spacing: -0.5px; margin-bottom: 8px; }
 .hero h1 span { color: var(--accent); }
-.hero p { color: var(--text-dim); font-size: 15px; max-width: 600px; }
+.hero p { color: var(--text-dim); font-size: 15px; max-width: 620px; }
+
+/* Backdrop for mobile sidebar */
+.backdrop {
+  display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5);
+  z-index: 90; backdrop-filter: blur(2px);
+}
+.backdrop.show { display: block; }
+
+/* Responsive */
+@media (max-width: 860px) {
+  .stats { display: none; }
+  .menu-toggle { display: flex; align-items: center; justify-content: center; }
+  .layout { grid-template-columns: 1fr; }
+  .sidebar {
+    position: fixed; top: 0; left: 0; bottom: 0; width: 260px; z-index: 95;
+    background: var(--bg); border-right: 1px solid var(--border);
+    max-height: none; padding: 80px 16px 24px; overflow-y: auto;
+    transform: translateX(-100%); transition: transform 0.22s ease;
+  }
+  .sidebar.open { transform: translateX(0); }
+  .reader-layout.has-toc { grid-template-columns: 1fr; }
+  .reader-layout.has-toc .reader-toc { display: none; }
+  .reader-content { max-height: none; padding: 24px 18px; }
+  .hero h1 { font-size: 24px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  * { transition: none !important; }
+}
 </style>
 </head>
 <body>
 
+<a href="#main" class="skip-link">Skip to content</a>
+
 <header>
   <div class="container header-inner">
-    <div class="logo" onclick="showBrowse()">
-      <div class="logo-mark"></div>
-      <div class="logo-text">The Source <span>Corpus</span></div>
-    </div>
+    <button class="menu-toggle" id="menuToggle" aria-label="Open navigation" aria-expanded="false" aria-controls="sidebar">&#9776;</button>
+    <button class="logo" id="logo" aria-label="The Source Corpus — home">
+      <span class="logo-mark" aria-hidden="true"></span>
+      <span class="logo-text">The Source <span>Corpus</span></span>
+    </button>
     <div class="search-wrap">
-      <span class="search-icon">&#128269;</span>
-      <input class="search-input" id="searchInput" placeholder="Search across 159 texts, 13 million words..." />
+      <span class="search-icon" aria-hidden="true">&#128269;</span>
+      <input class="search-input" id="searchInput" type="search" autocomplete="off"
+             aria-label="Search across 159 texts, 13 million words"
+             placeholder="Search 159 texts, 13 million words… (press /)">
+      <button class="search-clear" id="searchClear" aria-label="Clear search" type="button">&#10005;</button>
     </div>
-    <div class="stats">
+    <div class="stats" aria-hidden="true">
       <span><b id="statTexts">159</b> texts</span>
       <span><b id="statWords">13M</b> words</span>
       <span><b id="statCats">4</b> traditions</span>
     </div>
   </div>
 </header>
+
+<div class="backdrop" id="backdrop"></div>
 
 <div class="container">
   <div class="hero" id="hero">
@@ -303,30 +409,45 @@ body::after {
   </div>
 
   <div class="layout">
-    <aside class="sidebar">
-      <div class="nav-section">
-        <div class="nav-label">Traditions</div>
-        <div class="nav-item active" onclick="filterCategory('all', event)">All Texts <span class="count" id="countAll">159</span></div>
-        <div class="nav-item" onclick="filterCategory('abrahamic', event)">Abrahamic <span class="count" id="countAbrahamic">90</span></div>
-        <div class="nav-item" onclick="filterCategory('eastern', event)">Eastern <span class="count" id="countEastern">33</span></div>
-        <div class="nav-item" onclick="filterCategory('esoteric', event)">Esoteric <span class="count" id="countEsoteric">11</span></div>
-        <div class="nav-item" onclick="filterCategory('mythology', event)">Mythology <span class="count" id="countMythology">25</span></div>
-      </div>
-    </aside>
+    <nav class="sidebar" id="sidebar" aria-label="Traditions">
+      <div class="nav-label" id="navLabel">Traditions</div>
+      <div id="navItems"></div>
+    </nav>
 
-    <main class="content">
+    <main class="content" id="main" tabindex="-1">
       <div id="browseView">
         <div class="text-grid" id="textGrid"></div>
       </div>
-      <div id="readerView" class="reader">
-        <div class="reader-header">
-          <button class="reader-back" onclick="closeReader()">&#8592; Back to corpus</button>
+
+      <div id="readerView" class="reader" aria-hidden="true">
+        <div class="reader-progress" aria-hidden="true"><span id="readerProgress"></span></div>
+        <div class="reader-toolbar">
+          <button class="reader-back" id="readerBack" aria-label="Back to corpus">&#8592; Back to corpus</button>
+          <div class="reader-tools">
+            <button class="tool-btn" id="findToggle" aria-label="Find within this text" aria-pressed="false">&#128269; Find</button>
+            <button class="tool-btn" id="textSmaller" aria-label="Decrease text size">A&#8722;</button>
+            <button class="tool-btn" id="textLarger" aria-label="Increase text size">A&#43;</button>
+          </div>
         </div>
-        <div class="reader-title" id="readerTitle"></div>
+        <h1 class="reader-title" id="readerTitle" tabindex="-1"></h1>
         <div class="reader-meta" id="readerMeta"></div>
-        <div class="reader-content" id="readerContent"></div>
+        <div class="reader-find" id="readerFind" hidden>
+          <input type="search" id="findInput" placeholder="Find in text…" aria-label="Find within this text" autocomplete="off">
+          <span class="find-count" id="findCount"></span>
+        </div>
+        <div class="reader-layout" id="readerLayout">
+          <aside class="reader-toc" id="readerToc" aria-label="Table of contents">
+            <div class="reader-toc-label">Contents</div>
+            <div id="readerTocList"></div>
+          </aside>
+          <div class="reader-main">
+            <div class="reader-content" id="readerContent" tabindex="0" role="article" aria-label="Text content"></div>
+          </div>
+        </div>
       </div>
-      <div id="searchView" class="search-results">
+
+      <div id="searchView" class="search-results" aria-hidden="true">
+        <div class="results-count" id="resultsCount" role="status" aria-live="polite"></div>
         <div id="searchResultsList"></div>
       </div>
     </main>
@@ -334,277 +455,598 @@ body::after {
 </div>
 
 <script>
-let catalog = null;
-let searchIndex = null;
-let currentFilter = 'all';
-let textCache = {};
+(function () {
+  'use strict';
 
-async function loadCatalog() {
-  const res = await fetch('catalog.json');
-  catalog = await res.json();
-  document.getElementById('statTexts').textContent = catalog.total_texts;
-  document.getElementById('statWords').textContent = (catalog.total_words / 1e6).toFixed(1) + 'M';
-  renderTexts();
-}
+  // ------------------------------------------------------------------ State
+  const State = {
+    summary: null,     // lean catalog for first paint
+    catalog: null,     // full catalog (previews, sha256), lazy
+    byId: new Map(),   // id -> text meta (summary, enriched by full)
+    searchIndex: null,
+    textCache: new Map(),
+    filter: 'all',
+    view: 'browse',
+    readerId: null,
+    settings: { readerSize: clampSize(parseInt(localStorage.getItem('tsc.readerSize'), 10) || 17) }
+  };
 
-async function loadSearchIndex() {
-  try {
-    const res = await fetch('search-index.json');
-    searchIndex = await res.json();
-  } catch (e) {
-    searchIndex = null; // full-text index unavailable — search falls back to titles/previews
+  const CATS = [
+    { id: 'all', label: 'All Texts' },
+    { id: 'abrahamic', label: 'Abrahamic' },
+    { id: 'eastern', label: 'Eastern' },
+    { id: 'esoteric', label: 'Esoteric' },
+    { id: 'mythology', label: 'Mythology' }
+  ];
+
+  const $ = (id) => document.getElementById(id);
+  function clampSize(n) { return Math.max(14, Math.min(24, n)); }
+
+  // ------------------------------------------------------------- DOM helper
+  function el(tag, attrs, ...kids) {
+    const n = document.createElement(tag);
+    if (attrs) for (const k in attrs) {
+      const v = attrs[k];
+      if (v == null) continue;
+      if (k === 'class') n.className = v;
+      else if (k === 'text') n.textContent = v;
+      else if (k === 'dataset') Object.assign(n.dataset, v);
+      else if (k.slice(0, 2) === 'on' && typeof v === 'function') n.addEventListener(k.slice(2), v);
+      else n.setAttribute(k, v);
+    }
+    for (const c of kids.flat()) {
+      if (c == null || c === false) continue;
+      n.append(c.nodeType ? c : document.createTextNode(String(c)));
+    }
+    return n;
   }
-}
 
-// Strip Project Gutenberg header/footer boilerplate and wiki markup so the
-// reader shows the text itself, not the scrape artifacts around it.
-function cleanText(raw) {
-  let text = raw;
+  // Append `text` into `container`, wrapping matches of any term in <mark>.
+  // Pure DOM — no innerHTML, so nothing user/content-derived is ever parsed.
+  function appendHighlighted(container, text, terms) {
+    const uniq = [...new Set(terms.filter(Boolean))].sort((a, b) => b.length - a.length);
+    if (!uniq.length) { container.append(document.createTextNode(text)); return; }
+    const re = new RegExp('(' + uniq.map(escapeRegex).join('|') + ')', 'gi');
+    let last = 0, m;
+    while ((m = re.exec(text)) !== null) {
+      if (m.index > last) container.append(document.createTextNode(text.slice(last, m.index)));
+      container.append(el('mark', null, m[0]));
+      last = m.index + m[0].length;
+      if (m.index === re.lastIndex) re.lastIndex++;
+    }
+    if (last < text.length) container.append(document.createTextNode(text.slice(last)));
+  }
+  function escapeRegex(s) { return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
 
-  const start = text.match(/\*\*\*\s*START OF (?:THIS |THE )?PROJECT GUTENBERG[^\n]*\*\*\*/i);
-  if (start) text = text.slice(start.index + start[0].length);
-  const end = text.match(/\*\*\*\s*END OF (?:THIS |THE )?PROJECT GUTENBERG[^\n]*\*\*\*/i);
-  if (end) text = text.slice(0, end.index);
+  // ---------------------------------------------------------- Text cleaning
+  // Canonical cleaner — byte-compatible with corpus.py clean_text().
+  function cleanText(raw) {
+    let text = raw;
+    const startRe = /\*\*\*\s*START OF (?:THIS |THE )?PROJECT GUTENBERG[^\n]*\*\*\*/i;
+    const s = text.match(startRe);
+    if (s) text = text.slice(s.index + s[0].length);
 
-  text = text
-    .replace(/\{\{[^{}]*\}\}/g, '')
-    .replace(/\[\[([^\]|]*)\|([^\]]*)\]\]/g, '$2')
-    .replace(/\[\[([^\]]*)\]\]/g, '$1')
-    .replace(/\n{3,}/g, '\n\n');
+    const endFenced = text.match(/\*\*\*\s*END OF (?:THIS |THE )?PROJECT GUTENBERG[^\n]*\*\*\*/i);
+    const endPlain = text.match(/\n[ \t]*End of (?:the |this )?Project Gutenberg[^\n]*/i);
+    const ends = [endFenced ? endFenced.index : -1, endPlain ? endPlain.index : -1].filter(i => i >= 0);
+    if (ends.length) text = text.slice(0, Math.min.apply(null, ends));
 
-  return text.trim();
-}
+    text = text.replace(/<!--[\s\S]*?-->/g, '').replace(/<[^>\n]{1,200}>/g, '');
+    for (let i = 0; i < 6; i++) {
+      const next = text.replace(/\{\{[^{}]*\}\}/g, '');
+      if (next === text) break;
+      text = next;
+    }
+    text = text
+      .replace(/\[\[[^\]|]*\|([^\]]*)\]\]/g, '$1')
+      .replace(/\[\[([^\]]*)\]\]/g, '$1')
+      .replace(/__[A-Z]+__/g, '')
+      .replace(/^=+\s*(.*?)\s*=+\s*$/gm, '$1')
+      .replace(/\n{3,}/g, '\n\n');
+    return text.trim();
+  }
 
-async function ensureTextLoaded(id) {
-  if (textCache[id]) return textCache[id];
-  const text = catalog.texts.find(t => t.id === id);
-  if (!text) return null;
-  try {
-    const res = await fetch(text.path);
-    textCache[id] = cleanText(await res.text());
-  } catch (e) {
+  // -------------------------------------------------------------- Data load
+  async function loadSummary() {
+    const res = await fetch('catalog-summary.json');
+    const data = await res.json();
+    State.summary = data;
+    for (const t of data.texts) State.byId.set(t.id, Object.assign({}, t));
+    $('statTexts').textContent = data.total_texts;
+    $('statWords').textContent = (data.total_words / 1e6).toFixed(1) + 'M';
+    // seed sidebar counts
+    const counts = { all: data.texts.length };
+    for (const t of data.texts) counts[t.category] = (counts[t.category] || 0) + 1;
+    renderNav(counts);
+    return data;
+  }
+
+  async function loadCatalog() {
+    const res = await fetch('catalog.json');
+    const data = await res.json();
+    State.catalog = data;
+    for (const t of data.texts) {
+      const existing = State.byId.get(t.id) || {};
+      State.byId.set(t.id, Object.assign(existing, t));
+    }
+    // enrich any rendered cards with their (now-clean) preview text
+    for (const t of data.texts) {
+      const p = document.querySelector('.text-preview[data-preview-for="' + cssEsc(t.id) + '"]');
+      if (p && !p.textContent) p.textContent = t.preview || '';
+    }
+    return data;
+  }
+
+  async function loadSearchIndex() {
     try {
-      const res = await fetch(encodeURIComponent(text.path));
-      textCache[id] = cleanText(await res.text());
-    } catch (e2) {
-      return null;
+      const res = await fetch('search-index.json');
+      State.searchIndex = await res.json();
+    } catch (e) { State.searchIndex = null; }
+  }
+
+  function cssEsc(s) { return (window.CSS && CSS.escape) ? CSS.escape(s) : s.replace(/["\\]/g, '\\$&'); }
+
+  async function ensureTextLoaded(id) {
+    if (State.textCache.has(id)) return State.textCache.get(id);
+    const meta = State.byId.get(id);
+    if (!meta) return null;
+    try {
+      const res = await fetch(meta.path);
+      const cleaned = cleanText(await res.text());
+      State.textCache.set(id, cleaned);
+      return cleaned;
+    } catch (e) {
+      try {
+        const res = await fetch(encodeURIComponent(meta.path));
+        const cleaned = cleanText(await res.text());
+        State.textCache.set(id, cleaned);
+        return cleaned;
+      } catch (e2) { return null; }
     }
   }
-  return textCache[id];
-}
 
-function tokenizeQuery(query) {
-  const STOPWORDS = new Set(['the','and','of','to','a','in','is','it','that','this','for','on','with','as','was','were']);
-  return (query.toLowerCase().match(/[a-z']+/g) || [])
-    .filter(w => w.length > 2 && !STOPWORDS.has(w));
-}
+  // ---------------------------------------------------------------- Router
+  // #/            browse all
+  // #/c/<cat>     browse category
+  // #/read/<id>   reader
+  // #/q/<query>   search
+  function parseHash() {
+    const h = decodeURIComponent(location.hash.replace(/^#/, ''));
+    if (h.startsWith('/read/')) return { view: 'reader', id: h.slice(6) };
+    if (h.startsWith('/c/')) return { view: 'browse', filter: h.slice(3) || 'all' };
+    if (h.startsWith('/q/')) return { view: 'search', query: h.slice(3) };
+    return { view: 'browse', filter: 'all' };
+  }
 
-// BM25 ranking over the v2 search index. Postings for a term are a flat array
-// [doc0, code0, ddoc1, code1, ...] where ddoc is the gap from the previous doc
-// id and code is a log-quantized term frequency (tf ≈ 2^(code-1)).
-const BM25_K1 = 1.2, BM25_B = 0.5;
-function bm25Rank(queryTerms) {
-  const idx = searchIndex.index;
-  const N = searchIndex.docs.length;
-  const doclen = searchIndex.doclen;
-  const avglen = searchIndex.avglen || 1;
-  const scores = new Map();
-  for (const term of queryTerms) {
-    const flat = idx[term];
-    if (!flat) continue;
-    const df = flat.length / 2;
-    const idf = Math.log(1 + (N - df + 0.5) / (df + 0.5));
-    let d = 0;
-    for (let i = 0; i < flat.length; i += 2) {
-      d += flat[i];
-      const tf = Math.pow(2, flat[i + 1] - 1);
-      const len = (doclen && doclen[d]) || avglen;
-      const denom = tf + BM25_K1 * (1 - BM25_B + BM25_B * len / avglen);
-      scores.set(d, (scores.get(d) || 0) + idf * (tf * (BM25_K1 + 1)) / denom);
+  function navigate(hash) {
+    if (location.hash === hash) route(); else location.hash = hash;
+  }
+
+  function route() {
+    const r = parseHash();
+    closeSidebar();
+    if (r.view === 'reader') { showReader(r.id); return; }
+    if (r.view === 'search') {
+      const input = $('searchInput');
+      if (input.value !== r.query) input.value = r.query;
+      toggleClear();
+      runSearch(r.query);
+      return;
     }
-  }
-  return [...scores.entries()].sort((a, b) => b[1] - a[1]);
-}
-
-function renderTexts() {
-  const grid = document.getElementById('textGrid');
-  const texts = currentFilter === 'all'
-    ? catalog.texts
-    : catalog.texts.filter(t => t.category === currentFilter);
-
-  grid.innerHTML = texts.map(t => `
-    <div class="text-card" onclick="openReader('${t.id}')">
-      <div class="text-title">${t.title}</div>
-      <div class="text-meta">
-        <span class="badge">${t.tradition}</span>
-        <span>${t.size_human}</span>
-        <span>${t.word_count.toLocaleString()} words</span>
-      </div>
-      <div class="text-preview">${escapeHtml(t.preview)}</div>
-    </div>
-  `).join('');
-}
-
-function filterCategory(cat, evt) {
-  currentFilter = cat;
-  document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-  evt.currentTarget.classList.add('active');
-  showBrowse();
-  renderTexts();
-}
-
-function showBrowse() {
-  document.getElementById('browseView').style.display = 'block';
-  document.getElementById('readerView').classList.remove('active');
-  document.getElementById('searchView').classList.remove('active');
-  document.getElementById('hero').style.display = 'block';
-}
-
-async function openReader(id) {
-  const text = catalog.texts.find(t => t.id === id);
-  if (!text) return;
-
-  document.getElementById('browseView').style.display = 'none';
-  document.getElementById('searchView').classList.remove('active');
-  document.getElementById('readerView').classList.add('active');
-  document.getElementById('hero').style.display = 'none';
-
-  document.getElementById('readerTitle').textContent = text.title;
-  document.getElementById('readerMeta').innerHTML = `
-    <strong>${text.tradition}</strong> &middot; ${text.size_human} &middot; ${text.word_count.toLocaleString()} words &middot;
-    <span style="font-family:var(--mono);font-size:11px">SHA256: ${text.sha256.substring(0,16)}...</span>
-  `;
-
-  const content = document.getElementById('readerContent');
-  content.innerHTML = '<div style="color:var(--text-faint)">Loading...</div>';
-
-  const loaded = await ensureTextLoaded(id);
-  if (loaded === null) {
-    content.innerHTML = '<div style="color:#ef4444">Failed to load text. The file may need to be served from the same directory as this app.</div>';
-    return;
-  }
-
-  content.textContent = loaded;
-}
-
-function closeReader() {
-  showBrowse();
-}
-
-// Search
-let searchTimer = null;
-document.getElementById('searchInput').addEventListener('input', (e) => {
-  clearTimeout(searchTimer);
-  const query = e.target.value.trim();
-
-  if (query.length < 2) {
+    State.filter = r.filter || 'all';
+    if ($('searchInput').value) { $('searchInput').value = ''; toggleClear(); }
     showBrowse();
-    return;
   }
 
-  searchTimer = setTimeout(() => doSearch(query), 300);
-});
+  // ----------------------------------------------------------------- Views
+  function setView(view) {
+    State.view = view;
+    $('browseView').style.display = view === 'browse' ? 'block' : 'none';
+    $('hero').style.display = view === 'browse' ? 'block' : 'none';
+    $('readerView').classList.toggle('active', view === 'reader');
+    $('readerView').setAttribute('aria-hidden', view === 'reader' ? 'false' : 'true');
+    $('searchView').classList.toggle('active', view === 'search');
+    $('searchView').setAttribute('aria-hidden', view === 'search' ? 'false' : 'true');
+  }
 
-async function doSearch(query) {
-  const qLower = query.toLowerCase();
-  const seen = new Set();
-  const results = [];
-
-  // Title matches first (strongest signal)
-  for (const t of catalog.texts) {
-    if (t.title.toLowerCase().includes(qLower)) {
-      seen.add(t.id);
-      results.push({ text: t, context: t.preview });
+  function renderNav(counts) {
+    const wrap = $('navItems');
+    wrap.textContent = '';
+    for (const c of CATS) {
+      const btn = el('button', {
+        class: 'nav-item',
+        'aria-current': State.filter === c.id ? 'true' : 'false',
+        dataset: { cat: c.id },
+        onclick: () => navigate(c.id === 'all' ? '#/' : '#/c/' + c.id)
+      },
+        el('span', null, c.label),
+        el('span', { class: 'count' }, String(counts[c.id] != null ? counts[c.id] : ''))
+      );
+      wrap.append(btn);
     }
   }
 
-  // Full-text matches via the prebuilt search index — instant, across all 159
-  // texts, ranked by BM25 over the v2 index (delta-encoded postings carrying a
-  // log-quantized term frequency, plus per-doc lengths for normalization).
-  const queryTerms = tokenizeQuery(query);
-  if (searchIndex && queryTerms.length) {
-    const ranked = bm25Rank(queryTerms);
-    for (const [docIdx] of ranked) {
-      const id = searchIndex.docs[docIdx];
-      if (seen.has(id)) continue;
-      const t = catalog.texts.find(x => x.id === id);
-      if (!t) continue;
-      seen.add(id);
-      results.push({ text: t, context: null }); // context filled in lazily below
-      if (results.length >= 40) break;
+  function refreshNavActive() {
+    for (const b of $('navItems').querySelectorAll('.nav-item'))
+      b.setAttribute('aria-current', b.dataset.cat === State.filter ? 'true' : 'false');
+  }
+
+  function currentTexts() {
+    const texts = State.summary ? State.summary.texts : [];
+    return State.filter === 'all' ? texts : texts.filter(t => t.category === State.filter);
+  }
+
+  function showBrowse() {
+    setView('browse');
+    refreshNavActive();
+    renderCards();
+    window.scrollTo({ top: 0 });
+  }
+
+  function renderCards() {
+    const grid = $('textGrid');
+    grid.textContent = '';
+    const texts = currentTexts();
+    const frag = document.createDocumentFragment();
+    for (const t of texts) {
+      const full = State.byId.get(t.id) || t;
+      const card = el('a', {
+        class: 'text-card', href: '#/read/' + encodeURIComponent(t.id),
+        'aria-label': t.title + ', ' + t.tradition + ', ' + t.word_count.toLocaleString() + ' words'
+      },
+        el('div', { class: 'text-title' }, t.title),
+        el('div', { class: 'text-meta' },
+          el('span', { class: 'badge' }, t.tradition),
+          el('span', null, t.size_human),
+          el('span', null, t.word_count.toLocaleString() + ' words')
+        ),
+        el('div', { class: 'text-preview', dataset: { previewFor: t.id } }, full.preview || '')
+      );
+      frag.append(card);
     }
+    grid.append(frag);
+    if (!texts.length) grid.append(el('div', { class: 'empty' }, 'No texts in this tradition.'));
   }
 
-  // Preview matches (catalog-only fallback, e.g. short/stopword queries)
-  for (const t of catalog.texts) {
-    if (seen.has(t.id)) continue;
-    if (t.preview.toLowerCase().includes(qLower)) {
-      seen.add(t.id);
-      results.push({ text: t, context: t.preview });
-    }
+  // ---------------------------------------------------------------- Search
+  const STOPQ = new Set(['the','and','of','to','a','in','is','it','that','this','for','on','with','as','was','were']);
+  function tokenizeQuery(q) {
+    return (q.toLowerCase().match(/[a-z']+/g) || []).filter(w => w.length > 2 && !STOPQ.has(w));
   }
 
-  // Switch to search view
-  document.getElementById('browseView').style.display = 'none';
-  document.getElementById('readerView').classList.remove('active');
-  document.getElementById('searchView').classList.add('active');
-  document.getElementById('hero').style.display = 'none';
-
-  const list = document.getElementById('searchResultsList');
-  if (results.length === 0) {
-    list.innerHTML = '<div class="empty">No results found. Try a different term.</div>';
-    return;
-  }
-
-  list.innerHTML = `<div style="color:var(--text-faint);font-size:13px;margin-bottom:16px">${results.length} result${results.length > 1 ? 's' : ''}</div>` +
-    results.map(r => `
-      <div class="search-result" onclick="openReader('${r.text.id}')">
-        <div class="search-result-title">${r.text.title}</div>
-        <div class="text-meta">
-          <span class="badge">${r.text.tradition}</span>
-          <span>${r.text.word_count.toLocaleString()} words</span>
-        </div>
-        <div class="search-result-context" data-context-for="${r.text.id}">${
-          r.context !== null ? '...' + highlightText(r.context, query) + '...' : 'Loading excerpt&hellip;'
-        }</div>
-      </div>
-    `).join('');
-
-  // Fetch excerpts for full-text-only matches (bounded — avoid a fetch storm)
-  const needsContext = results.filter(r => r.context === null).slice(0, 20);
-  for (const r of needsContext) {
-    const content = await ensureTextLoaded(r.text.id);
-    const el = list.querySelector(`[data-context-for="${r.text.id}"]`);
-    if (!el) continue;
-    if (!content) { el.textContent = r.text.preview; continue; }
-    const contentLower = content.toLowerCase();
-    let anchor = contentLower.indexOf(qLower);
-    if (anchor === -1) {
-      for (const term of queryTerms) {
-        anchor = contentLower.indexOf(term);
-        if (anchor !== -1) break;
+  const BM25_K1 = 1.2, BM25_B = 0.5;
+  function bm25Rank(terms) {
+    const si = State.searchIndex, idx = si.index, N = si.docs.length;
+    const doclen = si.doclen, avglen = si.avglen || 1;
+    const scores = new Map();
+    for (const term of terms) {
+      const flat = idx[term];
+      if (!flat) continue;
+      const df = flat.length / 2;
+      const idf = Math.log(1 + (N - df + 0.5) / (df + 0.5));
+      let d = 0;
+      for (let i = 0; i < flat.length; i += 2) {
+        d += flat[i];
+        const tf = Math.pow(2, flat[i + 1] - 1);
+        const len = (doclen && doclen[d]) || avglen;
+        const denom = tf + BM25_K1 * (1 - BM25_B + BM25_B * len / avglen);
+        scores.set(d, (scores.get(d) || 0) + idf * (tf * (BM25_K1 + 1)) / denom);
       }
     }
-    if (anchor === -1) { el.textContent = r.text.preview; continue; }
-    const start = Math.max(0, anchor - 100);
-    const end = Math.min(content.length, anchor + qLower.length + 100);
-    el.innerHTML = '...' + highlightText(content.substring(start, end), query) + '...';
+    return [...scores.entries()].sort((a, b) => b[1] - a[1]);
   }
-}
 
-function highlightText(text, query) {
-  const terms = [query, ...tokenizeQuery(query)].filter(Boolean).map(escapeRegex);
-  const regex = new RegExp('(' + [...new Set(terms)].join('|') + ')', 'gi');
-  return escapeHtml(text).replace(regex, '<mark>$1</mark>');
-}
+  let searchToken = 0;
+  async function runSearch(query) {
+    query = (query || '').trim();
+    if (query.length < 2) { navigate('#/'); return; }
+    const myToken = ++searchToken;
+    const qLower = query.toLowerCase();
+    const terms = tokenizeQuery(query);
+    const seen = new Set();
+    const results = [];
+    const texts = State.summary ? State.summary.texts : [];
 
-function escapeRegex(s) { return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
-function escapeHtml(s) {
-  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-}
+    // Title matches first
+    for (const t of texts) {
+      if (t.title.toLowerCase().includes(qLower)) { seen.add(t.id); results.push({ t, context: null, kind: 'title' }); }
+    }
+    // Full-text via BM25 index
+    if (State.searchIndex && terms.length) {
+      for (const [docIdx] of bm25Rank(terms)) {
+        const id = State.searchIndex.docs[docIdx];
+        if (seen.has(id)) continue;
+        const t = State.byId.get(id);
+        if (!t) continue;
+        seen.add(id);
+        results.push({ t, context: null, kind: 'full' });
+        if (results.length >= 50) break;
+      }
+    }
+    // Preview fallback (short/stopword queries)
+    if (State.catalog) {
+      for (const t of State.catalog.texts) {
+        if (seen.has(t.id)) continue;
+        if ((t.preview || '').toLowerCase().includes(qLower)) { seen.add(t.id); results.push({ t: State.byId.get(t.id), context: t.preview, kind: 'preview' }); }
+      }
+    }
 
-loadCatalog();
-loadSearchIndex();
+    setView('search');
+    renderResults(results, query);
+
+    // Lazily fetch excerpts for full-text hits (bounded)
+    const need = results.filter(r => r.context === null && r.kind === 'full').slice(0, 20);
+    for (const r of need) {
+      if (myToken !== searchToken) return; // superseded
+      const content = await ensureTextLoaded(r.t.id);
+      const holder = $('searchResultsList').querySelector('[data-ctx="' + cssEsc(r.t.id) + '"]');
+      if (!holder) continue;
+      holder.textContent = '';
+      if (!content) { holder.textContent = (State.byId.get(r.t.id) || {}).preview || ''; continue; }
+      const cl = content.toLowerCase();
+      let anchor = cl.indexOf(qLower);
+      if (anchor === -1) for (const term of terms) { anchor = cl.indexOf(term); if (anchor !== -1) break; }
+      if (anchor === -1) { holder.textContent = (State.byId.get(r.t.id) || {}).preview || ''; continue; }
+      const start = Math.max(0, anchor - 100);
+      const end = Math.min(content.length, anchor + qLower.length + 120);
+      holder.append(document.createTextNode(start > 0 ? '…' : ''));
+      appendHighlighted(holder, content.slice(start, end).replace(/\s+/g, ' ').trim(), [query, ...terms]);
+      holder.append(document.createTextNode(end < content.length ? '…' : ''));
+    }
+  }
+
+  function renderResults(results, query) {
+    const list = $('searchResultsList');
+    list.textContent = '';
+    const count = $('resultsCount');
+    if (!results.length) {
+      count.textContent = '';
+      list.append(el('div', { class: 'empty' }, 'No results for “' + query + '”. Try a different term.'));
+      return;
+    }
+    count.textContent = results.length + ' result' + (results.length > 1 ? 's' : '') + ' for “' + query + '”';
+    const terms = [query, ...tokenizeQuery(query)];
+    const frag = document.createDocumentFragment();
+    for (const r of results) {
+      const t = r.t;
+      const ctx = el('div', { class: 'search-result-context', dataset: { ctx: t.id } });
+      if (r.context !== null) { appendHighlighted(ctx, r.context, terms); }
+      else { ctx.textContent = 'Loading excerpt…'; }
+      frag.append(el('a', {
+        class: 'search-result', href: '#/read/' + encodeURIComponent(t.id),
+        'aria-label': 'Open ' + t.title
+      },
+        el('div', { class: 'search-result-title' }, t.title),
+        el('div', { class: 'text-meta' },
+          el('span', { class: 'badge' }, t.tradition),
+          el('span', null, (t.word_count || 0).toLocaleString() + ' words')
+        ),
+        ctx
+      ));
+    }
+    list.append(frag);
+  }
+
+  // ---------------------------------------------------------------- Reader
+  async function showReader(id) {
+    const meta = State.byId.get(id);
+    if (!meta) { navigate('#/'); return; }
+    State.readerId = id;
+    setView('reader');
+    applyReaderSize();
+    resetFind();
+
+    $('readerTitle').textContent = meta.title;
+    const metaEl = $('readerMeta');
+    metaEl.textContent = '';
+    metaEl.append(el('strong', null, meta.tradition), document.createTextNode(' · ' + meta.size_human + ' · ' + (meta.word_count || 0).toLocaleString() + ' words'));
+    if (meta.sha256) metaEl.append(document.createTextNode(' · '), el('span', { style: 'font-family:var(--mono);font-size:11px' }, 'SHA256 ' + meta.sha256.slice(0, 12) + '…'));
+
+    const content = $('readerContent');
+    content.textContent = '';
+    content.append(el('div', { class: 'measure', style: 'color:var(--text-faint)' }, 'Loading…'));
+    $('readerTitle').focus();
+
+    const loaded = await ensureTextLoaded(id);
+    if (State.readerId !== id) return; // navigated away
+    content.textContent = '';
+    if (loaded === null) {
+      content.append(el('div', { style: 'color:var(--danger)' }, 'Failed to load text. It must be served from the same directory as this app.'));
+      return;
+    }
+    const measure = el('div', { class: 'measure' });
+    content.append(measure);
+    State._readerText = loaded;
+    buildTOC(loaded, measure);
+    renderReaderBody(measure, loaded);
+    restoreScroll(id);
+    window.scrollTo({ top: 0 });
+  }
+
+  function renderReaderBody(measure, text, marks) {
+    measure.textContent = '';
+    if (marks && marks.length) appendHighlighted(measure, text, marks);
+    else measure.textContent = text;
+  }
+
+  // Detect headings (wiki/scripture style) and build an anchored TOC for long texts.
+  function buildTOC(text, measure) {
+    const layout = $('readerLayout');
+    const tocList = $('readerTocList');
+    tocList.textContent = '';
+    layout.classList.remove('has-toc');
+    if (text.length < 40000) return; // only worthwhile for long texts
+
+    const lines = text.split('\n');
+    const heads = [];
+    // Keyword-anchored heading detector — high precision across the corpus's
+    // heterogeneous heading conventions (Books, Chapters, Cantos, Suras, Parvas…).
+    const headRe = /^((the\s+)?(first|second|third|fourth|fifth|sixth|seventh|eighth|ninth|tenth\s+)?\s*(book|gospel|epistle|acts|revelation|lamentations|proverbs|psalms?)\b.{0,48}|(book|chapter|canto|sura|surah|part|section|hymn|lay|parva|kanda|mandala|adhyaya|fargard|tablet|discourse)\s+[\divxlc]{1,8}\b.{0,48}|[A-Z][A-Z' ]{3,46}(parva|kanda|purva))$/i;
+    for (let i = 0; i < lines.length; i++) {
+      const ln = lines[i].trim();
+      if (ln.length >= 3 && ln.length <= 64 && headRe.test(ln)) heads.push({ i, text: ln });
+      if (heads.length > 300) break;
+    }
+    if (heads.length < 10) return; // need a solid set, else a TOC just adds noise
+    // Dedupe by heading text keeping the LAST occurrence: sources that print a
+    // contents list up front AND the divisions in the body would otherwise land
+    // the jump on the contents list instead of the actual section.
+    const lastByText = new Map();
+    for (const h of heads) lastByText.set(h.text, h);
+    const picked = [...lastByText.values()].sort((a, b) => a.i - b.i).slice(0, 180);
+    layout.classList.add('has-toc');
+    const frag = document.createDocumentFragment();
+    picked.forEach((h, idx) => {
+      frag.append(el('a', {
+        href: 'javascript:void 0', dataset: { line: String(h.i) },
+        onclick: (e) => { e.preventDefault(); scrollToLine(h.i); }
+      }, h.text));
+    });
+    tocList.append(frag);
+    State._readerLines = lines;
+  }
+
+  function scrollToLine(lineNo) {
+    const lines = State._readerLines; if (!lines) return;
+    const before = lines.slice(0, lineNo).join('\n').length;
+    const content = $('readerContent');
+    const total = State._readerText.length || 1;
+    content.scrollTop = (before / total) * (content.scrollHeight - content.clientHeight);
+  }
+
+  // Text size
+  function applyReaderSize() { document.documentElement.style.setProperty('--reader-size', State.settings.readerSize + 'px'); }
+  function bumpSize(delta) {
+    State.settings.readerSize = clampSize(State.settings.readerSize + delta);
+    localStorage.setItem('tsc.readerSize', String(State.settings.readerSize));
+    applyReaderSize();
+  }
+
+  // Reading progress + resume position
+  function onReaderScroll() {
+    const c = $('readerContent');
+    const max = c.scrollHeight - c.clientHeight;
+    const pct = max > 0 ? (c.scrollTop / max) : 0;
+    $('readerProgress').style.width = (pct * 100).toFixed(1) + '%';
+    if (State.readerId) localStorage.setItem('tsc.pos.' + State.readerId, String(pct));
+  }
+  function restoreScroll(id) {
+    const pct = parseFloat(localStorage.getItem('tsc.pos.' + id));
+    if (pct > 0.01 && pct < 0.99) {
+      requestAnimationFrame(() => {
+        const c = $('readerContent');
+        c.scrollTop = pct * (c.scrollHeight - c.clientHeight);
+        onReaderScroll();
+      });
+    } else { $('readerProgress').style.width = '0%'; }
+  }
+
+  // Find within current text
+  let findMatches = [], findCurrent = -1;
+  function resetFind() {
+    findMatches = []; findCurrent = -1;
+    $('readerFind').hidden = true;
+    $('findToggle').setAttribute('aria-pressed', 'false');
+    $('findInput').value = '';
+    $('findCount').textContent = '';
+  }
+  function toggleFind() {
+    const f = $('readerFind');
+    const show = f.hidden;
+    f.hidden = !show;
+    $('findToggle').setAttribute('aria-pressed', show ? 'true' : 'false');
+    if (show) $('findInput').focus();
+    else runFind('');
+  }
+  function runFind(q) {
+    const measure = $('readerContent').querySelector('.measure');
+    if (!measure || State._readerText == null) return;
+    q = q.trim();
+    if (q.length < 2) { renderReaderBody(measure, State._readerText); $('findCount').textContent = ''; findMatches = []; return; }
+    renderReaderBody(measure, State._readerText, [q]);
+    findMatches = [...measure.querySelectorAll('mark')];
+    findCurrent = findMatches.length ? 0 : -1;
+    $('findCount').textContent = findMatches.length ? '1 / ' + findMatches.length : 'No matches';
+    focusMatch();
+  }
+  function focusMatch() {
+    findMatches.forEach(m => m.classList.remove('current'));
+    if (findCurrent < 0 || !findMatches[findCurrent]) return;
+    const m = findMatches[findCurrent];
+    m.classList.add('current');
+    m.scrollIntoView({ block: 'center', behavior: 'auto' });
+    $('findCount').textContent = (findCurrent + 1) + ' / ' + findMatches.length;
+  }
+  function stepFind(dir) {
+    if (!findMatches.length) return;
+    findCurrent = (findCurrent + dir + findMatches.length) % findMatches.length;
+    focusMatch();
+  }
+
+  // -------------------------------------------------------------- Sidebar
+  function openSidebar() { $('sidebar').classList.add('open'); $('backdrop').classList.add('show'); $('menuToggle').setAttribute('aria-expanded', 'true'); }
+  function closeSidebar() { $('sidebar').classList.remove('open'); $('backdrop').classList.remove('show'); $('menuToggle').setAttribute('aria-expanded', 'false'); }
+
+  function toggleClear() { $('searchClear').classList.toggle('show', !!$('searchInput').value); }
+
+  // ------------------------------------------------------------------ Wire
+  function wireEvents() {
+    $('logo').addEventListener('click', () => navigate('#/'));
+    $('menuToggle').addEventListener('click', () => $('sidebar').classList.contains('open') ? closeSidebar() : openSidebar());
+    $('backdrop').addEventListener('click', closeSidebar);
+    $('readerBack').addEventListener('click', () => history.length > 1 ? history.back() : navigate('#/'));
+
+    let timer = null;
+    const input = $('searchInput');
+    input.addEventListener('input', () => {
+      toggleClear();
+      clearTimeout(timer);
+      const q = input.value.trim();
+      timer = setTimeout(() => { navigate(q.length >= 2 ? '#/q/' + encodeURIComponent(q) : '#/'); }, 260);
+    });
+    $('searchClear').addEventListener('click', () => { input.value = ''; toggleClear(); input.focus(); navigate('#/'); });
+
+    $('textSmaller').addEventListener('click', () => bumpSize(-1));
+    $('textLarger').addEventListener('click', () => bumpSize(1));
+    $('findToggle').addEventListener('click', toggleFind);
+    $('findInput').addEventListener('input', (e) => runFind(e.target.value));
+    $('findInput').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') { e.preventDefault(); stepFind(e.shiftKey ? -1 : 1); }
+      if (e.key === 'Escape') { toggleFind(); $('readerContent').focus(); }
+    });
+    $('readerContent').addEventListener('scroll', throttle(onReaderScroll, 100));
+
+    window.addEventListener('hashchange', route);
+
+    document.addEventListener('keydown', (e) => {
+      const typing = /^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement.tagName);
+      if (e.key === '/' && !typing) { e.preventDefault(); input.focus(); input.select(); }
+      else if (e.key === 'Escape' && State.view === 'reader' && !typing) { navigate('#/'); }
+      else if (e.key === 'Escape' && $('sidebar').classList.contains('open')) { closeSidebar(); }
+    });
+  }
+
+  function throttle(fn, ms) {
+    let t = 0, pending = false;
+    return function () {
+      const now = Date.now();
+      if (now - t >= ms) { t = now; fn(); }
+      else if (!pending) { pending = true; setTimeout(() => { pending = false; t = Date.now(); fn(); }, ms - (now - t)); }
+    };
+  }
+
+  // ------------------------------------------------------------------ Init
+  async function init() {
+    wireEvents();
+    applyReaderSize();
+    await loadSummary();
+    route();                 // first paint from summary
+    loadCatalog();           // enrich previews + enable preview-fallback search
+    loadSearchIndex();       // enable full-text search
+  }
+
+  init();
+})();
 </script>
 </body>
 </html>
