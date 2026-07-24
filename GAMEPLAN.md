@@ -162,11 +162,42 @@ gets a browser check; 8 is a stretch.
   the prebuilt index. **No flag needed.**
 
 **FLAGGED for human decision (not implemented in this pass):**
-- **None that block the plan.** No item in this plan requires crossing a soft or
-  hard constraint, so there is nothing being deliberately skipped pending
-  sign-off. If Phase 3's index measurement comes back larger than ~1 MB gzipped,
-  I will *keep the presence-only index* rather than blow the size budget, and note
-  it — that's a fallback within the plan, not a constraint crossing.
+
+- **FLAG 1 — 8 catalog entries are junk/duplicates; removing them drops the count
+  below 159 (a hard constraint), so this is flagged, not done.** Phase 2's new
+  `corpus.py verify` surfaced a data-integrity problem the original audit missed:
+  several of the "159 texts" are not primary sources at all. Broken down:
+
+  | Entry (title) | path | what it actually is |
+  |---|---|---|
+  | Ramayana Arch Gut | `eastern/ramayana-arch-gut.txt` | archive.org **"Internet Archive: Error" HTML page** |
+  | Tibetan Arch5 | `eastern/tibetan-arch5.txt` | archive.org error HTML |
+  | Tibetan Archive2 | `eastern/tibetan-archive2.txt` | archive.org error HTML **+ untracked in git → 404s on the live site right now** |
+  | Egyptian Pyramid Texts | `mythology/egyptian-pyramid-texts.txt` | archive.org error HTML — **no valid copy exists; this title has never had real content** |
+  | Tibetan Arch3 | `eastern/tibetan-arch3.txt` | raw OCR garbage ("ya he, Me e Pee iT") from a scan |
+  | Ramayana Missing | `eastern/ramayana_missing.txt` | partial wiki canto-list, **untracked → 404s on live** |
+  | Ramayana Wiki3 | `eastern/ramayana-wiki3.txt` | duplicate of the real `eastern/ramayana.txt` |
+  | Code of Hammurabi (Wiki) | `mythology/hammurabi-wiki3.txt` | duplicate of the real `mythology/code-of-hammurabi.txt` |
+
+  A real, clean version is already in the catalog for every one of these **except
+  Egyptian Pyramid Texts** (its only file is the error page). So the live site
+  currently: 404s on 2 texts, serves an "Internet Archive: Error" HTML page for 4
+  more, and shows OCR gibberish for 1.
+
+  **Recommendation:** remove all 8 junk entries → corpus becomes **151 genuine
+  texts** with zero broken/duplicate/404 entries, and update the "159" number
+  everywhere it's branded (`index.html` hero + stat + placeholder, `catalog.json`
+  totals, `README.md`, `CLAUDE.md`). Optionally re-source a real *Egyptian Pyramid
+  Texts* (Faulkner/Mercer translation is public domain) before or after, to land
+  on a rounder number. **Not done in this pass** because it changes the flagship
+  "159" — a hard constraint requiring sign-off. The moment you approve, it's a
+  ~10-minute change: `git rm` the 8 files (the 2 untracked ones just get deleted),
+  drop their catalog entries, `python3 corpus.py build`, update branding, verify.
+
+- Aside from FLAG 1, **nothing else blocks the plan.** If Phase 3's index
+  measurement comes back larger than ~1 MB gzipped, I'll *keep the presence-only
+  index* rather than blow the size budget — a fallback within the plan, not a
+  constraint crossing.
 
 **Local decisions recorded (reversible, non-destructive, within constraints):**
 - *eucharist-b orphan* (`abrahamic/nag-hammadi-on-the-eucharist-b.txt`, 451 B, on
