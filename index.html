@@ -2290,8 +2290,20 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
     onScroll();
   }
 
+  // Offline reading. First-party static caching only — no CDN, no third party,
+  // no tracking. Registered after load so it never competes with first paint,
+  // and failure is silent because the app works fully without it.
+  function registerWorker() {
+    if (!('serviceWorker' in navigator)) return;
+    if (location.protocol === 'file:') return;
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('sw.js').catch(() => {});
+    });
+  }
+
   // ------------------------------------------------------------------ Init
   async function init() {
+    registerWorker();
     wireEvents();
     watchHeader();
     applyReaderSize();
