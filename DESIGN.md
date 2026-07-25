@@ -861,6 +861,75 @@ Phases 1–2 are the largest visible change for the least risk. Phase 3 is the
 highest-risk phase and is gated on the measurements in §3.3. Phases 5–6 depend on
 nothing in 3–4 and could be reordered if needed.
 
+### 5.1 Execution status
+
+Five commits shipped. The eight planned phases collapsed into five because
+Contents (4) fell out of the paragraph model and had to ship with it — a TOC
+built on real anchors is not separable from the blocks it anchors to — and
+Motion/a11y (7) and the Colophon (8) were folded into their neighbours.
+
+| commit | phase | state |
+|---|---|---|
+| `c2622c0` | 1 · Foundations | **done** — tokens, type system, palette, material, details, icons, logo/favicon, reduced-motion policy, the stale `159` |
+| `a411b44` | 2 · The reader is a page | **done** — box deleted, window-driven progress + resume (dead on phones before), visible progress bar |
+| `4bb7cbb` | 3 · The paragraph model | **done** — `segmentText()`, verse gutter, rebuilt find, real TOC anchors + router branch, one rail, the reading dial |
+| `fd738b7` | 4 · Browse | **done** — grid ladder, card rebuild, extent tiers, threshold + `CONTINUE`, shelf header |
+| `8d404cc` | 5 · Colophon, search, geometry | **done** — colophon, honest counts, `inert` drawer, focus return, exact geometry |
+
+**Deferred, with reasons.** Collection cards (folding 53 Nag Hammadi tractates
+into one expandable object) — described in §4.2, still the right end-state, but
+it changes what "151 texts" means on screen, which is the owner's call. Search
+facets that scope the query, and density-ranked double excerpts — the
+*correctness* half of §4.5 shipped (honest totals, `N+ matches`, no stranded
+placeholder); the ranking refinement did not. The phone contents sheet and the
+auto-hiding phone header from §4.4. Punctuation normalisation stays deferred
+per §6.2.
+
+### 5.2 One architectural decision was reversed mid-build — and it matters
+
+§3.3 committed to `content-visibility: auto`, on measurements showing a 6–49×
+render speedup, and on a risk test that found `scrollIntoView` pixel-accurate
+into skipped sections. **Shipping it revealed the test was too narrow, and it
+was removed in Phase 5.**
+
+What the narrow test missed: containment makes the *document height* an
+estimate, because unrendered sections report `contain-intrinsic-size` rather
+than their real height. Measured consequences on the shipped build — the
+contents list landed **31,784px** from its target on the KJV, and the colophon
+could not be reached at all. Computing a per-section estimate from its own
+content narrowed the error from a flat placeholder to +10–31%, which was not
+enough. `contain-intrinsic-size: auto` does **not** retain the real size once a
+section has rendered — verified directly: after forcing every section to render,
+the document height reverts to the estimate *exactly* — and forcing that
+realize pass costs 2–3.5s, which is worse than simply not containing.
+
+Sections therefore keep only `contain: layout style`, which costs no geometric
+accuracy. TOC jumps now land at **−0.0px**. The cost is a slower first paint on
+the largest texts, and that is the right trade: **a contents list that lies is
+worse than a slower first paint in a reading instrument.**
+
+A second, smaller reversal in the same phase: `scrollIntoView({behavior:'auto'})`
+means *consult CSS*, and `html { scroll-behavior: smooth }` was making every
+programmatic jump animate while the settle loop fought it. Programmatic scrolls
+are now `'instant'`; the find-jump stays smooth, because that is the one place
+motion is load-bearing.
+
+### 5.3 Verification
+
+`python3 corpus.py verify` PASS at every commit (151 texts, integrity green).
+A 35-check golden path (`goldenpath.py` in the session scratchpad) runs desktop
+1440×900 and phone 390×844 with zero console errors, and grew from 26 checks as
+the pass added claims worth defending — the phone progress/resume pair, block
+structure, reflow, verse-reference painting, TOC landing accuracy, and colophon
+reachability. Three of those checks fail against the pre-pass build by design;
+they encode defects this pass fixed.
+
+Contrast is re-verified against the shipped tokens: every pairing meets its
+target, including the three that failed before — `--ink-low` at 5.08:1 worst
+case (was 3.74:1), `--rule-edge` at 3.53:1 worst (was 1.09–1.22:1), and the
+mark at 11.13:1, which is now *brighter* than body copy at 10.97:1 where it
+previously receded at 7.34:1 against 14.58:1.
+
 ---
 
 ## 6. CONSTRAINT DECISIONS
