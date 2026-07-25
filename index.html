@@ -554,15 +554,20 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
    box — so a reference positioned outside it is silently clipped away even
    though it computes as visible with a valid bounding rect. */
 .reader-content section { padding-left: 3.4em; }
-/* Sections carry the containment that makes real DOM affordable: measured on
-   the 4.4MB KJV (24,611 blocks), plain render 413ms vs 50ms with this, and on
-   the Rig Veda 1183ms vs 24ms. Risk-tested on a 543,460px document:
-   scrollIntoView into a skipped section is pixel-accurate, scroll anchoring
-   holds, and a TreeWalker still reaches the text inside. */
-.reader-content section {
-  content-visibility: auto;
-  contain-intrinsic-size: auto 1200px;
-}
+/* `content-visibility: auto` was tried here and REMOVED, deliberately.
+   It is dramatically faster (KJV 413ms -> 50ms, Rig Veda 1183ms -> 24ms) but
+   it makes the document's geometry an estimate: unrendered sections report
+   `contain-intrinsic-size`, so the document height changes as you scroll
+   through it. Measured consequences — the contents list landed 31,784px from
+   its target on the KJV, and the colophon could not be reached at all.
+   Per-section estimates computed from content narrowed the error to +10..31%
+   but did not fix it, and `contain-intrinsic-size: auto` does NOT retain the
+   real size once a section has rendered (verified: the document height reverts
+   to the estimate exactly), while forcing a realize pass costs 2-3.5s.
+   A contents list that lies is worse than a slower first paint in a reading
+   instrument, so sections keep only layout containment, which costs no
+   geometric accuracy. */
+.reader-content section { contain: layout style; }
 .reader-content p {
   margin: 0 0 var(--s-3);
   position: relative;
@@ -614,6 +619,49 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
    not confident about, keep today's behaviour rather than a confidently-wrong
    page. */
 .reader-content .raw { white-space: pre-wrap; }
+
+/* THE COLOPHON. Provenance is this product's entire argument, and it was an
+   11px truncated hash in a failing-contrast meta line — 12 of 64 characters
+   verify nothing, so it was decoration impersonating evidence. A colophon is
+   by definition the statement at the END of a work about how it was made. */
+.colophon {
+  margin: var(--s-10) auto 0; max-width: var(--reader-measure, 33em);
+  padding-top: var(--s-7); border-top: 1px solid var(--rule);
+  font-family: var(--face-ui); font-size: var(--fs-meta);
+  color: var(--ink-low); line-height: 1.7;
+  text-align: center;
+  font-variant-numeric: tabular-nums lining-nums;
+  hyphens: none;
+}
+.colophon-mark { color: var(--ink-mid); display: block; margin-bottom: var(--s-4); }
+.colophon-label {
+  font-family: var(--face-read); font-weight: 500;
+  text-transform: uppercase; letter-spacing: .115em;
+  color: var(--ink-mid); margin-bottom: var(--s-4);
+}
+.colophon dl {
+  display: grid; grid-template-columns: auto 1fr; gap: var(--s-2) var(--s-4);
+  text-align: left; margin: var(--s-5) 0;
+}
+.colophon dt {
+  font-family: var(--face-read); font-weight: 500;
+  text-transform: uppercase; letter-spacing: .09em;
+  font-size: var(--fs-lapidary); color: var(--ink-low); padding-top: .25em;
+}
+.colophon dd { color: var(--ink-mid); overflow-wrap: anywhere; }
+/* All 64 characters, in 4x16 groups, so a human can actually compare them. */
+.colophon .sha {
+  font-family: var(--face-mono); font-size: .95em;
+  font-variant-numeric: tabular-nums slashed-zero; font-variant-ligatures: none;
+  color: var(--ink-mid); line-height: 1.55; white-space: pre;
+}
+.colophon .verify { font-family: var(--face-mono); font-size: .95em; color: var(--ink-mid); }
+.colophon .rendered { margin-top: var(--s-5); text-align: left; text-wrap: pretty; }
+.colophon .rights { margin-top: var(--s-4); color: var(--ink-low); }
+@media (max-width: 860px) {
+  .colophon dl { grid-template-columns: 1fr; gap: var(--s-1) 0; }
+  .colophon .sha { white-space: pre-wrap; word-break: break-all; }
+}
 /* The hit ADVANCES: 11.08:1 against body copy's 10.97:1. Previously it receded,
    at 7.34:1 against 14.58:1. The inset underline is the non-colour channel. */
 .reader-content mark, .search-result-context mark {
@@ -1152,7 +1200,8 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
     return '≈' + (hours < 10 ? hours.toFixed(1).replace(/\.0$/, '') : Math.round(hours)) + ' h';
   }
   function storedPos(id) {
-    const v = parseFloat(localStorage.getItem('tsc.pos.' + id));
+    const r = storedRaw(id);
+    const v = r && typeof r.p === 'number' ? r.p : (r && r.n ? (r.s + r.f) / r.n : 0);
     return v > 0.001 && v <= 1 ? v : 0;
   }
 
@@ -1309,9 +1358,17 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   }
 
   function showBrowse() {
+    const from = State.readerId;
+    State.readerId = null;
     setView('browse');
     refreshNavActive();
     renderCards();
+    // Focus was managed on ENTRY to the reader and abandoned on every exit.
+    // Return it to the card the reader was opened from.
+    if (from) {
+      const card = $('textGrid').querySelector('[href="#/read/' + cssEsc(encodeURIComponent(from)) + '"]');
+      if (card) requestAnimationFrame(() => card.focus({ preventScroll: true }));
+    }
     if (State.filter === 'all') renderContinue();
     else renderShelfHead();
     window.scrollTo({ top: 0 });
@@ -1379,7 +1436,7 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   function bm25Rank(terms) {
     const si = State.searchIndex, idx = si.index, N = si.docs.length;
     const doclen = si.doclen, avglen = si.avglen || 1;
-    const scores = new Map();
+    const scores = new Map(), strength = new Map();
     for (const term of terms) {
       const flat = idx[term];
       if (!flat) continue;
@@ -1392,9 +1449,12 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
         const len = (doclen && doclen[d]) || avglen;
         const denom = tf + BM25_K1 * (1 - BM25_B + BM25_B * len / avglen);
         scores.set(d, (scores.get(d) || 0) + idf * (tf * (BM25_K1 + 1)) / denom);
+        strength.set(d, Math.max(strength.get(d) || 0, tf));
       }
     }
-    return [...scores.entries()].sort((a, b) => b[1] - a[1]);
+    return [...scores.entries()]
+      .sort((a, b) => b[1] - a[1])
+      .map(e => [e[0], e[1], strength.get(e[0]) || 0]);
   }
 
   let searchToken = 0;
@@ -1412,16 +1472,22 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
     for (const t of texts) {
       if (t.title.toLowerCase().includes(qLower)) { seen.add(t.id); results.push({ t, context: null, kind: 'title' }); }
     }
-    // Full-text via BM25 index
-    if (State.searchIndex && terms.length) {
-      for (const [docIdx] of bm25Rank(terms)) {
+    // Full-text via BM25 index. `strength` is the QUANTISED term frequency the
+    // index actually stores — tf = 2^(q-1), i.e. a power-of-two bucket. It is a
+    // mathematical lower bound, never an exact count, and it is printed as
+    // "N+ matches" so it never claims precision the data cannot support.
+    let ranked = [];
+    if (State.searchIndex && terms.length) ranked = bm25Rank(terms);
+    let truncated = 0;
+    if (ranked.length) {
+      for (const [docIdx, , strength] of ranked) {
         const id = State.searchIndex.docs[docIdx];
         if (seen.has(id)) continue;
         const t = State.byId.get(id);
         if (!t) continue;
         seen.add(id);
-        results.push({ t, context: null, kind: 'full' });
-        if (results.length >= 50) break;
+        if (results.length >= 100) { truncated++; continue; }
+        results.push({ t, context: null, kind: 'full', strength: strength });
       }
     }
     // Preview fallback (short/stopword queries)
@@ -1433,7 +1499,7 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
     }
 
     setView('search');
-    renderResults(results, query);
+    renderResults(results, query, truncated);
 
     // Lazily fetch excerpts for full-text hits (bounded)
     const need = results.filter(r => r.context === null && r.kind === 'full').slice(0, 20);
@@ -1456,7 +1522,7 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
     }
   }
 
-  function renderResults(results, query) {
+  function renderResults(results, query, truncated) {
     const list = $('searchResultsList');
     list.textContent = '';
     const count = $('resultsCount');
@@ -1465,7 +1531,14 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
       list.append(el('div', { class: 'empty' }, 'No results for “' + query + '”. Try a different term.'));
       return;
     }
-    count.textContent = results.length + ' result' + (results.length > 1 ? 's' : '') + ' for “' + query + '”';
+    // The total is the DOCUMENT FREQUENCY — how many texts contain the term —
+    // never the length of a truncated result list, which is what the old
+    // `break at 50` printed as though it were an answer.
+    const shown = results.length;
+    const total = shown + (truncated || 0);
+    count.textContent = total + ' text' + (total === 1 ? '' : 's') + ' contain “' + query + '”'
+      + (truncated ? ' · showing the top ' + shown : '')
+      + (State.searchIndex ? '' : ' · titles only, index still loading');
     const terms = [query, ...tokenizeQuery(query)];
     const frag = document.createDocumentFragment();
     for (const r of results) {
@@ -1488,7 +1561,10 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
         el('div', { class: 'search-result-title' }, t.title),
         el('div', { class: 'text-meta' },
           el('span', null, (t.word_count || 0).toLocaleString() + ' words'),
-          el('span', { class: 'extent' }, duration(t.word_count || 0))
+          el('span', { class: 'extent' }, duration(t.word_count || 0)),
+          // The index stores tf as a power-of-two bucket, so this is a lower
+          // bound and the "+" says so. Never a fabricated exact count.
+          r.strength ? el('span', null, r.strength + '+ matches') : null
         ),
         ctx
       ));
@@ -1505,14 +1581,17 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
     setView('reader');
     applyReaderSize();
     resetFind();
-    window.scrollTo({ top: 0, behavior: 'auto' });
+    window.scrollTo({ top: 0, behavior: 'instant' });
     $('readerContent').style.setProperty('--bind', 'var(--bind-' + meta.category + ')');
 
     $('readerTitle').textContent = meta.title;
     const metaEl = $('readerMeta');
     metaEl.textContent = '';
-    metaEl.append(el('strong', null, meta.tradition), document.createTextNode(' · ' + meta.size_human + ' · ' + (meta.word_count || 0).toLocaleString() + ' words'));
-    if (meta.sha256) metaEl.append(document.createTextNode(' · '), el('span', { style: 'font-family:var(--mono);font-size:11px' }, 'SHA256 ' + meta.sha256.slice(0, 12) + '…'));
+    // The truncated hash moves to the colophon at the foot of the work, where
+    // it is printed in full and can actually be checked.
+    metaEl.append(el('strong', null, meta.tradition),
+      document.createTextNode(' · ' + (meta.word_count || 0).toLocaleString() + ' words · '
+        + duration(meta.word_count || 0)));
 
     const content = $('readerContent');
     content.textContent = '';
@@ -1532,6 +1611,7 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
     State._readerText = loaded;
     State.blocks = stripFrontMatter(segmentText(loaded));
     renderBlocks(measure, State.blocks);
+    renderColophon(measure, State.byId.get(id) || meta, loaded, State.blocks);
     buildTOC(State.blocks, id);
     if (anchor != null) { jumpToBlock(anchor); State.restoring = false; return; }
     // Order matters: land at the top of the text, THEN restore. The reverse
@@ -1687,7 +1767,13 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
     State._blockEls = new Array(blocks.length);
     const frag = document.createDocumentFragment();
     let sec = null, n = 0;
-    const newSection = () => { sec = document.createElement('section'); frag.append(sec); n = 0; };
+    const sections = [];
+    // Sections are the anchor unit for position storage and the containment
+    // boundary; they are NOT a virtualisation scheme (see the CSS note).
+    const newSection = () => {
+      sec = document.createElement('section');
+      sections.push(sec); frag.append(sec); n = 0;
+    };
     newSection();
     // The incipit marks the first PROSE paragraph of the work, and only if the
     // work is long enough to have a threshold worth crossing.
@@ -1726,8 +1812,57 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
       State._blockEls[i] = node;
       n++;
     }
+    State._sections = sections;
     measure.append(frag);
   }
+
+  // Scrolling to a target inside content-visibility sections is iterative: the
+  // first scroll forces intervening sections to lay out, which moves the
+  // target. Settle by re-measuring until it stops moving.
+  function settleScroll(getTarget, done) {
+    let tries = 0;
+    const step = () => {
+      const el = getTarget();
+      if (!el) { if (done) done(); return; }
+      const off = el.getBoundingClientRect().top
+        - (parseFloat(getComputedStyle(document.documentElement).scrollPaddingTop) || 0);
+      if (Math.abs(off) < 4 || ++tries > 6) { if (done) done(); return; }
+      window.scrollBy({ top: off, behavior: 'instant' });
+      requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+  }
+  // The colophon closes the work. Full hash, real counts, and — mandatorily —
+  // a statement of what rendering did to the bytes, which is what keeps the
+  // paragraph model from being silent mediation in a product named unmediated.
+  function renderColophon(measure, meta, raw, blocks) {
+    const words = meta.word_count || 0;
+    const dl = el('dl', null);
+    const row = (k, v) => { dl.append(el('dt', null, k), el('dd', null, v)); };
+    row('Source', meta.path || '—');
+    row('Extent', (meta.size_bytes ? meta.size_bytes.toLocaleString() + ' bytes · ' : '')
+      + (raw ? raw.split('\n').length.toLocaleString() + ' lines · ' : '')
+      + words.toLocaleString() + ' words · ' + duration(words) + ' at 180 wpm');
+    if (meta.sha256) {
+      const h = meta.sha256;
+      const groups = [];
+      for (let i = 0; i < h.length; i += 16) groups.push(h.slice(i, i + 16).replace(/(.{8})(.{8})/, '$1 $2'));
+      dl.append(el('dt', null, 'sha-256'), el('dd', null, el('span', { class: 'sha' }, groups.join('\n'))));
+      dl.append(el('dt', null, 'Verify'), el('dd', null,
+        el('span', { class: 'verify' }, 'shasum -a 256 ' + (meta.path || ''))));
+    }
+    measure.append(el('footer', { class: 'colophon' },
+      el('span', { class: 'colophon-mark', 'aria-hidden': 'true' }, '⁘'),
+      el('div', { class: 'colophon-label' }, 'Colophon'),
+      dl,
+      el('p', { class: 'rendered' },
+        'Rendered: source line-wraps rejoined into paragraphs; verse line breaks kept; '
+        + 'verse references set in the margin' + (blocks ? ' (' + blocks.length.toLocaleString() + ' blocks)' : '')
+        + '. The bytes above are unmodified — the command verifies them.'),
+      el('p', { class: 'rights' }, 'Public domain. Served as retrieved.')
+    ));
+  }
+
   function nthSpace(s, n) {
     let i = -1;
     for (let k = 0; k < n; k++) { i = s.indexOf(' ', i + 1); if (i === -1) return s.length; }
@@ -1822,7 +1957,8 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   function jumpToBlock(i, push) {
     const node = (State._blockEls || [])[i];
     if (!node) return;
-    node.scrollIntoView({ block: 'start', behavior: 'auto' });
+    node.scrollIntoView({ block: 'start', behavior: 'instant' });
+    settleScroll(() => (State._blockEls || [])[i]);
     markActiveTOC(i);
     if (push && State.readerId) {
       history.replaceState(null, '', '#/read/' + encodeURIComponent(State.readerId) + '/h/' + i);
@@ -1889,24 +2025,76 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   // Suppressed while a text is opening: entering the reader scrolls to the top,
   // and that scroll would otherwise commit position 0 over the stored one
   // moments before restoreScroll got the chance to read it.
+  // Position is stored as {section, fraction-within-section}, not as a scroll
+  // percentage. Sections are the unit content-visibility works in, so this
+  // survives the document-height drift that makes a pixel percentage lie —
+  // and it survives a text-size change, rotation, and a different device.
+  function readPosition() {
+    const secs = State._sections || [];
+    if (!secs.length) return null;
+    const pad = parseFloat(getComputedStyle(document.documentElement).scrollPaddingTop) || 0;
+    const top = window.scrollY + pad + 4;
+    for (let i = secs.length - 1; i >= 0; i--) {
+      const r = secs[i].getBoundingClientRect();
+      const y = r.top + window.scrollY;
+      if (y <= top || i === 0)
+        return { s: i, f: Math.max(0, Math.min(1, (top - y) / Math.max(1, r.height))) };
+    }
+    return { s: 0, f: 0 };
+  }
   function savePosition() {
     if (State.restoring || State.view !== 'reader' || !State.readerId) return;
-    try { localStorage.setItem('tsc.pos.' + State.readerId, String(readProgress())); } catch (e) {}
+    const pos = readPosition();
+    if (!pos) return;
+    const secs = State._sections || [];
+    try {
+      localStorage.setItem('tsc.pos.' + State.readerId, JSON.stringify({
+        s: pos.s, f: +pos.f.toFixed(3), n: secs.length, p: +readProgress().toFixed(4)
+      }));
+    } catch (e) {}
+  }
+  // `p` is kept alongside so the browse card underline and CONTINUE have a
+  // cheap fraction without needing the text loaded.
+  function storedRaw(id) {
+    const v = localStorage.getItem('tsc.pos.' + id);
+    if (!v) return null;
+    if (v.charAt(0) === '{') { try { return JSON.parse(v); } catch (e) { return null; } }
+    const f = parseFloat(v);                       // legacy: a bare percentage
+    return f > 0 ? { p: f } : null;
   }
   function restoreScroll(id) {
-    const pct = parseFloat(localStorage.getItem('tsc.pos.' + id));
+    const raw = storedRaw(id);
+    const pct = raw ? (typeof raw.p === 'number' ? raw.p : (raw.n ? (raw.s + raw.f) / raw.n : 0)) : NaN;
     $('readerProgress').style.width = '0%';
     // The old `pct > 0.01 && pct < 0.99` guard meant finishing a text was never
     // recorded. Only the "never opened" case is skipped now.
     if (!(pct > 0.001)) { State.restoring = false; return; }
+    // Resume by BLOCK, not by pixel percentage: under content-visibility a
+    // document-height percentage is an estimate that drifts as sections
+    // render, and a block anchor also survives a text-size change or rotation.
     requestAnimationFrame(() => {
       if (State.readerId !== id) { State.restoring = false; return; }
-      const box = leafBox($('readerContent'));
-      window.scrollTo({ top: box.top + pct * box.height, behavior: 'auto' });
-      onReaderScroll();
-      // Release only after the landing scroll has settled, so its own
-      // scrollend does not immediately rewrite what we just restored.
-      setTimeout(() => { State.restoring = false; }, 120);
+      const secs = State._sections || [];
+      // Prefer the exact section anchor; fall back to the fraction for legacy
+      // values written before positions were stored this way.
+      const si = raw && typeof raw.s === 'number' && secs[raw.s]
+        ? raw.s : (secs.length ? Math.min(secs.length - 1, Math.round(pct * secs.length)) : -1);
+      const target = secs[si];
+      if (target) {
+        const frac = raw && typeof raw.f === 'number' ? raw.f : 0;
+        target.scrollIntoView({ block: 'start', behavior: 'instant' });
+        settleScroll(() => (State._sections || [])[si], () => {
+          const h = target.offsetHeight;
+          if (frac > 0.02) window.scrollBy({ top: frac * h, behavior: 'instant' });
+          onReaderScroll();
+          setTimeout(() => { State.restoring = false; }, 120);
+        });
+      } else {
+        const box = leafBox($('readerContent'));
+        window.scrollTo({ top: box.top + pct * box.height, behavior: 'instant' });
+        onReaderScroll();
+        setTimeout(() => { State.restoring = false; }, 120);
+      }
     });
   }
 
@@ -1963,12 +2151,15 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
     $('findCount').textContent = '1 / ' + findMatches.length;
     focusMatch();
   }
+  function prefersReducedMotion() {
+    return window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  }
   function focusMatch() {
     findMatches.forEach(m => m.classList.remove('current'));
     if (findCurrent < 0 || !findMatches[findCurrent]) return;
     const m = findMatches[findCurrent];
     m.classList.add('current');
-    m.scrollIntoView({ block: 'center', behavior: 'auto' });
+    m.scrollIntoView({ block: 'center', behavior: prefersReducedMotion() ? 'instant' : 'smooth' });
     $('findCount').textContent = (findCurrent + 1) + ' / ' + findMatches.length;
   }
   function stepFind(dir) {
@@ -1978,8 +2169,33 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   }
 
   // -------------------------------------------------------------- Sidebar
-  function openSidebar() { $('sidebar').classList.add('open'); $('backdrop').classList.add('show'); $('menuToggle').setAttribute('aria-expanded', 'true'); }
-  function closeSidebar() { $('sidebar').classList.remove('open'); $('backdrop').classList.remove('show'); $('menuToggle').setAttribute('aria-expanded', 'false'); }
+  // `transform: translateX(-100%)` leaves every control inside the closed
+  // drawer focusable and announced off-screen — five phantom tab stops on the
+  // majority device, with a focus ring rendering at x = -260px. `inert` is the
+  // whole fix; the drawer is only inert while it is actually a drawer.
+  function drawerMode() { return window.matchMedia('(max-width: 860px)').matches; }
+  function syncInert() {
+    const s = $('sidebar');
+    if (!('inert' in HTMLElement.prototype)) return;
+    s.inert = drawerMode() && !s.classList.contains('open');
+  }
+  function openSidebar() {
+    const s = $('sidebar');
+    State._returnFocus = document.activeElement;
+    s.classList.add('open'); $('backdrop').classList.add('show');
+    $('menuToggle').setAttribute('aria-expanded', 'true');
+    syncInert();
+    const first = s.querySelector('.nav-item');
+    if (first) first.focus();
+  }
+  function closeSidebar() {
+    const s = $('sidebar');
+    const wasOpen = s.classList.contains('open');
+    s.classList.remove('open'); $('backdrop').classList.remove('show');
+    $('menuToggle').setAttribute('aria-expanded', 'false');
+    syncInert();
+    if (wasOpen && drawerMode()) $('menuToggle').focus();
+  }
 
   function toggleClear() { $('searchClear').classList.toggle('show', !!$('searchInput').value); }
 
@@ -2056,6 +2272,8 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
     setH();
     if (window.ResizeObserver) new ResizeObserver(setH).observe(header);
     else window.addEventListener('resize', setH);
+    window.addEventListener('resize', syncInert);
+    syncInert();
 
     // "candle" — the header was byte-identical at scrollTop 0 and at 40,000.
     let lit = false, ticking = false;
