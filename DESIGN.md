@@ -876,14 +876,46 @@ Motion/a11y (7) and the Colophon (8) were folded into their neighbours.
 | `fd738b7` | 4 · Browse | **done** — grid ladder, card rebuild, extent tiers, threshold + `CONTINUE`, shelf header |
 | `8d404cc` | 5 · Colophon, search, geometry | **done** — colophon, honest counts, `inert` drawer, focus return, exact geometry |
 
-**Deferred, with reasons.** Collection cards (folding 53 Nag Hammadi tractates
-into one expandable object) — described in §4.2, still the right end-state, but
-it changes what "151 texts" means on screen, which is the owner's call. Search
-facets that scope the query, and density-ranked double excerpts — the
+**Shipped after owner sign-off** (commits `1e5fc57`, `097ea97`, `6f68f59`,
+`556229e`): the catalog previews and a new `corpus.py provenance` check; offline
+reading (GAMEPLAN FLAG 2 — the one approved crossing of the single-file rule);
+the phone contents sheet; search facets that scope the query; collection cards;
+and a guarded em-dash repair.
+
+**Still deferred, with reasons.** Density-ranked double excerpts — the
 *correctness* half of §4.5 shipped (honest totals, `N+ matches`, no stranded
-placeholder); the ranking refinement did not. The phone contents sheet and the
-auto-hiding phone header from §4.4. Punctuation normalisation stays deferred
-per §6.2.
+placeholder); the ranking refinement did not. The auto-hiding phone header from
+§4.4. Quote curling stays refused on evidence: roughly 4,919 apostrophes across
+11 files are transliteration marks (avagraha, glottal stops), and curling those
+is exactly the silent mediation this product is named against. The em-dash half
+of §6.2 shipped only because it could be scoped safely — a blanket rule would
+have destroyed 35,695 lacuna markers of the form `[ -- ]` in the Dead Sea
+Scrolls, so the shipped rule requires word characters on both sides.
+
+### 5.4 A corpus-integrity finding this pass surfaced
+
+Fixing the previews showed that the previews were not the real problem.
+`corpus.py verify` has always passed on a corpus in which **roughly 18 of 151
+files are a different book entirely** — it checked hashes, missing files and
+HTML error pages, none of which notice that `abrahamic/quran-pickthall.txt`
+contains *Crime and Punishment*, `mythology/epic-of-gilgamesh.txt` contains
+Fenimore Cooper's *The Pathfinder*, or `eastern/zhuangzi.txt` contains an
+Esperanto anthology. Kojiki, Lotus Sutra, Popol Vuh, Nihon Shoki, Orphic Hymns,
+Kebra Nagast, Corpus Hermeticum, Analects, Mencius, Laws of Manu, Vishnu Purana,
+Great Learning, Guru Granth Sahib, Mabinogion and Pre-Socratic Fragments are
+affected the same way.
+
+`corpus.py provenance` now reports it from two independent, evidence-based
+signals — the source's own declared `Title:` conflicting with the catalog title,
+and no significant title word occurring anywhere in the body. Neither is
+reliable alone (the Quran legitimately declares itself "The Koran"; 1 Maccabees
+never says "Maccabees"), so agreement is what makes a finding certain, and every
+finding prints the opening line as its evidence. `verify` reports the count as
+`[warn]` and does not fail on it.
+
+**Nothing was deleted.** Whether to remove or re-source these changes the
+flagship "151 texts" number, which is the same class of decision GAMEPLAN's
+FLAG 1 required sign-off for.
 
 ### 5.2 One architectural decision was reversed mid-build — and it matters
 
