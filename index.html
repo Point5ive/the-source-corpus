@@ -31,35 +31,147 @@
 }
 </script>
 <style>
+/* ─────────────────────────────────────────────────────────────────────────
+   THE SOURCE CORPUS — "Iron Gall": the screen is an unlit scriptorium and the
+   text is the only thing under the lamp. See DESIGN.md for the full rationale.
+   Hierarchy is carried by light and by type — never by hue.
+   ───────────────────────────────────────────────────────────────────────── */
+
+/* Reading serif, metric-normalised to Georgia's x-height. local() sources ONLY:
+   no font file, no network request, zero bytes on the wire. Distinct family
+   names are required — six @font-face rules sharing one name resolve by
+   declaration order with the LAST winning in Chromium, which would land every
+   macOS and Windows reader on Times New Roman at 108%.
+   size-adjust needs Chrome/Firefox 92+, Safari 17+; older Safari ignores it and
+   degrades to exactly the previous behaviour. */
+@font-face{font-family:Read1;src:local('Iowan Old Style');size-adjust:94%}
+@font-face{font-family:Read2;src:local('Charter'),local('Bitstream Charter');size-adjust:100%}
+@font-face{font-family:Read3;src:local('Georgia');size-adjust:100%}
+@font-face{font-family:Read4;src:local('Palatino'),local('Palatino Linotype'),local('Book Antiqua');size-adjust:103%}
+@font-face{font-family:Read5;src:local('Noto Serif');size-adjust:90%}
+@font-face{font-family:Read6;src:local('Liberation Serif'),local('Times New Roman');size-adjust:108%}
+
 :root {
-  --bg: #0a0e1a;
-  --bg-card: #111729;
-  --bg-hover: #1a2138;
-  --text: #e2e8f0;
-  --text-dim: #94a3b8;
-  --text-faint: #64748b;
-  --accent: #06b6d4;
-  --accent-dim: #0e7490;
-  --accent-soft: rgba(6,182,212,0.14);
-  --border: #1e293b;
-  --danger: #ef4444;
-  --radius: 8px;
-  --reader-size: 17px;
-  --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
-  --serif: 'Iowan Old Style', 'Palatino Linotype', 'Georgia', 'Times New Roman', serif;
-  --mono: 'SF Mono', 'Fira Code', 'Cascadia Code', ui-monospace, monospace;
+  /* ── The room: hue locked 222–228°, saturation holding as lightness rises ── */
+  --void:      #04060e;
+  --room:      #080c18;
+  --rail:      #0b1020;
+  --leaf:      #0d1220;   /* THE READING SURFACE — the lit plane */
+  --card:      #11172b;
+  --card-lit:  #161e36;
+  --rule-hair: #1c2440;   /* decorative hairlines ONLY — may never bound a control */
+  --rule:      #29335a;   /* dividers, the quire rule */
+  --rule-edge: #66739b;   /* EVERY control boundary + scrollbar thumb — 3.53:1 worst */
+
+  /* ── The ink: iron gall, browning ── */
+  --ink-high:  #e6eaf4;   /* 14.76:1 on card */
+  --ink-read:  #cbc6bb;   /* the reading body — 10.97:1 on leaf, paper not sepia */
+  --ink-mid:   #9daac4;   /* 7.60:1 on card */
+  --ink-low:   #838fa9;   /* 5.08:1 worst case — retires the old 3.74:1 failure */
+  --fault:     #d98b7a;   /* 6.71:1 — the one message shown when we are broken */
+
+  /* ── The rubric: the second ink. Five permitted meanings, see DESIGN.md §3.4 ── */
+  --rubric:      #1fc7dc;
+  --rubric-hi:   #5fe0f0;
+  --rubric-wash: rgba(31,199,220,.18);
+  --rubric-ink:  #04212b;
+
+  /* ── Tradition bindings: the covering of the boards, never the leaf ── */
+  --bind-abrahamic: #5470b5;
+  --bind-eastern:   #a8834a;
+  --bind-mythology: #86864a;
+  --bind-esoteric:  #8f6cbb;
+
+  /* ── Elevation — the dimension the old file did not have (0 box-shadows) ── */
+  --elev-card:     0 1px 2px rgba(0,0,0,.55), inset 0 1px 0 rgba(158,186,255,.045);
+  --elev-card-lit: 0 2px 6px -1px rgba(0,0,0,.62), 0 10px 28px -10px rgba(0,0,0,.58),
+                   inset 0 1px 0 rgba(158,186,255,.08);
+  --elev-chrome:   0 1px 0 var(--rule), 0 14px 36px -18px rgba(0,0,0,.82);
+  --elev-leaf:     0 18px 48px -18px rgba(0,0,0,.75), inset 0 1px 0 rgba(178,198,255,.055);
+  --scrim:         rgba(4,6,14,.74);
+
+  /* ── Spacing: base 4, nine steps, nothing off-scale ── */
+  --s-1:4px; --s-2:8px; --s-3:12px; --s-4:16px; --s-5:24px;
+  --s-6:32px; --s-7:48px; --s-8:64px; --s-9:96px; --s-10:144px;
+
+  /* ── Radius: a codex has square corners. Nothing >260px may carry one. ── */
+  --r-leaf: 0;
+  --r-card: 2px;
+  --r-ctl:  4px;
+
+  /* ── Type scale: base 16, down 1.125 / up 1.25, all rem ── */
+  --fs-lapidary: .703rem;
+  --fs-meta:     .790rem;
+  --fs-ui-sm:    .889rem;
+  --fs-ui:       1rem;
+  --fs-title:    1.263rem;
+  --fs-head:     1.588rem;
+  --fs-work:     2rem;
+  --fs-display:  clamp(2rem, 1.1rem + 2.8vw, 2.875rem);
+
+  --face-read: Read1, Read2, Read3, Read4, Read5, Read6, serif;
+  --face-ui:   system-ui, -apple-system, 'Segoe UI Variable Text', 'Segoe UI',
+               Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --face-mono: ui-monospace, 'SF Mono', SFMono-Regular, 'Cascadia Mono', Consolas,
+               'Roboto Mono', 'DejaVu Sans Mono', monospace;
+
+  /* ── Motion: four curves, five durations, no free values ── */
+  --ease-leaf:  cubic-bezier(.22,.61,.36,1);
+  --ease-lift:  cubic-bezier(.32,.72,0,1);
+  --ease-quill: cubic-bezier(.40,0,.20,1);
+  --ease-exit:  cubic-bezier(.40,0,1,1);
+  --t-ink:   90ms;
+  --t-lift: 150ms;
+  --t-turn: 240ms;
+  --t-quire:320ms;
+  --t-open: 480ms;
+
+  --header-h: 64px;          /* measured by ResizeObserver in Phase 2 */
+  --reader-size: 17px;       /* the reading dial; becomes a coupled index in Phase 3 */
+  --mono: var(--face-mono);  /* referenced from JS */
+  --danger: var(--fault);    /* referenced from JS */
+
+  color-scheme: dark;
 }
 * { margin: 0; padding: 0; box-sizing: border-box; }
-html { scroll-behavior: smooth; }
+html { scroll-behavior: smooth; scroll-padding-top: calc(var(--header-h) + var(--s-4)); }
 body {
-  background: var(--bg);
-  color: var(--text);
-  font-family: var(--font);
+  /* The bloom: the top of the room reads lit, the bottom recedes, near-black
+     acquires a direction. Deliberately NOT tinted cyan — the accent discipline
+     holds even for light. This delivers more perceived depth than the grain. */
+  background: radial-gradient(128% 76% at 50% -14%, rgba(58,74,132,.15), transparent 62%),
+              var(--room);
+  background-attachment: fixed;
+  color: var(--ink-high);
+  font-family: var(--face-ui);
+  font-optical-sizing: auto;
   line-height: 1.6;
-  -webkit-font-smoothing: antialiased;
   overflow-x: hidden;
+  font-synthesis: none;
 }
-.container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+.container { max-width: 1200px; margin: 0 auto; padding: 0 var(--s-5); }
+
+/* The tooth — bound to the surface, never nailed to the glass. The old grain
+   was a 200-unit viewBox with NO background-size, stretched ~7× across the
+   viewport at an amplitude below the 8-bit quantisation step, and fixed at
+   z-index 9999 so it did not move when 900,000 words scrolled past it. */
+.tooth { position: relative; isolation: isolate; }
+.tooth::before {
+  content: ''; position: absolute; inset: 0; pointer-events: none; z-index: 0;
+  border-radius: inherit;
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='168' height='168'%3E%3Cfilter id='t'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.82' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23t)'/%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='720' height='720'%3E%3Cfilter id='c'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.011' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23c)'/%3E%3C/svg%3E");
+  background-size: 168px 168px, 720px 720px;
+  background-repeat: repeat;
+  mix-blend-mode: overlay;   /* darkens AND lifts; `normal` only lifts blacks */
+  opacity: .022;
+}
+.tooth > * { position: relative; z-index: 1; }
+
+/* Selection — the core outward act of a reading product, previously painted by
+   whatever accent colour the visitor's OS happened to use. */
+::selection { background: rgba(31,199,220,.26); color: #eaf9fc; text-shadow: none; }
 
 /* Accessibility helpers */
 .sr-only {
@@ -67,310 +179,484 @@ body {
   overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0;
 }
 .skip-link {
-  position: absolute; left: 12px; top: -60px; z-index: 200;
-  background: var(--accent); color: #04212b; font-weight: 600;
-  padding: 10px 16px; border-radius: var(--radius);
-  transition: top 0.15s;
+  position: absolute; left: var(--s-3); top: -60px; z-index: 200;
+  background: var(--rubric); color: var(--rubric-ink); font-weight: 600;
+  padding: 10px var(--s-4); border-radius: var(--r-ctl);
+  transition: top var(--t-ink) var(--ease-quill);
 }
-.skip-link:focus { top: 12px; }
-:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
+.skip-link:focus { top: var(--s-3); }
+/* The halo makes the ring survive against an adjacent card and inside the rail's
+   overflow. Instant — a ring that fades in arrives late for whoever needs it. */
+:focus-visible {
+  outline: 2px solid var(--rubric-hi); outline-offset: 2px;
+  box-shadow: 0 0 0 4px var(--room);
+}
 
 /* Header */
 header {
-  border-bottom: 1px solid var(--border);
-  padding: 16px 0;
+  border-bottom: 1px solid var(--rule-hair);
+  padding: var(--s-3) 0;
   position: sticky; top: 0;
-  background: rgba(10,14,26,0.95);
-  backdrop-filter: blur(12px);
+  background: rgba(8,12,24,.72);
+  backdrop-filter: blur(20px) saturate(1.3);
+  -webkit-backdrop-filter: blur(20px) saturate(1.3);
   z-index: 100;
+  transition: background var(--t-lift) var(--ease-quill),
+              border-color var(--t-lift) var(--ease-quill),
+              box-shadow var(--t-lift) var(--ease-quill);
 }
-.header-inner { display: flex; align-items: center; gap: 20px; }
+header.is-lit { border-bottom-color: var(--rule); box-shadow: var(--elev-chrome); }
+.header-inner { display: flex; align-items: center; gap: var(--s-5); }
 .logo {
-  display: flex; align-items: center; gap: 12px; cursor: pointer;
+  display: flex; align-items: center; gap: var(--s-3); cursor: pointer;
   background: none; border: none; color: inherit; font-family: inherit; padding: 0;
-  flex-shrink: 0;
+  flex-shrink: 0; border-radius: var(--r-ctl);
 }
-.logo-mark {
-  width: 32px; height: 32px;
-  border: 2px solid var(--accent);
-  border-radius: 50%;
-  display: flex; align-items: center; justify-content: center;
-  position: relative;
+/* The mark: four bottom-aligned bars, heights ∝ √(90/27/23/11), each in its
+   tradition's binding colour. Derived from the collection, so it means
+   something — and four heavy bars survive 16px where a ring and a dot do not. */
+.logo-mark { display: block; width: 24px; height: 24px; flex-shrink: 0; }
+.logo-text {
+  font-size: 1.0625rem; font-weight: 600; letter-spacing: -0.012em; white-space: nowrap;
+  color: var(--ink-high);
 }
-.logo-mark::after {
-  content: ''; position: absolute;
-  width: 8px; height: 8px;
-  background: var(--accent);
-  border-radius: 50%;
-}
-.logo-text { font-size: 18px; font-weight: 600; letter-spacing: -0.3px; white-space: nowrap; }
-.logo-text span { color: var(--accent); }
+
+.icon { width: 20px; height: 20px; flex-shrink: 0; display: block; fill: none;
+        stroke: currentColor; stroke-width: 1.5; stroke-linecap: round;
+        stroke-linejoin: round; }
 
 .menu-toggle {
   display: none;
-  background: var(--bg-card); border: 1px solid var(--border); color: var(--text);
-  width: 40px; height: 40px; border-radius: var(--radius); cursor: pointer;
-  font-size: 18px; flex-shrink: 0;
+  background: var(--card); border: 1px solid var(--rule-edge); color: var(--ink-mid);
+  width: 40px; height: 40px; border-radius: var(--r-ctl); cursor: pointer;
+  align-items: center; justify-content: center; flex-shrink: 0;
+  box-shadow: var(--elev-card);
+  transition: background var(--t-ink) var(--ease-quill), color var(--t-ink) var(--ease-quill);
 }
+.menu-toggle:hover { background: var(--card-lit); color: var(--ink-high); }
 
 /* Search */
 .search-wrap { flex: 1; max-width: 520px; position: relative; }
 .search-input {
   width: 100%;
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  color: var(--text);
-  padding: 10px 40px 10px 40px;
-  font-size: 14px;
-  font-family: var(--font);
-  outline: none;
-  transition: border-color 0.2s;
+  background: var(--rail);
+  border: 1px solid var(--rule-edge);
+  border-radius: var(--r-ctl);
+  color: var(--ink-high);
+  padding: 10px 40px 10px 42px;
+  font-size: var(--fs-ui);          /* 16px — below this iOS zooms the viewport */
+  font-family: var(--face-ui);
+  box-shadow: var(--elev-card);
+  transition: background var(--t-ink) var(--ease-quill);
 }
-.search-input:focus { border-color: var(--accent-dim); }
-.search-input::placeholder { color: var(--text-faint); }
+.search-input:focus:not(:focus-visible) { outline: none; }
+.search-input:focus { background: var(--card); }
+.search-input::placeholder { color: var(--ink-low); }
+/* WebKit renders its own cancel button on top of ours */
+input[type="search"]::-webkit-search-cancel-button,
+input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appearance: none; }
 .search-icon {
-  position: absolute; left: 14px; top: 50%;
+  position: absolute; left: var(--s-3); top: 50%;
   transform: translateY(-50%);
-  color: var(--text-faint);
-  font-size: 14px; pointer-events: none;
+  color: var(--ink-low);
+  pointer-events: none; display: flex;
 }
 .search-clear {
-  position: absolute; right: 8px; top: 50%; transform: translateY(-50%);
-  background: none; border: none; color: var(--text-faint); cursor: pointer;
-  width: 26px; height: 26px; border-radius: 50%; font-size: 15px;
+  position: absolute; right: var(--s-1); top: 50%; transform: translateY(-50%);
+  background: none; border: none; color: var(--ink-low); cursor: pointer;
+  width: 32px; height: 32px; border-radius: var(--r-ctl);
   display: none; align-items: center; justify-content: center;
+  transition: color var(--t-ink) var(--ease-quill), background var(--t-ink) var(--ease-quill);
 }
-.search-clear:hover { color: var(--text); background: var(--bg-hover); }
+.search-clear:hover { color: var(--ink-high); background: var(--card-lit); }
 .search-clear.show { display: flex; }
 
-/* Stats */
-.stats { display: flex; gap: 18px; font-size: 13px; color: var(--text-dim); flex-shrink: 0; }
-.stats b { color: var(--accent); font-weight: 600; }
+/* Stats — tabular so the numbers do not jitter. Never cyan: a count is not a
+   live state, and cyan means exactly five things (DESIGN.md §3.4). */
+.stats {
+  display: flex; gap: var(--s-5); font-size: var(--fs-meta); color: var(--ink-low);
+  flex-shrink: 0; font-variant-numeric: tabular-nums lining-nums;
+}
+.stats b { color: var(--ink-mid); font-weight: 600; }
 
 /* Layout */
-.layout { display: grid; grid-template-columns: 240px 1fr; gap: 24px; padding: 24px 0; }
+.layout { display: grid; grid-template-columns: 240px 1fr; gap: var(--s-6); padding: var(--s-5) 0; }
 
-/* Sidebar */
-.sidebar { position: sticky; top: 80px; max-height: calc(100vh - 100px); overflow-y: auto; align-self: start; }
+/* Sidebar — the rail. It keeps its OWN overflow: "one scroll axis" governs the
+   reading surface, not the chrome. */
+.sidebar {
+  position: sticky; top: calc(var(--header-h) + var(--s-2));
+  max-height: calc(100dvh - var(--header-h) - var(--s-6));
+  overflow-y: auto; align-self: start;
+}
 .nav-label {
-  font-size: 11px; font-weight: 600;
-  text-transform: uppercase; letter-spacing: 1px;
-  color: var(--text-faint);
-  margin-bottom: 8px; padding-left: 12px;
+  font-family: var(--face-read);
+  font-size: var(--fs-lapidary); font-weight: 500;
+  text-transform: uppercase; letter-spacing: .115em;
+  color: var(--ink-low);
+  margin-bottom: var(--s-2); padding-left: var(--s-3);
 }
 .nav-item {
-  display: flex; align-items: center; justify-content: space-between; gap: 8px;
-  width: 100%;
-  padding: 8px 12px;
-  border-radius: 6px;
+  display: flex; align-items: center; justify-content: space-between; gap: var(--s-2);
+  width: 100%; min-height: 40px;
+  padding: var(--s-2) var(--s-3);
+  border-radius: var(--r-ctl);
+  border-left: 2px solid transparent;
   cursor: pointer;
-  font-size: 14px;
-  color: var(--text-dim);
-  transition: background 0.15s, color 0.15s;
-  background: none; border: none; font-family: inherit; text-align: left;
+  font-size: var(--fs-ui-sm);
+  color: var(--ink-mid);
+  transition: background var(--t-ink) var(--ease-quill), color var(--t-ink) var(--ease-quill);
+  background: none; border-top: none; border-right: none; border-bottom: none;
+  font-family: inherit; text-align: left;
 }
-.nav-item:hover { background: var(--bg-card); color: var(--text); }
-.nav-item[aria-current="true"] { background: var(--bg-card); color: var(--accent); }
+.nav-item:hover { background: var(--card); color: var(--ink-high); }
+/* Current state is a rule + weight + ink, never colour alone — the old version
+   differed from hover by 1.06:1 relative luminance, i.e. invisible under
+   deuteranopia. */
+.nav-item[aria-current="true"] {
+  background: var(--card); color: var(--ink-high); font-weight: 600;
+  border-left-color: var(--rubric);
+}
 .nav-item .count {
-  font-size: 11px; color: var(--text-faint);
-  background: var(--bg);
-  padding: 2px 8px; border-radius: 10px;
+  font-size: var(--fs-meta); color: var(--ink-low);
+  font-variant-numeric: tabular-nums lining-nums;
 }
 
 /* Content */
 .content { min-height: 60vh; }
 
 /* Text cards */
-.text-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 16px; }
+.text-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: var(--s-5); }
 .text-card {
   display: block; text-align: left; width: 100%;
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 20px;
+  background: var(--card);
+  border: 1px solid var(--rule-hair);
+  border-left: 2px solid var(--bind, var(--rule-edge));
+  border-radius: var(--r-card);
+  padding: var(--s-5);
   cursor: pointer;
-  transition: border-color 0.2s, background 0.2s, transform 0.2s;
+  box-shadow: var(--elev-card);
+  transition: background var(--t-lift) var(--ease-leaf),
+              box-shadow var(--t-lift) var(--ease-leaf),
+              border-color var(--t-lift) var(--ease-leaf),
+              transform var(--t-lift) var(--ease-leaf);
   position: relative;
-  overflow: hidden;
   color: inherit; font-family: inherit; text-decoration: none;
 }
-.text-card:hover { border-color: var(--accent-dim); background: var(--bg-hover); }
-.text-card::before {
-  content: ''; position: absolute;
-  top: 0; left: 0; width: 3px; height: 100%;
-  background: var(--accent);
-  opacity: 0; transition: opacity 0.2s;
+/* HOVER IS AN ELEVATION EVENT, NEVER A HUE EVENT. Focus gets the identical
+   treatment — the old accent bar was mouse-only. */
+.text-card:hover, .text-card:focus-visible {
+  background: var(--card-lit);
+  box-shadow: var(--elev-card-lit);
+  transform: translateY(-1px);
 }
-.text-card:hover::before { opacity: 0.6; }
-.text-title { font-size: 15px; font-weight: 600; margin-bottom: 6px; color: var(--text); }
-.text-meta { display: flex; gap: 12px; font-size: 12px; color: var(--text-faint); margin-bottom: 8px; flex-wrap: wrap; }
+.text-title {
+  font-family: var(--face-read);
+  font-size: var(--fs-title); font-weight: 600; line-height: 1.24;
+  letter-spacing: -0.008em; text-wrap: balance;
+  margin-bottom: var(--s-2); color: var(--ink-high);
+}
+.text-meta {
+  display: flex; gap: var(--s-3); font-size: var(--fs-meta); color: var(--ink-low);
+  margin-bottom: var(--s-3); flex-wrap: wrap;
+  font-variant-numeric: tabular-nums lining-nums;
+}
+/* The tradition name is always written out beside the binding edge, so WCAG
+   1.4.1 is satisfied by construction rather than by an aria attribute. */
 .text-meta .badge {
-  background: var(--bg);
-  padding: 2px 8px; border-radius: 4px;
-  color: var(--text-dim);
+  font-family: var(--face-read);
+  text-transform: uppercase; letter-spacing: .115em; font-weight: 500;
+  font-size: var(--fs-lapidary); color: var(--ink-mid);
 }
 .text-preview {
-  font-size: 13px; color: var(--text-dim);
-  line-height: 1.5;
+  font-family: var(--face-read);
+  font-size: .975rem; color: var(--ink-read); opacity: .88;
+  line-height: 1.52;
   display: -webkit-box;
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
-  min-height: 3.9em; /* reserve space so previews filling in cause no layout shift */
+  min-height: 4.56em; /* reserve space so previews filling in cause no layout shift */
 }
 
 /* Reader view */
 .reader { display: none; }
 .reader.active { display: block; }
 .reader-progress {
-  position: sticky; top: 0; height: 3px; background: transparent; z-index: 5;
-  margin-bottom: 4px;
+  position: sticky; top: 0; height: 2px; background: var(--rule-hair); z-index: 5;
+  margin-bottom: var(--s-1);
 }
-.reader-progress span { display: block; height: 100%; width: 0; background: var(--accent); transition: width 0.1s linear; }
+/* No width transition: the old 0.1s exactly equalled the 100ms scroll throttle,
+   so the bar was permanently one batch behind the scroll it reported. */
+.reader-progress span { display: block; height: 100%; width: 0; background: var(--rubric); }
 .reader-toolbar {
-  display: flex; align-items: center; justify-content: space-between; gap: 16px;
-  margin-bottom: 16px; flex-wrap: wrap;
+  display: flex; align-items: center; justify-content: space-between; gap: var(--s-4);
+  margin-bottom: var(--s-4); flex-wrap: wrap;
 }
 .reader-back {
-  background: none; border: none; color: var(--text-dim);
-  cursor: pointer; font-size: 14px;
-  display: flex; align-items: center; gap: 6px; padding: 6px 4px;
+  background: none; border: none; color: var(--ink-mid);
+  cursor: pointer; font-size: var(--fs-ui-sm);
+  display: flex; align-items: center; gap: var(--s-2); padding: var(--s-2) var(--s-1);
+  border-radius: var(--r-ctl);
+  transition: color var(--t-ink) var(--ease-quill);
 }
-.reader-back:hover { color: var(--accent); }
-.reader-tools { display: flex; align-items: center; gap: 8px; }
+.reader-back:hover { color: var(--ink-high); }
+.reader-tools { display: flex; align-items: center; gap: var(--s-2); }
 .tool-btn {
-  background: var(--bg-card); border: 1px solid var(--border); color: var(--text-dim);
-  border-radius: 6px; cursor: pointer; height: 32px; min-width: 32px; padding: 0 10px;
-  font-size: 13px; display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  background: var(--card); border: 1px solid var(--rule-edge); color: var(--ink-mid);
+  border-radius: var(--r-ctl); cursor: pointer; height: 40px; min-width: 40px; padding: 0 var(--s-3);
+  font-size: var(--fs-ui-sm); font-family: inherit;
+  display: inline-flex; align-items: center; justify-content: center; gap: var(--s-2);
+  box-shadow: var(--elev-card);
+  font-variant-numeric: tabular-nums;
+  transition: background var(--t-ink) var(--ease-quill), color var(--t-ink) var(--ease-quill);
 }
-.tool-btn:hover { color: var(--text); border-color: var(--accent-dim); }
-.tool-btn[aria-pressed="true"] { color: var(--accent); border-color: var(--accent-dim); }
-.reader-title { font-size: 24px; font-weight: 700; letter-spacing: -0.4px; }
-.reader-meta { font-size: 13px; color: var(--text-faint); margin: 6px 0 18px; }
-.reader-layout { display: grid; grid-template-columns: 1fr; gap: 20px; }
-.reader-layout.has-toc { grid-template-columns: 220px 1fr; }
+.tool-btn:hover { color: var(--ink-high); background: var(--card-lit); }
+.tool-btn[aria-pressed="true"] {
+  color: var(--ink-high); background: var(--card-lit); font-weight: 600;
+  border-left: 2px solid var(--rubric);
+}
+/* A title page, not a header: the work in the reading serif at 400, not the
+   marketing hero's 700-weight sans with its −0.4px tracking. */
+.reader-title {
+  font-family: var(--face-read);
+  font-size: var(--fs-work); font-weight: 400; line-height: 1.12;
+  letter-spacing: -0.018em; text-wrap: balance; color: var(--ink-high);
+}
+.reader-title:focus { outline: none; }
+.reader-meta {
+  font-size: var(--fs-meta); color: var(--ink-low); margin: var(--s-2) 0 var(--s-5);
+  font-variant-numeric: tabular-nums lining-nums;
+}
+.reader-meta strong {
+  font-family: var(--face-read); font-weight: 500;
+  text-transform: uppercase; letter-spacing: .115em; color: var(--ink-mid);
+}
+.reader-layout { display: grid; grid-template-columns: 1fr; gap: var(--s-6); }
+.reader-layout.has-toc { grid-template-columns: 240px 1fr; }
 .reader-toc {
   display: none;
-  position: sticky; top: 80px; align-self: start;
-  max-height: calc(100vh - 160px); overflow-y: auto;
-  font-size: 13px; border-left: 1px solid var(--border); padding-left: 4px;
+  position: sticky; top: calc(var(--header-h) + var(--s-2)); align-self: start;
+  max-height: calc(100dvh - var(--header-h) - var(--s-8)); overflow-y: auto;
+  font-size: var(--fs-ui-sm);
 }
 .reader-layout.has-toc .reader-toc { display: block; }
-.reader-toc-label { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: var(--text-faint); margin: 0 0 8px 12px; }
-.reader-toc a {
-  display: block; padding: 5px 12px; color: var(--text-dim); text-decoration: none;
-  border-radius: 5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+.reader-toc-label {
+  font-family: var(--face-read);
+  font-size: var(--fs-lapidary); font-weight: 500;
+  text-transform: uppercase; letter-spacing: .115em;
+  color: var(--ink-low); margin: 0 0 var(--s-2) var(--s-3);
 }
-.reader-toc a:hover { background: var(--bg-card); color: var(--text); }
+/* Two-line wrap, no ellipsis — the old 220px nowrap rail truncated entries at
+   about 30 characters, which is not a table of contents. */
+.reader-toc a {
+  display: block; padding: var(--s-2) var(--s-3); color: var(--ink-mid); text-decoration: none;
+  border-radius: var(--r-ctl); border-left: 2px solid transparent;
+  line-height: 1.35;
+  transition: background var(--t-ink) var(--ease-quill), color var(--t-ink) var(--ease-quill);
+}
+.reader-toc a:hover { background: var(--card); color: var(--ink-high); }
+.reader-toc a[aria-current="true"] {
+  background: var(--card); color: var(--ink-high); font-weight: 600;
+  border-left-color: var(--rubric);
+}
 .reader-main { min-width: 0; }
 .reader-find {
-  display: flex; align-items: center; gap: 8px; margin-bottom: 12px;
+  display: flex; align-items: center; gap: var(--s-3); margin-bottom: var(--s-4);
 }
 .reader-find input {
-  flex: 1; max-width: 320px; background: var(--bg-card); border: 1px solid var(--border);
-  color: var(--text); border-radius: 6px; padding: 7px 12px; font-size: 13px; font-family: var(--font);
+  flex: 1; max-width: 320px; background: var(--rail); border: 1px solid var(--rule-edge);
+  color: var(--ink-high); border-radius: var(--r-ctl); padding: var(--s-2) var(--s-3);
+  font-size: var(--fs-ui); font-family: var(--face-ui);
 }
-.reader-find input:focus { outline: none; border-color: var(--accent-dim); }
-.reader-find .find-count { font-size: 12px; color: var(--text-faint); white-space: nowrap; }
+.reader-find input:focus:not(:focus-visible) { outline: none; }
+.reader-find .find-count {
+  font-size: var(--fs-meta); color: var(--ink-low); white-space: nowrap;
+  font-variant-numeric: tabular-nums lining-nums;
+}
+/* THE LEAF — the single lit plane in the product. Phase 2 removes the box
+   entirely (border, radius, max-height, inner scroller); Phase 1 lights it. */
 .reader-content {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 40px clamp(20px, 5vw, 56px);
+  background: var(--leaf);
+  border: 1px solid var(--rule-hair);
+  border-radius: var(--r-leaf);
+  box-shadow: var(--elev-leaf);
+  padding: var(--s-8) clamp(var(--s-5), 5vw, var(--s-7));
   font-size: var(--reader-size);
-  line-height: 1.85;
+  line-height: 1.62;
+  color: var(--ink-read);
   max-height: calc(100vh - 260px);
   overflow-y: auto;
   white-space: pre-wrap;
   overflow-wrap: break-word;
-  font-family: var(--serif);
+  font-family: var(--face-read);
+  font-variant-numeric: oldstyle-nums proportional-nums;
+  text-rendering: optimizeLegibility;
+  letter-spacing: .004em;
 }
-.reader-content .measure { max-width: 68ch; margin: 0 auto; }
+/* em, not ch: `ch` is the advance of glyph 0 — ≈0.50em in Iowan, ≈0.56em in
+   Georgia — so `68ch` resolved to 578–648px depending on which fallback won. */
+.reader-content .measure { max-width: 33em; margin: 0 auto; }
+/* The hit ADVANCES: 11.08:1 against body copy's 10.97:1. Previously it receded,
+   at 7.34:1 against 14.58:1. The inset underline is the non-colour channel. */
 .reader-content mark, .search-result-context mark {
-  background: var(--accent-soft);
-  color: var(--accent);
-  border-radius: 2px;
-  padding: 0 2px;
+  background: var(--rubric-wash);
+  color: var(--ink-high);
+  box-shadow: inset 0 -2px 0 var(--rubric);
+  border-radius: 0;
+  padding: 0 1px;
 }
-.reader-content mark.current { background: var(--accent); color: #04212b; }
+.reader-content mark.current {
+  background: var(--rubric); color: var(--rubric-ink);
+  outline: 2px solid var(--ink-high); box-shadow: none;
+}
 
 /* Search results */
 .search-results { display: none; }
 .search-results.active { display: block; }
-.results-count { color: var(--text-faint); font-size: 13px; margin-bottom: 16px; }
+.results-count {
+  color: var(--ink-mid); font-size: var(--fs-ui-sm); margin-bottom: var(--s-4);
+  font-variant-numeric: tabular-nums lining-nums;
+}
 .search-result {
   display: block; width: 100%; text-align: left;
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 16px 20px;
-  margin-bottom: 12px;
+  background: var(--card);
+  border: 1px solid var(--rule-hair);
+  border-left: 2px solid var(--bind, var(--rule-edge));
+  border-radius: var(--r-card);
+  padding: var(--s-4) var(--s-5);
+  margin-bottom: var(--s-3);
   cursor: pointer;
-  transition: border-color 0.2s;
+  box-shadow: var(--elev-card);
+  transition: background var(--t-lift) var(--ease-leaf), box-shadow var(--t-lift) var(--ease-leaf);
   color: inherit; font-family: inherit; text-decoration: none;
 }
-.search-result:hover { border-color: var(--accent-dim); }
-.search-result-title { font-size: 14px; font-weight: 600; margin-bottom: 4px; color: var(--text); }
+.search-result:hover, .search-result:focus-visible {
+  background: var(--card-lit); box-shadow: var(--elev-card-lit);
+}
+.search-result-title {
+  font-family: var(--face-read);
+  font-size: var(--fs-title); font-weight: 600; line-height: 1.24;
+  margin-bottom: var(--s-1); color: var(--ink-high);
+}
 .search-result-context {
-  font-size: 13px; color: var(--text-dim); line-height: 1.5; margin-top: 6px;
+  font-family: var(--face-read);
+  font-size: .975rem; color: var(--ink-read); opacity: .9;
+  line-height: 1.52; margin-top: var(--s-2);
 }
 
-/* Empty / loading state */
-.empty { text-align: center; padding: 60px 20px; color: var(--text-faint); }
+/* Empty / loading state — a library does not sparkle, so no shimmer. */
+.empty { text-align: center; padding: var(--s-9) var(--s-5); color: var(--ink-low); }
 
-/* Scrollbar */
-::-webkit-scrollbar { width: 8px; height: 8px; }
-::-webkit-scrollbar-track { background: var(--bg); }
-::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
-::-webkit-scrollbar-thumb:hover { background: var(--text-faint); }
-
-/* Film grain */
-body::after {
-  content: ''; position: fixed; top: 0; left: 0;
-  width: 100%; height: 100%;
-  pointer-events: none; z-index: 9999;
-  opacity: 0.015;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+/* Scrollbar — transparent track. The old --bg track was darker than the panel
+   it sat inside and punched a black trench down the reading surface. */
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: var(--rule-edge); border-radius: 999px;
+  border: 3px solid transparent; background-clip: padding-box;
 }
+::-webkit-scrollbar-thumb:hover { background: var(--ink-low); background-clip: padding-box; }
+* { scrollbar-width: thin; scrollbar-color: var(--rule-edge) transparent; }
 
 /* Hero */
 .hero {
-  padding: 40px 0 20px;
-  border-bottom: 1px solid var(--border);
+  padding: var(--s-9) 0 var(--s-7);
+  border-bottom: 1px solid var(--rule-hair);
 }
-.hero h1 { font-size: 30px; font-weight: 700; letter-spacing: -0.5px; margin-bottom: 8px; }
-.hero h1 span { color: var(--accent); }
-.hero p { color: var(--text-dim); font-size: 15px; max-width: 620px; }
+.hero h1 {
+  font-family: var(--face-read);
+  font-size: var(--fs-display); font-weight: 400; line-height: 1.05;
+  letter-spacing: -0.026em; text-wrap: balance;
+  margin-bottom: var(--s-4); color: var(--ink-high);
+  max-width: 20ch;
+}
+/* Never cyan: the manifesto is not a live state. */
+.hero h1 span { color: var(--ink-mid); }
+.hero p { color: var(--ink-mid); font-size: var(--fs-ui); max-width: 46ch; text-wrap: pretty; }
 
-/* Backdrop for mobile sidebar */
+/* Backdrop for mobile sidebar — fades WITH the drawer instead of popping. */
 .backdrop {
-  display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5);
-  z-index: 90; backdrop-filter: blur(2px);
+  position: fixed; inset: 0; background: var(--scrim);
+  z-index: 90; backdrop-filter: blur(4px) saturate(.85);
+  -webkit-backdrop-filter: blur(4px) saturate(.85);
+  opacity: 0; visibility: hidden;
+  transition: opacity var(--t-turn) var(--ease-quill), visibility var(--t-turn);
 }
-.backdrop.show { display: block; }
+.backdrop.show { opacity: 1; visibility: visible; }
 
 /* Responsive */
 @media (max-width: 860px) {
   .stats { display: none; }
-  .menu-toggle { display: flex; align-items: center; justify-content: center; }
-  .layout { grid-template-columns: 1fr; }
+  .menu-toggle { display: flex; }
+  .layout { grid-template-columns: 1fr; gap: var(--s-5); }
   .sidebar {
     position: fixed; top: 0; left: 0; bottom: 0; width: 260px; z-index: 95;
-    background: var(--bg); border-right: 1px solid var(--border);
-    max-height: none; padding: 80px 16px 24px; overflow-y: auto;
-    transform: translateX(-100%); transition: transform 0.22s ease;
+    background: var(--room); border-right: 1px solid var(--rule-edge);
+    box-shadow: 0 28px 72px -14px rgba(0,0,0,.88), inset 1px 0 0 rgba(158,186,255,.06);
+    max-height: none; padding: calc(var(--header-h) + var(--s-4)) var(--s-4) var(--s-5);
+    overflow-y: auto;
+    transform: translateX(-100%);
+    transition: transform var(--t-quire) var(--ease-lift);
   }
   .sidebar.open { transform: translateX(0); }
   .reader-layout.has-toc { grid-template-columns: 1fr; }
   .reader-layout.has-toc .reader-toc { display: none; }
-  .reader-content { max-height: none; padding: 24px 18px; }
-  .hero h1 { font-size: 24px; }
+  .reader-content { max-height: none; padding: var(--s-6) var(--s-5); }
+  .hero { padding: var(--s-7) 0 var(--s-6); }
 }
 
+/* Touch: every control ≥44×44 with real separation. */
+@media (pointer: coarse) {
+  .tool-btn { height: 44px; min-width: 44px; }
+  .reader-tools { gap: var(--s-3); }
+  .nav-item { min-height: 44px; }
+  .search-clear { width: 44px; height: 44px; }
+  .menu-toggle { width: 44px; height: 44px; }
+}
+
+/* Reduced motion, DESIGNED — not disabled. prefers-reduced-motion addresses
+   vestibular triggers: translation, parallax, scale, spin. A 90ms colour
+   cross-fade is none of those; it is the affordance telling you a target is
+   interactive. So: remove translation, stagger and smooth-scroll; PRESERVE
+   colour, opacity and shadow; substitute a fade wherever a slide was removed.
+   The old `* { transition: none !important }` deleted seven transitions of
+   which exactly one was a genuine translation, and turned a 260px drawer from
+   a glide into an instant materialisation — arguably the worse vestibular
+   event, because there is no cue at all about where the panel came from. */
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
-  * { transition: none !important; }
+  :root { --t-turn: 120ms; --t-quire: 0ms; --t-open: 0ms; }
+  /* --t-ink and --t-lift survive intact */
+  .text-card:hover, .text-card:focus-visible { transform: none; }
+  .sidebar {
+    transform: none; opacity: 0; visibility: hidden;
+    transition: opacity 140ms var(--ease-quill), visibility 140ms;
+  }
+  .sidebar.open { opacity: 1; visibility: visible; }
+}
+
+/* Windows High Contrast: materiality goes, structure survives. */
+@media (forced-colors: active) {
+  .tooth::before, body { background-image: none; }
+  .reader-progress span { background: Highlight; forced-color-adjust: none; }
+  mark { background: Mark; color: MarkText; box-shadow: none; }
+  .reader-content mark.current { outline: 2px solid Highlight; outline-offset: 1px; }
+  .nav-item[aria-current="true"], .reader-toc a[aria-current="true"] {
+    border-inline-start: 2px solid Highlight;
+  }
+  .reader-content { border: 1px solid CanvasText; }
+  .backdrop { background: Canvas; }
+  .text-card { border-left-color: CanvasText; }
+}
+
+@media (prefers-contrast: more) {
+  :root {
+    --ink-high: #f5f7fb; --ink-read: #e2ded4; --ink-mid: #c3ccdd; --ink-low: #a7b2c8;
+    --rule-edge: #8b97b0; --rubric: #5fe0f0;
+  }
+  .text-card, .search-input, .reader-find input, .tool-btn { border-width: 2px; }
+  :focus-visible { outline-width: 3px; }
 }
 </style>
 </head>
@@ -378,23 +664,52 @@ body::after {
 
 <a href="#main" class="skip-link">Skip to content</a>
 
+<!-- Icon sprite. Replaces five emoji/dingbat glyphs from four unrelated
+     typographic systems — including U+1F50D, a full-colour OS bitmap that
+     ignored its own `color` declaration and was the most saturated object
+     anywhere in a monochrome navy instrument. One 20px / 1.5px grid. -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <defs>
+    <symbol id="i-search" viewBox="0 0 20 20"><circle cx="9" cy="9" r="5.5"/><path d="M13 13l4 4"/></symbol>
+    <symbol id="i-menu" viewBox="0 0 20 20"><path d="M3 6h14M3 10h14M3 14h14"/></symbol>
+    <symbol id="i-close" viewBox="0 0 20 20"><path d="M5 5l10 10M15 5L5 15"/></symbol>
+    <symbol id="i-back" viewBox="0 0 20 20"><path d="M11.5 4L5.5 10l6 6"/></symbol>
+    <symbol id="i-contents" viewBox="0 0 20 20"><path d="M3 5h3M3 10h3M3 15h3M9 5h8M9 10h8M9 15h8"/></symbol>
+    <symbol id="i-colophon" viewBox="0 0 20 20"><circle cx="10" cy="4.5" r="1.2" fill="currentColor" stroke="none"/><circle cx="5.5" cy="12" r="1.2" fill="currentColor" stroke="none"/><circle cx="14.5" cy="12" r="1.2" fill="currentColor" stroke="none"/><circle cx="10" cy="16.5" r="1.2" fill="currentColor" stroke="none"/></symbol>
+  </defs>
+</svg>
+
 <header>
   <div class="container header-inner">
-    <button class="menu-toggle" id="menuToggle" aria-label="Open navigation" aria-expanded="false" aria-controls="sidebar">&#9776;</button>
+    <button class="menu-toggle" id="menuToggle" aria-label="Open navigation" aria-expanded="false" aria-controls="sidebar">
+      <svg class="icon" aria-hidden="true"><use href="#i-menu"/></svg>
+    </button>
     <button class="logo" id="logo" aria-label="The Source Corpus — home">
-      <span class="logo-mark" aria-hidden="true"></span>
-      <span class="logo-text">The Source <span>Corpus</span></span>
+      <!-- Four bars, heights ∝ √(90/27/23/11), each in its tradition's binding
+           colour: the mark is derived from the collection, so it means something
+           and teaches the colour code at a glance. -->
+      <svg class="logo-mark" viewBox="0 0 24 24" aria-hidden="true">
+        <rect x="1"    y="2"  width="2.5" height="20" fill="#5470b5"/>
+        <rect x="7.17" y="12" width="2.5" height="10" fill="#a8834a"/>
+        <rect x="13.33" y="13" width="2.5" height="9"  fill="#86864a"/>
+        <rect x="19.5" y="15" width="2.5" height="7"  fill="#8f6cbb"/>
+      </svg>
+      <span class="logo-text">The Source Corpus</span>
     </button>
     <div class="search-wrap">
-      <span class="search-icon" aria-hidden="true">&#128269;</span>
+      <span class="search-icon" aria-hidden="true"><svg class="icon"><use href="#i-search"/></svg></span>
       <input class="search-input" id="searchInput" type="search" autocomplete="off"
-             aria-label="Search across 151 texts, 13 million words"
-             placeholder="Search 151 texts, 13 million words… (press /)">
-      <button class="search-clear" id="searchClear" aria-label="Clear search" type="button">&#10005;</button>
+             aria-label="Search the corpus"
+             placeholder="Search the corpus…">
+      <button class="search-clear" id="searchClear" aria-label="Clear search" type="button">
+        <svg class="icon" aria-hidden="true"><use href="#i-close"/></svg>
+      </button>
     </div>
-    <div class="stats" aria-hidden="true">
-      <span><b id="statTexts">159</b> texts</span>
-      <span><b id="statWords">13M</b> words</span>
+    <!-- The scale claim is the product's argument; it is announced, not hidden.
+         Values are owned by JS — no magic number ships in the markup. -->
+    <div class="stats">
+      <span><b id="statTexts">—</b> texts</span>
+      <span><b id="statWords">—</b> words</span>
       <span><b id="statCats">4</b> traditions</span>
     </div>
   </div>
@@ -404,8 +719,8 @@ body::after {
 
 <div class="container">
   <div class="hero" id="hero">
-    <h1>Humanity's wisdom, <span>unmediated</span></h1>
-    <p>151 primary texts spanning every major world tradition. From the Rig Veda to the Nag Hammadi codices, from Gilgamesh to the Zohar. Not summaries. Not interpretations. The actual texts.</p>
+    <h1>Humanity's wisdom, <span>unmediated.</span></h1>
+    <p>No commentary. No summaries. The actual public-domain texts, from the Rig Veda to the Nag Hammadi codices, from Gilgamesh to the Zohar.</p>
   </div>
 
   <div class="layout">
@@ -422,11 +737,15 @@ body::after {
       <div id="readerView" class="reader" aria-hidden="true">
         <div class="reader-progress" aria-hidden="true"><span id="readerProgress"></span></div>
         <div class="reader-toolbar">
-          <button class="reader-back" id="readerBack" aria-label="Back to corpus">&#8592; Back to corpus</button>
+          <button class="reader-back" id="readerBack" aria-label="Back to corpus">
+            <svg class="icon" aria-hidden="true"><use href="#i-back"/></svg> Corpus
+          </button>
           <div class="reader-tools">
-            <button class="tool-btn" id="findToggle" aria-label="Find within this text" aria-pressed="false">&#128269; Find</button>
-            <button class="tool-btn" id="textSmaller" aria-label="Decrease text size">A&#8722;</button>
-            <button class="tool-btn" id="textLarger" aria-label="Increase text size">A&#43;</button>
+            <button class="tool-btn" id="findToggle" aria-label="Find within this text" aria-pressed="false">
+              <svg class="icon" aria-hidden="true"><use href="#i-search"/></svg> Find
+            </button>
+            <button class="tool-btn" id="textSmaller" aria-label="Decrease text size" title="Decrease text size">A&#8722;</button>
+            <button class="tool-btn" id="textLarger" aria-label="Increase text size" title="Increase text size">A&#43;</button>
           </div>
         </div>
         <h1 class="reader-title" id="readerTitle" tabindex="-1"></h1>
@@ -552,8 +871,9 @@ body::after {
     const data = await res.json();
     State.summary = data;
     for (const t of data.texts) State.byId.set(t.id, Object.assign({}, t));
-    $('statTexts').textContent = data.total_texts;
+    $('statTexts').textContent = data.total_texts.toLocaleString();
     $('statWords').textContent = (data.total_words / 1e6).toFixed(1) + 'M';
+    $('statCats').textContent = String(new Set(data.texts.map(t => t.category)).size);
     // seed sidebar counts
     const counts = { all: data.texts.length };
     for (const t of data.texts) counts[t.category] = (counts[t.category] || 0) + 1;
@@ -572,7 +892,7 @@ body::after {
     // enrich any rendered cards with their (now-clean) preview text
     for (const t of data.texts) {
       const p = document.querySelector('.text-preview[data-preview-for="' + cssEsc(t.id) + '"]');
-      if (p && !p.textContent) p.textContent = t.preview || '';
+      if (p && !p.textContent) p.textContent = cleanPreview(t.preview);
     }
     return data;
   }
@@ -585,6 +905,18 @@ body::after {
   }
 
   function cssEsc(s) { return (window.CSS && CSS.escape) ? CSS.escape(s) : s.replace(/["\\]/g, '\\$&'); }
+
+  // Catalog previews are a blind head-of-file grab, so a number of them are
+  // apparatus or a DIFFERENT WORK ENTIRELY — the Epic of Gilgamesh preview is
+  // currently the opening of Fenimore Cooper's "The Pathfinder". Regenerating
+  // them belongs in corpus.py, which this pass may not touch, so a preview that
+  // matches the apparatus signature is suppressed rather than displayed.
+  const APPARATUS = /^\s*(\{\{|\||https?:\/\/|={3,}|\*\*\*|The Project Gutenberg|Produced by|Transcribed? |This eBook|This etext|Title:|Author:|Release Date|Posting Date|Language:|Character set|Updated:|\[\[|<|\[Transcriber)/i;
+  function cleanPreview(p) {
+    p = (p || '').trim();
+    if (!p || p.length < 40 || APPARATUS.test(p)) return '';
+    return p;
+  }
 
   async function ensureTextLoaded(id) {
     if (State.textCache.has(id)) return State.textCache.get(id);
@@ -691,16 +1023,16 @@ body::after {
     for (const t of texts) {
       const full = State.byId.get(t.id) || t;
       const card = el('a', {
-        class: 'text-card', href: '#/read/' + encodeURIComponent(t.id),
+        class: 'text-card tooth', href: '#/read/' + encodeURIComponent(t.id),
+        style: '--bind:var(--bind-' + t.category + ')',
         'aria-label': t.title + ', ' + t.tradition + ', ' + t.word_count.toLocaleString() + ' words'
       },
         el('div', { class: 'text-title' }, t.title),
         el('div', { class: 'text-meta' },
           el('span', { class: 'badge' }, t.tradition),
-          el('span', null, t.size_human),
           el('span', null, t.word_count.toLocaleString() + ' words')
         ),
-        el('div', { class: 'text-preview', dataset: { previewFor: t.id } }, full.preview || '')
+        el('div', { class: 'text-preview', dataset: { previewFor: t.id } }, cleanPreview(full.preview))
       );
       frag.append(card);
     }
@@ -782,11 +1114,11 @@ body::after {
       const holder = $('searchResultsList').querySelector('[data-ctx="' + cssEsc(r.t.id) + '"]');
       if (!holder) continue;
       holder.textContent = '';
-      if (!content) { holder.textContent = (State.byId.get(r.t.id) || {}).preview || ''; continue; }
+      if (!content) { holder.textContent = cleanPreview((State.byId.get(r.t.id) || {}).preview); continue; }
       const cl = content.toLowerCase();
       let anchor = cl.indexOf(qLower);
       if (anchor === -1) for (const term of terms) { anchor = cl.indexOf(term); if (anchor !== -1) break; }
-      if (anchor === -1) { holder.textContent = (State.byId.get(r.t.id) || {}).preview || ''; continue; }
+      if (anchor === -1) { holder.textContent = cleanPreview((State.byId.get(r.t.id) || {}).preview); continue; }
       const start = Math.max(0, anchor - 100);
       const end = Math.min(content.length, anchor + qLower.length + 120);
       holder.append(document.createTextNode(start > 0 ? '…' : ''));
@@ -811,9 +1143,16 @@ body::after {
       const t = r.t;
       const ctx = el('div', { class: 'search-result-context', dataset: { ctx: t.id } });
       if (r.context !== null) { appendHighlighted(ctx, r.context, terms); }
-      else { ctx.textContent = 'Loading excerpt…'; }
+      else {
+        // Never a terminal "Loading excerpt…": title matches and everything past
+        // the excerpt budget never resolved, so >half of a broad query's results
+        // sat on that placeholder forever. Fall back to the epigraph, which
+        // always exists, and let the excerpt overwrite it if one arrives.
+        ctx.textContent = cleanPreview((State.byId.get(t.id) || {}).preview);
+      }
       frag.append(el('a', {
-        class: 'search-result', href: '#/read/' + encodeURIComponent(t.id),
+        class: 'search-result tooth', href: '#/read/' + encodeURIComponent(t.id),
+        style: '--bind:var(--bind-' + t.category + ')',
         'aria-label': 'Open ' + t.title
       },
         el('div', { class: 'search-result-title' }, t.title),
@@ -1035,9 +1374,37 @@ body::after {
     };
   }
 
+  // --------------------------------------------------------------- Chrome
+  // The header's height is measured, never hardcoded: a `top: 80px` slides
+  // under a 144px header at 200% zoom. Every sticky offset derives from this.
+  function watchHeader() {
+    const header = document.querySelector('header');
+    if (!header) return;
+    const setH = () => document.documentElement.style.setProperty(
+      '--header-h', Math.round(header.getBoundingClientRect().height) + 'px');
+    setH();
+    if (window.ResizeObserver) new ResizeObserver(setH).observe(header);
+    else window.addEventListener('resize', setH);
+
+    // "candle" — the header was byte-identical at scrollTop 0 and at 40,000.
+    let lit = false, ticking = false;
+    const onScroll = () => {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(() => {
+        const next = window.scrollY > 8;
+        if (next !== lit) { lit = next; header.classList.toggle('is-lit', lit); }
+        ticking = false;
+      });
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+  }
+
   // ------------------------------------------------------------------ Init
   async function init() {
     wireEvents();
+    watchHeader();
     applyReaderSize();
     await loadSummary();
     route();                 // first paint from summary

@@ -1,5 +1,10 @@
+<!-- The mark: four bottom-aligned bars, heights proportional to the square root
+     of each tradition's holdings (90/27/23/11), in that tradition's binding
+     colour. Identical geometry to the in-app logo. -->
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
-  <rect width="32" height="32" rx="16" fill="#0a0e1a"/>
-  <circle cx="16" cy="16" r="12.5" fill="none" stroke="#06b6d4" stroke-width="2.5"/>
-  <circle cx="16" cy="16" r="4" fill="#06b6d4"/>
+  <rect width="32" height="32" fill="#04060e"/>
+  <rect x="3.2"  y="4.5"  width="3.4" height="23.5" fill="#5470b5"/>
+  <rect x="11.4" y="17.4" width="3.4" height="10.6" fill="#a8834a"/>
+  <rect x="19.5" y="18.6" width="3.4" height="9.4"  fill="#86864a"/>
+  <rect x="27.7" y="21.0" width="3.4" height="7.0"  fill="#8f6cbb"/>
 </svg>
