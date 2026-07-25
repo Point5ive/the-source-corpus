@@ -354,6 +354,38 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
    box. Uniform boxes are an information failure; continuous proportional
    sizing would be a grid failure. Quantised tiers are the answer. */
 .text-card.is-monument { grid-column: span 2; }
+/* Collections. 53 cards whose first two words are "Nag Hammadi" is a directory
+   listing, not a shelf: the grid drops from 151 objects to 77. Expansion is
+   in place — an inline shelf, no route change — and search always returns
+   tractate-level records, never the wrapper. */
+.collection-card .text-title::after {
+  content: attr(data-count); float: right; font-family: var(--face-ui);
+  font-size: var(--fs-meta); font-weight: 400; color: var(--ink-low);
+  letter-spacing: 0; margin-left: var(--s-3);
+}
+/* Expanded, the card becomes the shelf's header rather than a lone cell with
+   two empty cells beside it. */
+.collection-card[aria-expanded="true"] { grid-column: 1 / -1; border-bottom-color: transparent; }
+.shelf {
+  grid-column: 1 / -1;
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: var(--s-2) var(--s-4);
+  padding: var(--s-4) var(--s-5) var(--s-5);
+  margin-top: calc(-1 * var(--s-4));
+  border: 1px solid var(--rule-hair); border-top: none;
+  border-left: 2px solid var(--bind, var(--rule-edge));
+  background: color-mix(in srgb, var(--card) 55%, transparent);
+}
+.shelf a {
+  display: flex; justify-content: space-between; gap: var(--s-3);
+  align-items: baseline; min-height: 36px; padding: var(--s-2);
+  color: var(--ink-mid); text-decoration: none; border-radius: var(--r-ctl);
+  font-size: var(--fs-ui-sm);
+  transition: background var(--t-ink) var(--ease-quill), color var(--t-ink) var(--ease-quill);
+}
+.shelf a:hover, .shelf a:focus-visible { background: var(--card-lit); color: var(--ink-high); }
+.shelf a span { color: var(--ink-low); font-size: var(--fs-meta);
+                font-variant-numeric: tabular-nums lining-nums; white-space: nowrap; }
 @media (max-width: 743px) { .text-card.is-monument { grid-column: auto; } }
 .text-card {
   display: block; text-align: left; width: 100%;
@@ -1416,6 +1448,41 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
       b.setAttribute('aria-current', b.dataset.cat === State.filter ? 'true' : 'false');
   }
 
+  // Collections are derived from the id, so they need no data change and no
+  // catalog field. Only groups of >=3 collapse; everything else stays a card.
+  const COLLECTIONS = [
+    [/^nag-hammadi/, 'Nag Hammadi Library'],
+    [/^apoc(rypha)?[-_]/, 'The Apocrypha'],
+    [/^bible-/, 'The Bible'],
+    [/veda/, 'The Vedas']
+  ];
+  function collectionOf(t) {
+    const id = t.id.split('__')[1] || '';
+    for (const [re, name] of COLLECTIONS) if (re.test(id)) return name;
+    return null;
+  }
+  // Returns a render list of cards and collections, preserving catalog order.
+  function shelfObjects(texts) {
+    const groups = new Map(), out = [];
+    for (const t of texts) {
+      const c = collectionOf(t);
+      if (!c) { out.push({ kind: 'text', t: t }); continue; }
+      if (!groups.has(c)) {
+        const g = { kind: 'collection', name: c, items: [] };
+        groups.set(c, g); out.push(g);
+      }
+      groups.get(c).items.push(t);
+    }
+    // a "collection" of one or two is just those texts
+    const flat = [];
+    for (const o of out) {
+      if (o.kind === 'collection' && o.items.length < 3)
+        for (const t of o.items) flat.push({ kind: 'text', t: t });
+      else flat.push(o);
+    }
+    return flat;
+  }
+
   function currentTexts() {
     const texts = State.summary ? State.summary.texts : [];
     return State.filter === 'all' ? texts : texts.filter(t => t.category === State.filter);
@@ -1458,7 +1525,9 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
     grid.textContent = '';
     const texts = currentTexts();
     const frag = document.createDocumentFragment();
-    for (const t of texts) {
+    for (const obj of shelfObjects(texts)) {
+      if (obj.kind === 'collection') { frag.append(collectionCard(obj)); continue; }
+      const t = obj.t;
       const full = State.byId.get(t.id) || t;
       const tier = tierOf(t.word_count);
       const pos = storedPos(t.id);
@@ -1488,6 +1557,42 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
     }
     grid.append(frag);
     if (!texts.length) grid.append(el('div', { class: 'empty' }, 'No texts in this tradition.'));
+  }
+
+  function collectionCard(g) {
+    const words = g.items.reduce((n, t) => n + (t.word_count || 0), 0);
+    const cat = g.items[0].category;
+    const read = g.items.filter(t => storedPos(t.id)).length;
+    const card = el('button', {
+      class: 'text-card tooth collection-card',
+      type: 'button',
+      style: '--bind:var(--bind-' + cat + ')',
+      'aria-expanded': 'false',
+      'aria-label': g.name + ', ' + g.items.length + ' texts, ' + words.toLocaleString() + ' words'
+    },
+      State.filter === 'all' ? el('div', { class: 'badge' }, g.items[0].tradition) : null,
+      el('div', { class: 'text-title', dataset: { count: g.items.length + ' texts' } }, g.name),
+      el('div', { class: 'text-meta' },
+        el('span', null, words.toLocaleString() + ' words'),
+        el('span', { class: 'extent' }, duration(words))),
+      el('div', { class: 'text-preview' },
+        g.items.slice(0, 6).map(t => t.title).join(' · ')
+          + (g.items.length > 6 ? ' · and ' + (g.items.length - 6) + ' more' : '')
+          + (read ? '' : ''))
+    );
+    let shelf = null;
+    card.addEventListener('click', () => {
+      const open = card.getAttribute('aria-expanded') === 'true';
+      if (open) { if (shelf) shelf.remove(); shelf = null; card.setAttribute('aria-expanded', 'false'); return; }
+      shelf = el('div', { class: 'shelf', style: '--bind:var(--bind-' + cat + ')' },
+        g.items.map(t => el('a', {
+          href: '#/read/' + encodeURIComponent(t.id),
+          'aria-label': t.title + ', ' + duration(t.word_count)
+        }, el('em', { style: 'font-style:normal' }, t.title), el('span', null, duration(t.word_count)))));
+      card.after(shelf);
+      card.setAttribute('aria-expanded', 'true');
+    });
+    return card;
   }
 
   // ---------------------------------------------------------------- Search
@@ -1726,6 +1831,7 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   function pushProse(out, text, ref) {
     text = text.trim();
     if (!text) return;
+    text = typo(text);
     if (text.length <= MAX_PARA) { out.push({ k: 'p', t: text, r: ref }); return; }
     const parts = text.split(/(?<=[.!?][”’"')\]]?)\s+/);
     let buf = '';
@@ -1777,7 +1883,7 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
       if (run.length === 1) {
         const s = run[0];
         if (isHeading(s)) out.push({ k: 'h', t: s });
-        else if (s.length < 0.55 * W) out.push({ k: 'v', l: [s] });
+        else if (s.length < 0.55 * W) out.push({ k: 'v', l: [typo(s)] });
         else { const r = splitRef(s); pushProse(out, r.t, r.ref); }
         run = []; return;
       }
@@ -1794,8 +1900,8 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
         if (rest.length > 1 && medianOf(rb) >= fill) {
           const r = splitRef(rest.join(' '));
           pushProse(out, r.t, r.ref);
-        } else if (rest.length) out.push({ k: 'v', l: rest });
-      } else out.push({ k: 'v', l: run });
+        } else if (rest.length) out.push({ k: 'v', l: rest.map(typo) });
+      } else out.push({ k: 'v', l: run.map(typo) });
       run = [];
     };
     for (let i = 0; i < lines.length; i++) {
@@ -1825,6 +1931,16 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
     }
     return i > 0 ? blocks.slice(i) : blocks;
   }
+
+  // Typographic repair, deliberately narrow. A blanket "--" -> em dash would
+  // corrupt 35,695 scholarly lacuna markers of the form `[ -- ]` in the Dead
+  // Sea Scrolls, so the rule requires word characters on BOTH sides, which
+  // those never have. Quote curling is NOT done: ~4,919 apostrophes across 11
+  // files are transliteration marks (avagraha, glottal stops), and curling
+  // those would be a fidelity error in a product named unmediated. The
+  // colophon declares this transformation.
+  const EMDASH = /(\w)--(\w)/g;
+  function typo(s) { return s.replace(EMDASH, '$1\u2014$2'); }
 
   // The plain string of a block — the substrate find-within searches, so that
   // finding never has to touch (or force layout on) the DOM.
@@ -1929,7 +2045,7 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
       el('p', { class: 'rendered' },
         'Rendered: source line-wraps rejoined into paragraphs; verse line breaks kept; '
         + 'verse references set in the margin' + (blocks ? ' (' + blocks.length.toLocaleString() + ' blocks)' : '')
-        + '. The bytes above are unmodified — the command verifies them.'),
+        + '; double-hyphens between words resolved to em dashes. The bytes above are unmodified — the command verifies them.'),
       el('p', { class: 'rights' }, 'Public domain. Served as retrieved.')
     ));
   }
