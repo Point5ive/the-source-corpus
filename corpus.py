@@ -108,10 +108,52 @@ def clean_text(raw: str) -> str:
     return text.strip()
 
 
+# A leading run of transcriber apparatus is not the work. clean_text() removes
+# the Gutenberg fences but not what sits between them and the first line of the
+# text, so previews opened on "Produced by John B. Hare…" rather than on the
+# text. Mirrors index.html's stripFrontMatter().
+_FRONT_LINE = re.compile(
+    r"^(produced by|transcribed?\b|transcriber|this ebook|this etext|e-?text prepared"
+    r"|title:|author:|translator:|editor:|release date|posting date|last updated"
+    r"|language:|character set|encoding:|credits:|html version|scanned|proofread"
+    r"|updated editions|end of|start of|www\.|https?://|\[illustration|\[transcriber"
+    r"|copyright|first published|printed in|contents:?$"
+    # markdown rules and embedded images from scraped sources, and the
+    # "Notes from the previous editions:" apparatus block
+    r"|-{3,}\s*$|!\[|\|\s|notes from|note:|source:|retrieved from)",
+    re.I,
+)
+
+
+def skip_front_matter(cleaned: str, max_blocks: int = 30) -> str:
+    """Drop a leading run of transcriber/publisher apparatus so what follows is
+    the work itself. Stops at the first substantial block, so a text that simply
+    opens with a short line is never truncated."""
+    blocks = re.split(r"\n\s*\n", cleaned)
+    i = 0
+    while i < len(blocks) and i < max_blocks:
+        b = blocks[i].strip()
+        if not b:
+            i += 1
+            continue
+        if len(b) > 400:  # a long block is the work, not apparatus
+            break
+        if _FRONT_LINE.match(b) or re.search(r"sacred-texts\.com|gutenberg", b, re.I):
+            i += 1
+            continue
+        # a block that is mostly URL or punctuation is scrape residue, not text
+        letters = sum(ch.isalpha() for ch in b)
+        if "http" in b.lower() or letters < len(b) * 0.5:
+            i += 1
+            continue
+        break
+    return "\n\n".join(blocks[i:]).strip() if i else cleaned
+
+
 def make_preview(cleaned: str, length: int = PREVIEW_LEN) -> str:
     """Single-line preview from cleaned text: collapse whitespace, clip to length
-    on a word boundary."""
-    flat = re.sub(r"\s+", " ", cleaned).strip()
+    on a word boundary. Front matter is skipped so the preview shows the text."""
+    flat = re.sub(r"\s+", " ", skip_front_matter(cleaned)).strip()
     if len(flat) <= length:
         return flat
     clipped = flat[:length]
@@ -119,6 +161,68 @@ def make_preview(cleaned: str, length: int = PREVIEW_LEN) -> str:
     if sp > length * 0.6:
         clipped = clipped[:sp]
     return clipped.rstrip() + "…"
+
+
+# --------------------------------------------------------------------------- #
+# Provenance: does the file contain the work the catalog says it does?
+# --------------------------------------------------------------------------- #
+
+_DECLARED_TITLE = re.compile(r"^\s*Title:\s*(.+?)\s*$", re.I | re.M)
+_TITLE_STOP = {
+    "the", "of", "and", "a", "an", "in", "on", "to", "or", "complete", "full",
+    "translation", "translated", "version", "book", "books", "text", "texts",
+    "collection", "edition", "combined", "core", "trans", "english", "new", "old",
+    "vol", "volume", "selected", "works", "part", "parts",
+}
+
+
+def _title_words(title: str) -> list[str]:
+    return [w for w in re.findall(r"[a-z]{4,}", title.lower()) if w not in _TITLE_STOP]
+
+
+def check_provenance(t: dict[str, Any], raw: str, cleaned: str) -> dict[str, Any] | None:
+    """Return a finding when a file does not appear to contain the work it is
+    cataloged as. Two independent signals, both evidence-based:
+
+      1. The source declares its own `Title:` (Project Gutenberg header) and it
+         shares no significant word with the catalog title.
+      2. No significant word of the catalog title occurs anywhere in the text.
+
+    Signal 1 is near-certain; signal 2 alone can be a false positive (1 Maccabees
+    never says "Maccabees"), so it is reported at lower confidence.
+    """
+    words = _title_words(t["title"])
+    if not words:
+        return None
+    low = cleaned.lower()
+    body_hits = max((low.count(w) for w in words), default=0)
+
+    declared = None
+    m = _DECLARED_TITLE.search(raw[:4000])
+    if m:
+        declared = m.group(1).strip()
+
+    declared_conflict = False
+    if declared:
+        dwords = set(_title_words(declared))
+        declared_conflict = bool(dwords) and not (dwords & set(words))
+
+    # Either signal alone produces false positives: a source may legitimately
+    # declare an alternate title (the Quran as "The Koran", the Táin as "The
+    # Cattle-Raid of Cualnge"), and a correct text may never name itself
+    # (1 Maccabees never says "Maccabees"). Agreement is what makes it certain.
+    if declared_conflict and body_hits == 0:
+        conf, why = "certain", f'source declares Title: "{declared}", and no title word appears in the body'
+    elif declared_conflict:
+        conf, why = "probable", f'source declares Title: "{declared}" (may be an alternate title)'
+    elif body_hits == 0:
+        conf, why = "possible", "no significant title word occurs anywhere in the text"
+    else:
+        return None
+    return {
+        "path": t["path"], "title": t["title"], "declared": declared,
+        "body_hits": body_hits, "confidence": conf, "why": why,
+    }
 
 
 def tokenize(text: str) -> list[str]:
@@ -266,6 +370,63 @@ def cmd_read(catalog: dict[str, Any], query: str) -> None:
 # Maintenance commands
 # --------------------------------------------------------------------------- #
 
+def collect_provenance(texts: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Run check_provenance across the catalog. Reads every file, so callers
+    should not invoke it in a tight loop."""
+    out: list[dict[str, Any]] = []
+    for t in texts:
+        fp = os.path.join(CORPUS_ROOT, t["path"])
+        if not os.path.exists(fp):
+            continue
+        with open(fp, encoding="utf-8", errors="replace") as f:
+            raw = f.read()
+        finding = check_provenance(t, raw, clean_text(raw))
+        if finding:
+            out.append(finding)
+    return out
+
+
+def cmd_provenance(catalog: dict[str, Any]) -> int:
+    """Report texts that may not contain the work they are cataloged as.
+
+    This check exists because `verify` passed on a corpus in which 18 of 151
+    files were a different book entirely — it only ever checked hashes, missing
+    files and HTML error pages, none of which notice that the Pickthall Quran's
+    file contains Crime and Punishment.
+    """
+    findings = collect_provenance(catalog["texts"])
+    order = {"certain": 0, "probable": 1, "possible": 2}
+    findings.sort(key=lambda f: (order[f["confidence"]], f["title"]))
+
+    print("Provenance check — does each file contain the work it is cataloged as?")
+    print(f"  texts checked: {len(catalog['texts'])}   flagged: {len(findings)}\n")
+    if not findings:
+        print("PASS — every text matches its catalog title.")
+        return 0
+
+    for conf in ("certain", "probable", "possible"):
+        group = [f for f in findings if f["confidence"] == conf]
+        if not group:
+            continue
+        print(f"  {conf.upper()} ({len(group)})")
+        for f in group:
+            print(f"    {f['title']}")
+            print(f"      path   {f['path']}")
+            print(f"      why    {f['why']}")
+            fp = os.path.join(CORPUS_ROOT, f["path"])
+            try:
+                with open(fp, encoding="utf-8", errors="replace") as fh:
+                    opens = make_preview(clean_text(fh.read()), 96)
+                print(f"      opens  {opens}")
+            except OSError:
+                pass
+            print()
+    print("Not an automatic failure: an alternate title is legitimate (the Quran")
+    print("as \"The Koran\"), and a correct text may never name itself (1 Maccabees")
+    print("never says \"Maccabees\"). Read the opening line and decide.")
+    return 0
+
+
 def cmd_verify(catalog: dict[str, Any]) -> int:
     """Integrity sweep: SHA256 drift, missing files, catalog/disk drift, and
     common encoding hazards. Returns a process exit code (0 = clean)."""
@@ -364,6 +525,17 @@ def cmd_verify(catalog: dict[str, Any]) -> int:
     print(f"  [{'ok' if count_ok else 'FAIL'}]   total_texts matches catalog length")
     if not count_ok:
         problems += 1
+
+    # Provenance is reported but does NOT affect the exit code: "is this file the
+    # work it claims to be" is a judgement about the corpus, not a pipeline
+    # invariant, and the remedy (remove or re-source) is the owner's call.
+    findings = collect_provenance(texts)
+    hard = [f for f in findings if f["confidence"] in ("certain", "probable")]
+    if findings:
+        print(f"  [warn] title/content mismatch: {len(findings)} "
+              f"({len(hard)} high-confidence) — run `corpus.py provenance`")
+    else:
+        print("  [ok]   title/content match")
 
     print()
     if problems == 0:
@@ -504,6 +676,7 @@ def main() -> int:
     p_read.add_argument("title", help="Text title, partial match")
 
     sub.add_parser("verify", help="Check corpus integrity (SHA256, drift, encoding)")
+    sub.add_parser("provenance", help="Report texts that may not be the work they claim to be")
     sub.add_parser("rebuild-catalog", help="Regenerate clean previews + catalog-summary.json")
     sub.add_parser("build-index", help="Build search-index.json from cleaned text")
     sub.add_parser("build", help="rebuild-catalog + build-index")
@@ -525,6 +698,8 @@ def main() -> int:
         cmd_read(catalog, args.title)
     elif args.command == "verify":
         return cmd_verify(catalog)
+    elif args.command == "provenance":
+        return cmd_provenance(catalog)
     elif args.command == "rebuild-catalog":
         cmd_rebuild_catalog(catalog)
     elif args.command == "build-index":
