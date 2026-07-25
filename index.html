@@ -1093,6 +1093,7 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   const State = {
     summary: null,     // lean catalog for first paint
     catalog: null,     // full catalog (previews, sha256), lazy
+    catalogReady: null,
     byId: new Map(),   // id -> text meta (summary, enriched by full)
     searchIndex: null,
     textCache: new Map(),
@@ -1787,6 +1788,18 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
     State._readerText = loaded;
     State.blocks = stripFrontMatter(segmentText(loaded));
     renderBlocks(measure, State.blocks);
+    // The colophon needs sha256/size_bytes, which live in the FULL catalog and
+    // load lazily — opening a reader link directly raced that load and silently
+    // dropped the hash, i.e. the product's whole identity claim. Wait for it;
+    // the text fetch is the long pole anyway, so this costs nothing.
+    if (State.catalogReady) {
+      State.catalogReady.then(() => {
+        if (State.readerId !== id) return;
+        const old = measure.querySelector('.colophon');
+        if (old) old.remove();
+        renderColophon(measure, State.byId.get(id) || meta, loaded, State.blocks);
+      }).catch(() => {});
+    }
     renderColophon(measure, State.byId.get(id) || meta, loaded, State.blocks);
     buildTOC(State.blocks, id);
     if (anchor != null) { jumpToBlock(anchor); State.restoring = false; return; }
@@ -2530,7 +2543,7 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
     applyReaderSize();
     await loadSummary();
     route();                 // first paint from summary
-    loadCatalog();           // enrich previews + enable preview-fallback search
+    State.catalogReady = loadCatalog();   // enrich previews + enable preview-fallback search
     loadSearchIndex();       // enable full-text search
   }
 
