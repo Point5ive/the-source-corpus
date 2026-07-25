@@ -336,8 +336,24 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
 /* Content */
 .content { min-height: 60vh; }
 
-/* Text cards */
-.text-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: var(--s-5); }
+/* Text cards.
+   `minmax(340px, 1fr)` was mathematically incapable of three columns — 1200
+   container − 240 rail − gap leaves 936px of main and three tracks need 1052 —
+   so a 2560px display showed two cards and a sea of navy. Below 388px the
+   track overflowed and `overflow-x:hidden` CLIPPED it: content loss, not
+   scrolling. An explicit ladder replaces it. */
+.text-grid { display: grid; grid-template-columns: repeat(1, minmax(0, 1fr)); gap: var(--s-5); }
+@media (min-width: 744px) { .text-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (min-width: 1180px) { .text-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (min-width: 1600px) {
+  .text-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .container { max-width: 1560px; padding: 0 var(--s-7); }
+}
+/* A 92-word fragment and a 909,011-word monument rendered as the same 148px
+   box. Uniform boxes are an information failure; continuous proportional
+   sizing would be a grid failure. Quantised tiers are the answer. */
+.text-card.is-monument { grid-column: span 2; }
+@media (max-width: 743px) { .text-card.is-monument { grid-column: auto; } }
 .text-card {
   display: block; text-align: left; width: 100%;
   background: var(--card);
@@ -369,15 +385,17 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
 }
 .text-meta {
   display: flex; gap: var(--s-3); font-size: var(--fs-meta); color: var(--ink-low);
-  margin-bottom: var(--s-3); flex-wrap: wrap;
+  margin-bottom: var(--s-4);
   font-variant-numeric: tabular-nums lining-nums;
+  white-space: nowrap;
 }
 /* The tradition name is always written out beside the binding edge, so WCAG
    1.4.1 is satisfied by construction rather than by an aria attribute. */
-.text-meta .badge {
+.badge {
   font-family: var(--face-read);
   text-transform: uppercase; letter-spacing: .115em; font-weight: 500;
-  font-size: var(--fs-lapidary); color: var(--ink-mid);
+  font-size: var(--fs-lapidary); color: var(--ink-low);
+  margin-bottom: var(--s-2);
 }
 .text-preview {
   font-family: var(--face-read);
@@ -388,6 +406,16 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   -webkit-box-orient: vertical;
   overflow: hidden;
   min-height: 4.56em; /* reserve space so previews filling in cause no layout shift */
+}
+.text-card.is-monument .text-preview { -webkit-line-clamp: 4; min-height: 6.08em; }
+/* "Will this cost me four minutes or sixty-two hours" is the single most
+   consequential fact in choosing a text, and it was a 12px failing-contrast
+   number ranked third, behind a redundant badge and bytes-on-disk. */
+.extent { color: var(--ink-mid); }
+/* Position in a text the product already stores and has never shown. */
+.resume {
+  position: absolute; left: 0; bottom: 0; height: 2px;
+  background: var(--rubric); opacity: .85;
 }
 
 /* Reader view */
@@ -648,10 +676,80 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
 ::-webkit-scrollbar-thumb:hover { background: var(--ink-low); background-clip: padding-box; }
 * { scrollbar-width: thin; scrollbar-color: var(--rule-edge) transparent; }
 
-/* Hero */
+/* The threshold. A library's front door is the stacks, so this stays at about
+   360px and the shelf begins above the fold. The four "enter by tradition"
+   door-cards two candidate directions proposed are cut: the rail lists all
+   four with counts two inches below, and a second larger copy of the same
+   links is a content-site gesture. */
 .hero {
   padding: var(--s-9) 0 var(--s-7);
   border-bottom: 1px solid var(--rule-hair);
+  display: grid; grid-template-columns: 1fr auto; gap: var(--s-8); align-items: start;
+}
+.hero-claim { min-width: 0; }
+.hero-figures {
+  display: grid; grid-template-columns: auto auto; gap: var(--s-2) var(--s-4);
+  font-variant-numeric: tabular-nums lining-nums;
+  align-self: start;
+}
+.hero-figures dt {
+  font-size: var(--fs-head); font-weight: 400; color: var(--ink-high);
+  font-family: var(--face-read); text-align: right; line-height: 1.2;
+}
+.hero-figures dd {
+  font-family: var(--face-read);
+  font-size: var(--fs-lapidary); font-weight: 500;
+  text-transform: uppercase; letter-spacing: .115em;
+  color: var(--ink-low); align-self: center;
+}
+/* Built from the position data the product already collects and has never
+   surfaced. The only cyan on the landing screen. */
+.continue { padding: var(--s-7) 0; border-bottom: 1px solid var(--rule-hair); }
+.continue-label {
+  font-family: var(--face-read);
+  font-size: var(--fs-lapidary); font-weight: 500;
+  text-transform: uppercase; letter-spacing: .115em;
+  color: var(--ink-low); margin-bottom: var(--s-4);
+}
+.continue-row { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: var(--s-4); }
+.continue-card {
+  position: relative; display: block; text-decoration: none; color: inherit;
+  background: var(--card); border: 1px solid var(--rule-hair);
+  border-left: 2px solid var(--bind, var(--rule-edge));
+  border-radius: var(--r-card); padding: var(--s-4);
+  box-shadow: var(--elev-card);
+  transition: background var(--t-lift) var(--ease-leaf), box-shadow var(--t-lift) var(--ease-leaf);
+}
+.continue-card:hover, .continue-card:focus-visible {
+  background: var(--card-lit); box-shadow: var(--elev-card-lit);
+}
+.continue-title {
+  font-family: var(--face-read); font-size: var(--fs-ui); font-weight: 600;
+  color: var(--ink-high); margin-bottom: var(--s-1);
+}
+.continue-meta {
+  font-size: var(--fs-meta); color: var(--ink-low);
+  font-variant-numeric: tabular-nums lining-nums;
+}
+.continue-bar { margin-top: var(--s-3); height: 2px; background: var(--rule-hair); }
+.continue-bar i { display: block; height: 100%; background: var(--rubric); }
+/* The manifesto is never said twice — a filtered view gets a shelf header. */
+.shelf-head {
+  padding: var(--s-6) 0 var(--s-5);
+  border-bottom: 1px solid var(--rule-hair);
+  margin-bottom: var(--s-5);
+  font-size: var(--fs-ui-sm); color: var(--ink-mid);
+  font-variant-numeric: tabular-nums lining-nums;
+}
+.shelf-head b {
+  font-family: var(--face-read); font-weight: 500;
+  text-transform: uppercase; letter-spacing: .115em;
+  color: var(--ink-high); font-size: var(--fs-ui-sm);
+}
+@media (max-width: 860px) {
+  .hero { grid-template-columns: 1fr; gap: var(--s-5); }
+  .hero-figures { grid-template-columns: auto auto; justify-content: start; }
+  .hero-figures dt { font-size: var(--fs-title); }
 }
 .hero h1 {
   font-family: var(--face-read);
@@ -818,9 +916,17 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
 
 <div class="container">
   <div class="hero" id="hero">
-    <h1>Humanity's wisdom, <span>unmediated.</span></h1>
-    <p>No commentary. No summaries. The actual public-domain texts, from the Rig Veda to the Nag Hammadi codices, from Gilgamesh to the Zohar.</p>
+    <div class="hero-claim">
+      <h1>Humanity's wisdom, <span>unmediated.</span></h1>
+      <p>No commentary. No summaries. The actual public-domain texts, from the Rig Veda to the Nag Hammadi codices, from Gilgamesh to the Zohar.</p>
+    </div>
+    <dl class="hero-figures" id="heroFigures"></dl>
   </div>
+  <div class="shelf-head" id="shelfHead" hidden></div>
+  <section class="continue" id="continue" aria-labelledby="continueLabel" hidden>
+    <div class="continue-label" id="continueLabel">Continue</div>
+    <div class="continue-row" id="continueRow"></div>
+  </section>
 
   <div class="layout">
     <nav class="sidebar" id="sidebar" aria-label="Traditions">
@@ -991,6 +1097,7 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
     const counts = { all: data.texts.length };
     for (const t of data.texts) counts[t.category] = (counts[t.category] || 0) + 1;
     renderNav(counts);
+    renderThreshold();
     return data;
   }
 
@@ -1029,6 +1136,63 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
     p = (p || '').trim();
     if (!p || p.length < 40 || APPARATUS.test(p)) return '';
     return p;
+  }
+
+  // Extent, expressed as the only unit that answers the reader's actual
+  // question. Four measured tiers over the corpus: Fragment 38 · Tract 57 ·
+  // Book 35 · Monument 21 (sums to 151). 180 wpm.
+  const WPM = 180;
+  function tierOf(words) {
+    return words < 3000 ? 'fragment' : words < 25000 ? 'tract' : words < 150000 ? 'book' : 'monument';
+  }
+  function duration(words) {
+    const mins = Math.round(words / WPM);
+    if (mins < 90) return '≈' + Math.max(1, mins) + ' min';
+    const hours = mins / 60;
+    return '≈' + (hours < 10 ? hours.toFixed(1).replace(/\.0$/, '') : Math.round(hours)) + ' h';
+  }
+  function storedPos(id) {
+    const v = parseFloat(localStorage.getItem('tsc.pos.' + id));
+    return v > 0.001 && v <= 1 ? v : 0;
+  }
+
+  function renderThreshold() {
+    const d = State.summary;
+    if (!d) return;
+    const dl = $('heroFigures');
+    dl.textContent = '';
+    const rows = [
+      [d.total_texts.toLocaleString(), 'Texts'],
+      [d.total_words.toLocaleString(), 'Words'],
+      [String(new Set(d.texts.map(t => t.category)).size), 'Traditions'],
+      [duration(d.total_words), 'To read it all']
+    ];
+    for (const [v, k] of rows) { dl.append(el('dt', null, v), el('dd', null, k)); }
+    renderContinue();
+  }
+
+  function renderContinue() {
+    const wrap = $('continue'), row = $('continueRow');
+    row.textContent = '';
+    const open = (State.summary ? State.summary.texts : [])
+      .map(t => ({ t: t, pos: storedPos(t.id) }))
+      .filter(x => x.pos > 0.005 && x.pos < 0.995)
+      .sort((a, b) => b.pos - a.pos)
+      .slice(0, 4);
+    if (!open.length) { wrap.hidden = true; return; }
+    wrap.hidden = false;
+    for (const { t, pos } of open) {
+      const left = Math.round(t.word_count * (1 - pos));
+      row.append(el('a', {
+        class: 'continue-card', href: '#/read/' + encodeURIComponent(t.id),
+        style: '--bind:var(--bind-' + t.category + ')',
+        'aria-label': 'Continue ' + t.title + ', ' + Math.round(pos * 100) + ' per cent read'
+      },
+        el('div', { class: 'continue-title' }, t.title),
+        el('div', { class: 'continue-meta' }, Math.round(pos * 100) + '% · ' + duration(left) + ' left'),
+        el('div', { class: 'continue-bar' }, el('i', { style: 'width:' + (pos * 100).toFixed(1) + '%' }))
+      ));
+    }
   }
 
   async function ensureTextLoaded(id) {
@@ -1105,7 +1269,12 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
     State.view = view;
     document.body.dataset.view = view;
     $('browseView').style.display = view === 'browse' ? 'block' : 'none';
-    $('hero').style.display = view === 'browse' ? 'block' : 'none';
+    // '' not 'block': the threshold is a grid, and 'block' would flatten it.
+    const browsing = view === 'browse';
+    const all = State.filter === 'all';
+    $('hero').style.display = browsing && all ? '' : 'none';
+    $('continue').style.display = browsing && all ? '' : 'none';
+    $('shelfHead').hidden = !(browsing && !all);
     $('readerView').classList.toggle('active', view === 'reader');
     $('readerView').setAttribute('aria-hidden', view === 'reader' ? 'false' : 'true');
     $('searchView').classList.toggle('active', view === 'search');
@@ -1143,7 +1312,24 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
     setView('browse');
     refreshNavActive();
     renderCards();
+    if (State.filter === 'all') renderContinue();
+    else renderShelfHead();
     window.scrollTo({ top: 0 });
+  }
+
+  // On a filtered view the manifesto is replaced by a shelf header — the same
+  // claim was previously repeated above every facet.
+  function renderShelfHead() {
+    const texts = currentTexts();
+    const words = texts.reduce((n, t) => n + (t.word_count || 0), 0);
+    const label = (CATS.find(c => c.id === State.filter) || {}).label || State.filter;
+    const head = $('shelfHead');
+    head.textContent = '';
+    head.append(
+      el('b', null, label),
+      document.createTextNode('  ·  ' + texts.length + ' text' + (texts.length === 1 ? '' : 's')
+        + '  ·  ' + words.toLocaleString() + ' words  ·  ' + duration(words))
+    );
   }
 
   function renderCards() {
@@ -1153,17 +1339,29 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
     const frag = document.createDocumentFragment();
     for (const t of texts) {
       const full = State.byId.get(t.id) || t;
+      const tier = tierOf(t.word_count);
+      const pos = storedPos(t.id);
       const card = el('a', {
-        class: 'text-card tooth', href: '#/read/' + encodeURIComponent(t.id),
+        class: 'text-card tooth' + (tier === 'monument' ? ' is-monument' : ''),
+        href: '#/read/' + encodeURIComponent(t.id),
         style: '--bind:var(--bind-' + t.category + ')',
-        'aria-label': t.title + ', ' + t.tradition + ', ' + t.word_count.toLocaleString() + ' words'
+        'aria-label': t.title + ', ' + t.tradition + ', ' + t.word_count.toLocaleString()
+          + ' words, ' + duration(t.word_count) + ' to read'
       },
+        // In a filtered view the tradition is stated once in the shelf header;
+        // repeating it on all 90 cards is the least useful possible way to
+        // say it. The binding edge still carries the lineage.
+        State.filter === 'all' ? el('div', { class: 'badge' }, t.tradition) : null,
         el('div', { class: 'text-title' }, t.title),
+        // size_human is deleted: a filesystem property with no reading meaning,
+        // and it outranked the duration on the old card. Two fixed rows rather
+        // than a wrapping flex row, so the extent never lands raggedly.
         el('div', { class: 'text-meta' },
-          el('span', { class: 'badge' }, t.tradition),
-          el('span', null, t.word_count.toLocaleString() + ' words')
+          el('span', null, t.word_count.toLocaleString() + ' words'),
+          el('span', { class: 'extent' }, duration(t.word_count))
         ),
-        el('div', { class: 'text-preview', dataset: { previewFor: t.id } }, cleanPreview(full.preview))
+        el('div', { class: 'text-preview', dataset: { previewFor: t.id } }, cleanPreview(full.preview)),
+        pos ? el('i', { class: 'resume', style: 'width:' + (pos * 100).toFixed(1) + '%', 'aria-hidden': 'true' }) : null
       );
       frag.append(card);
     }
@@ -1286,10 +1484,11 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
         style: '--bind:var(--bind-' + t.category + ')',
         'aria-label': 'Open ' + t.title
       },
+        el('div', { class: 'badge' }, t.tradition),
         el('div', { class: 'search-result-title' }, t.title),
         el('div', { class: 'text-meta' },
-          el('span', { class: 'badge' }, t.tradition),
-          el('span', null, (t.word_count || 0).toLocaleString() + ' words')
+          el('span', null, (t.word_count || 0).toLocaleString() + ' words'),
+          el('span', { class: 'extent' }, duration(t.word_count || 0))
         ),
         ctx
       ));
