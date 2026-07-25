@@ -223,6 +223,7 @@ header.is-lit { border-bottom-color: var(--rule); box-shadow: var(--elev-chrome)
   color: var(--ink-high);
 }
 
+.toc-toggle { display: none; }
 .icon { width: 20px; height: 20px; flex-shrink: 0; display: block; fill: none;
         stroke: currentColor; stroke-width: 1.5; stroke-linecap: round;
         stroke-linejoin: round; }
@@ -836,7 +837,29 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   }
   .sidebar.open { transform: translateX(0); }
   .reader-layout.has-toc { grid-template-columns: 1fr; }
-  .reader-layout.has-toc .reader-toc { display: none; }
+  /* Contents returns as a bottom sheet at exactly the width where a
+     909,011-word Bible most needs a map. It was `display:none` here, so the
+     longest texts in the corpus had no structural navigation at all on the
+     device where long-form reading actually happens. */
+  .reader-layout.has-toc .reader-toc {
+    display: block;
+    position: fixed; inset: auto 0 0 0; top: auto;
+    max-height: 70vh; z-index: 96;
+    background: var(--room);
+    border-top: 1px solid var(--rule-edge);
+    box-shadow: 0 -28px 72px -14px rgba(0,0,0,.88), inset 0 1px 0 rgba(158,186,255,.06);
+    padding: var(--s-2) var(--s-4) calc(var(--s-5) + env(safe-area-inset-bottom, 0px));
+    overflow-y: auto; overscroll-behavior: contain;
+    transform: translateY(100%);
+    transition: transform var(--t-quire) var(--ease-lift);
+  }
+  .reader-layout.has-toc .reader-toc.open { transform: translateY(0); }
+  .reader-toc::before {
+    content: ''; display: block; width: 36px; height: 4px; margin: 0 auto var(--s-3);
+    background: var(--rule-edge); border-radius: 999px;
+  }
+  .reader-toc a { padding: var(--s-3); min-height: 44px; }
+  .toc-toggle:not([hidden]) { display: inline-flex; }
   /* Killing the reading card returns the 36px its inset was consuming — on a
      375px phone that is the difference between ~31 and ~40 characters. */
   .reader-content { padding: var(--s-7) var(--s-5) 40vh; }
@@ -994,6 +1017,10 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
             <svg class="icon" aria-hidden="true"><use href="#i-back"/></svg> Corpus
           </button>
           <div class="reader-tools">
+            <button class="tool-btn toc-toggle" id="tocToggle" aria-label="Contents"
+                    aria-expanded="false" aria-controls="readerToc" hidden>
+              <svg class="icon" aria-hidden="true"><use href="#i-contents"/></svg> Contents
+            </button>
             <button class="tool-btn" id="findToggle" aria-label="Find within this text" aria-pressed="false">
               <svg class="icon" aria-hidden="true"><use href="#i-search"/></svg> Find
             </button>
@@ -1038,6 +1065,7 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
     searchIndex: null,
     textCache: new Map(),
     filter: 'all',
+    searchFacet: 'all',
     view: 'browse',
     readerId: null,
     blocks: null,
@@ -1144,6 +1172,7 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
     // seed sidebar counts
     const counts = { all: data.texts.length };
     for (const t of data.texts) counts[t.category] = (counts[t.category] || 0) + 1;
+    State._navCounts = counts;
     renderNav(counts);
     renderThreshold();
     return data;
@@ -1347,6 +1376,41 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
     }
   }
 
+  // The rail's third job. Facet counts are computed from the RESULT SET, and
+  // choosing one scopes the results in place rather than navigating away to a
+  // category browse — the rail previously showed global counts during a search
+  // and clicking one abandoned the query.
+  function renderFacets(results) {
+    const wrap = $('navItems');
+    wrap.textContent = '';
+    const counts = { all: results.length };
+    for (const r of results) counts[r.t.category] = (counts[r.t.category] || 0) + 1;
+    $('navLabel').textContent = 'In tradition';
+    for (const c of CATS) {
+      const n = c.id === 'all' ? results.length : (counts[c.id] || 0);
+      const attrs = {
+        class: 'nav-item',
+        'aria-current': State.searchFacet === c.id ? 'true' : 'false',
+        dataset: { cat: c.id },
+        onclick: () => {
+          if (!n) return;
+          State.searchFacet = c.id;
+          renderResults(State._results || [], State._query || '', State._truncated || 0);
+        }
+      };
+      if (!n) attrs.disabled = '';
+      wrap.append(el('button', attrs,
+        el('span', null, c.label),
+        el('span', { class: 'count' }, n ? String(n) : '—')));
+    }
+  }
+
+  function restoreNav() {
+    $('navLabel').textContent = 'Traditions';
+    renderNav(State._navCounts || { all: 0 });
+    refreshNavActive();
+  }
+
   function refreshNavActive() {
     for (const b of $('navItems').querySelectorAll('.nav-item'))
       b.setAttribute('aria-current', b.dataset.cat === State.filter ? 'true' : 'false');
@@ -1361,7 +1425,7 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
     const from = State.readerId;
     State.readerId = null;
     setView('browse');
-    refreshNavActive();
+    restoreNav();
     renderCards();
     // Focus was managed on ENTRY to the reader and abandoned on every exit.
     // Return it to the card the reader was opened from.
@@ -1462,6 +1526,7 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
     query = (query || '').trim();
     if (query.length < 2) { navigate('#/'); return; }
     const myToken = ++searchToken;
+    if (query !== State._query) State.searchFacet = 'all';
     const qLower = query.toLowerCase();
     const terms = tokenizeQuery(query);
     const seen = new Set();
@@ -1523,6 +1588,10 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   }
 
   function renderResults(results, query, truncated) {
+    State._results = results; State._query = query; State._truncated = truncated || 0;
+    renderFacets(results);
+    if (State.searchFacet && State.searchFacet !== 'all')
+      results = results.filter(r => r.t.category === State.searchFacet);
     const list = $('searchResultsList');
     list.textContent = '';
     const count = $('resultsCount');
@@ -1534,10 +1603,12 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
     // The total is the DOCUMENT FREQUENCY — how many texts contain the term —
     // never the length of a truncated result list, which is what the old
     // `break at 50` printed as though it were an answer.
+    const scoped = State.searchFacet && State.searchFacet !== 'all';
     const shown = results.length;
-    const total = shown + (truncated || 0);
+    const total = (State._results || results).length + (truncated || 0);
     count.textContent = total + ' text' + (total === 1 ? '' : 's') + ' contain “' + query + '”'
-      + (truncated ? ' · showing the top ' + shown : '')
+      + (scoped ? ' · ' + shown + ' in ' + (CATS.find(c => c.id === State.searchFacet) || {}).label : '')
+      + (truncated ? ' · showing the top ' + (State._results || results).length : '')
       + (State.searchIndex ? '' : ' · titles only, index still loading');
     const terms = [query, ...tokenizeQuery(query)];
     const frag = document.createDocumentFragment();
@@ -1914,6 +1985,7 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
     const tocList = $('readerTocList');
     tocList.textContent = '';
     layout.classList.remove('has-toc');
+    syncTocToggle();
 
     const heads = [];
     for (let i = 0; i < blocks.length; i++) if (blocks[i].k === 'h') heads.push({ i: i, t: blocks[i].t });
@@ -1948,10 +2020,37 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
         // scrollTop without ever moving the AT virtual cursor.
         href: '#/read/' + encodeURIComponent(id) + '/h/' + h.i,
         dataset: { b: String(h.i) },
-        onclick: (e) => { e.preventDefault(); jumpToBlock(h.i, true); }
+        onclick: (e) => { e.preventDefault(); closeToc(false); jumpToBlock(h.i, true); }
       }, h.t));
     }
     tocList.append(frag);
+    syncTocToggle();
+  }
+
+  // The contents sheet (drawer breakpoint only). One TOC node serves both the
+  // desktop rail and the phone sheet, so entries and handlers are never cloned.
+  function sheetMode() { return window.matchMedia('(max-width: 860px)').matches; }
+  function openToc() {
+    const t = $('readerToc');
+    State._tocReturn = document.activeElement;
+    t.classList.add('open');
+    $('tocToggle').setAttribute('aria-expanded', 'true');
+    $('backdrop').classList.add('show');
+    const first = t.querySelector('a');
+    if (first) first.focus();
+  }
+  function closeToc(restore) {
+    const t = $('readerToc');
+    if (!t.classList.contains('open')) return;
+    t.classList.remove('open');
+    $('tocToggle').setAttribute('aria-expanded', 'false');
+    $('backdrop').classList.remove('show');
+    if (restore !== false) $('tocToggle').focus();
+  }
+  function syncTocToggle() {
+    const has = $('readerLayout').classList.contains('has-toc');
+    $('tocToggle').hidden = !(has && sheetMode() && State.view === 'reader');
+    if (!sheetMode()) closeToc(false);
   }
 
   function jumpToBlock(i, push) {
@@ -2203,7 +2302,7 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   function wireEvents() {
     $('logo').addEventListener('click', () => navigate('#/'));
     $('menuToggle').addEventListener('click', () => $('sidebar').classList.contains('open') ? closeSidebar() : openSidebar());
-    $('backdrop').addEventListener('click', closeSidebar);
+    $('backdrop').addEventListener('click', () => { closeSidebar(); closeToc(); });
     $('readerBack').addEventListener('click', () => history.length > 1 ? history.back() : navigate('#/'));
 
     let timer = null;
@@ -2218,6 +2317,9 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
 
     $('textSmaller').addEventListener('click', () => bumpSize(-1));
     $('textLarger').addEventListener('click', () => bumpSize(1));
+    $('tocToggle').addEventListener('click', () => {
+      $('readerToc').classList.contains('open') ? closeToc() : openToc();
+    });
     $('findToggle').addEventListener('click', toggleFind);
     let findTimer = null;
     $('findInput').addEventListener('input', (e) => {
@@ -2247,7 +2349,9 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
     document.addEventListener('keydown', (e) => {
       const typing = /^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement.tagName);
       if (e.key === '/' && !typing) { e.preventDefault(); input.focus(); input.select(); }
+      else if (e.key === 'Escape' && $('readerToc').classList.contains('open')) { closeToc(); }
       else if (e.key === 'Escape' && State.view === 'reader' && !typing) { navigate('#/'); }
+      else if (e.key === 'Escape' && $('readerToc').classList.contains('open')) { closeToc(); }
       else if (e.key === 'Escape' && $('sidebar').classList.contains('open')) { closeSidebar(); }
     });
   }
@@ -2273,6 +2377,7 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
     if (window.ResizeObserver) new ResizeObserver(setH).observe(header);
     else window.addEventListener('resize', setH);
     window.addEventListener('resize', syncInert);
+    window.addEventListener('resize', syncTocToggle);
     syncInert();
 
     // "candle" — the header was byte-identical at scrollTop 0 and at 40,000.
