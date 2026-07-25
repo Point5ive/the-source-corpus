@@ -382,10 +382,15 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
 /* Reader view */
 .reader { display: none; }
 .reader.active { display: block; }
+/* The old bar was `position:sticky; top:0; z-index:5` underneath an opaque
+   `z-index:100` header, so it had never been visible on any device at any
+   width. Fixed directly below the measured header, above it in the stack. */
 .reader-progress {
-  position: sticky; top: 0; height: 2px; background: var(--rule-hair); z-index: 5;
-  margin-bottom: var(--s-1);
+  position: fixed; top: var(--header-h); left: 0; right: 0;
+  height: 2px; background: var(--rule-hair); z-index: 101;
+  opacity: 0; transition: opacity var(--t-turn) var(--ease-quill);
 }
+.reader.active .reader-progress { opacity: 1; }
 /* No width transition: the old 0.1s exactly equalled the 100ms scroll throttle,
    so the bar was permanently one batch behind the scroll it reported. */
 .reader-progress span { display: block; height: 100%; width: 0; background: var(--rubric); }
@@ -474,26 +479,31 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   font-size: var(--fs-meta); color: var(--ink-low); white-space: nowrap;
   font-variant-numeric: tabular-nums lining-nums;
 }
-/* THE LEAF — the single lit plane in the product. Phase 2 removes the box
-   entirely (border, radius, max-height, inner scroller); Phase 1 lights it. */
+/* THE LEAF — the single lit plane in the product, and a PAGE, not a widget.
+   No border, no radius, no max-height, no inner scroller. Deleting the box is
+   what restores reading progress and scroll-resume on phones (where both were
+   dead code), returns spacebar/PageDown/native find/browser scroll restoration,
+   stops 200% zoom collapsing the reader to about two lines, and stabilises the
+   measure at one value instead of 63ch-or-68ch depending on a regex. */
 .reader-content {
   background: var(--leaf);
-  border: 1px solid var(--rule-hair);
+  border: none;
+  border-left: 2px solid var(--bind, var(--rule));
   border-radius: var(--r-leaf);
   box-shadow: var(--elev-leaf);
-  padding: var(--s-8) clamp(var(--s-5), 5vw, var(--s-7));
+  padding: var(--s-9) clamp(var(--s-5), 5vw, var(--s-7)) 40vh;
   font-size: var(--reader-size);
   line-height: 1.62;
   color: var(--ink-read);
-  max-height: calc(100vh - 260px);
-  overflow-y: auto;
   white-space: pre-wrap;
   overflow-wrap: break-word;
   font-family: var(--face-read);
   font-variant-numeric: oldstyle-nums proportional-nums;
   text-rendering: optimizeLegibility;
   letter-spacing: .004em;
+  hyphens: auto;
 }
+.reader-content:focus { outline: none; }
 /* em, not ch: `ch` is the advance of glyph 0 — ≈0.50em in Iowan, ≈0.56em in
    Georgia — so `68ch` resolved to 578–648px depending on which fallback won. */
 .reader-content .measure { max-width: 33em; margin: 0 auto; }
@@ -602,7 +612,9 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   .sidebar.open { transform: translateX(0); }
   .reader-layout.has-toc { grid-template-columns: 1fr; }
   .reader-layout.has-toc .reader-toc { display: none; }
-  .reader-content { max-height: none; padding: var(--s-6) var(--s-5); }
+  /* Killing the reading card returns the 36px its inset was consuming — on a
+     375px phone that is the difference between ~31 and ~40 characters. */
+  .reader-content { padding: var(--s-7) var(--s-5) 40vh; }
   .hero { padding: var(--s-7) 0 var(--s-6); }
 }
 
@@ -955,6 +967,7 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   }
 
   function route() {
+    savePosition();          // commit where we were before the view changes
     const r = parseHash();
     closeSidebar();
     if (r.view === 'reader') { showReader(r.id); return; }
@@ -1171,9 +1184,12 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
     const meta = State.byId.get(id);
     if (!meta) { navigate('#/'); return; }
     State.readerId = id;
+    State.restoring = true;
     setView('reader');
     applyReaderSize();
     resetFind();
+    window.scrollTo({ top: 0, behavior: 'auto' });
+    $('readerContent').style.setProperty('--bind', 'var(--bind-' + meta.category + ')');
 
     $('readerTitle').textContent = meta.title;
     const metaEl = $('readerMeta');
@@ -1190,6 +1206,7 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
     if (State.readerId !== id) return; // navigated away
     content.textContent = '';
     if (loaded === null) {
+      State.restoring = false;
       content.append(el('div', { style: 'color:var(--danger)' }, 'Failed to load text. It must be served from the same directory as this app.'));
       return;
     }
@@ -1198,8 +1215,9 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
     State._readerText = loaded;
     buildTOC(loaded, measure);
     renderReaderBody(measure, loaded);
+    // Order matters: land at the top of the text, THEN restore. The reverse
+    // (as it was) silently undid every resume the moment the page scrolled.
     restoreScroll(id);
-    window.scrollTo({ top: 0 });
   }
 
   function renderReaderBody(measure, text, marks) {
@@ -1245,12 +1263,21 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
     State._readerLines = lines;
   }
 
+  // Until Phase 3 gives every heading a real DOM anchor, a jump is still an
+  // estimate — but it now scrolls the PAGE, which is the only scroll axis.
   function scrollToLine(lineNo) {
     const lines = State._readerLines; if (!lines) return;
     const before = lines.slice(0, lineNo).join('\n').length;
-    const content = $('readerContent');
-    const total = State._readerText.length || 1;
-    content.scrollTop = (before / total) * (content.scrollHeight - content.clientHeight);
+    const total = (State._readerText || '').length || 1;
+    const leaf = $('readerContent');
+    const box = leafBox(leaf);
+    window.scrollTo({ top: box.top + (before / total) * box.height, behavior: 'auto' });
+  }
+
+  // The leaf's document-space top and its scrollable extent.
+  function leafBox(leaf) {
+    const top = leaf.getBoundingClientRect().top + window.scrollY;
+    return { top: top, height: Math.max(1, leaf.offsetHeight - window.innerHeight * 0.5) };
   }
 
   // Text size
@@ -1261,23 +1288,47 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
     applyReaderSize();
   }
 
-  // Reading progress + resume position
+  // Reading progress + resume position.
+  // Both were bound to #readerContent's own scrollbar, and below 860px the
+  // element had `max-height:none` — so it never scrolled, the listener never
+  // fired, and restoreScroll multiplied by (scrollHeight - clientHeight) = 0.
+  // The reader's two flagship features were dead code on every phone and
+  // tablet. Driving them from the window fixes both on every device at once.
+  function readProgress() {
+    if (State.view !== 'reader') return 0;
+    const leaf = $('readerContent');
+    if (!leaf) return 0;
+    const box = leafBox(leaf);
+    return Math.max(0, Math.min(1, (window.scrollY - box.top) / box.height));
+  }
   function onReaderScroll() {
-    const c = $('readerContent');
-    const max = c.scrollHeight - c.clientHeight;
-    const pct = max > 0 ? (c.scrollTop / max) : 0;
-    $('readerProgress').style.width = (pct * 100).toFixed(1) + '%';
-    if (State.readerId) localStorage.setItem('tsc.pos.' + State.readerId, String(pct));
+    const pct = readProgress();
+    $('readerProgress').style.width = (pct * 100).toFixed(2) + '%';
+  }
+  // Three writes a session, not a synchronous localStorage write at 10Hz
+  // through momentum scroll — the textbook dropped-frame pattern on mobile.
+  // Suppressed while a text is opening: entering the reader scrolls to the top,
+  // and that scroll would otherwise commit position 0 over the stored one
+  // moments before restoreScroll got the chance to read it.
+  function savePosition() {
+    if (State.restoring || State.view !== 'reader' || !State.readerId) return;
+    try { localStorage.setItem('tsc.pos.' + State.readerId, String(readProgress())); } catch (e) {}
   }
   function restoreScroll(id) {
     const pct = parseFloat(localStorage.getItem('tsc.pos.' + id));
-    if (pct > 0.01 && pct < 0.99) {
-      requestAnimationFrame(() => {
-        const c = $('readerContent');
-        c.scrollTop = pct * (c.scrollHeight - c.clientHeight);
-        onReaderScroll();
-      });
-    } else { $('readerProgress').style.width = '0%'; }
+    $('readerProgress').style.width = '0%';
+    // The old `pct > 0.01 && pct < 0.99` guard meant finishing a text was never
+    // recorded. Only the "never opened" case is skipped now.
+    if (!(pct > 0.001)) { State.restoring = false; return; }
+    requestAnimationFrame(() => {
+      if (State.readerId !== id) { State.restoring = false; return; }
+      const box = leafBox($('readerContent'));
+      window.scrollTo({ top: box.top + pct * box.height, behavior: 'auto' });
+      onReaderScroll();
+      // Release only after the landing scroll has settled, so its own
+      // scrollend does not immediately rewrite what we just restored.
+      setTimeout(() => { State.restoring = false; }, 120);
+    });
   }
 
   // Find within current text
@@ -1353,7 +1404,18 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
       if (e.key === 'Enter') { e.preventDefault(); stepFind(e.shiftKey ? -1 : 1); }
       if (e.key === 'Escape') { toggleFind(); $('readerContent').focus(); }
     });
-    $('readerContent').addEventListener('scroll', throttle(onReaderScroll, 100));
+    // One scroll axis: the page.
+    window.addEventListener('scroll', () => {
+      if (State.view !== 'reader') return;
+      requestAnimationFrame(onReaderScroll);
+    }, { passive: true });
+    // Position is committed at natural boundaries, not continuously.
+    if ('onscrollend' in window) window.addEventListener('scrollend', savePosition);
+    else window.addEventListener('scroll', throttle(savePosition, 900), { passive: true });
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'hidden') savePosition();
+    });
+    window.addEventListener('pagehide', savePosition);
 
     window.addEventListener('hashchange', route);
 
