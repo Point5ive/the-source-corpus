@@ -1,12 +1,12 @@
 {
   "name": "The Source Corpus",
   "description": "The world's wisdom traditions as unmediated primary sources. 151 texts spanning every major tradition — from the Rig Veda to the Nag Hammadi codices, from Gilgamesh to the Zohar. Decentralized. Forkable. Free.",
-  "total_texts": 151,
-  "total_words": 12875937,
-  "total_size_mb": 75.7,
+  "total_texts": 155,
+  "total_words": 13329137,
+  "total_size_mb": 78.2,
   "categories": {
     "abrahamic": {
-      "count": 90,
+      "count": 91,
       "label": "Abrahamic"
     },
     "eastern": {
@@ -18,7 +18,7 @@
       "label": "Esoteric/Western Occult"
     },
     "mythology": {
-      "count": 23,
+      "count": 26,
       "label": "Mythology/Classical"
     }
   },
@@ -1985,6 +1985,58 @@
       "word_count": 60259,
       "sha256": "f81e9ee996cf84899c6f142eabfef158d0e882b0a3a1e5e33d688fa6550e98bb",
       "preview": "THE STORY OF THE VOLSUNGS, (VOLSUNGA SAGA) WITH EXCERPTS FROM THE POETIC EDDA By Anonymous Originally written in Icelandic (Old Norse) in the thirteenth century A.D., by an unknown hand. However, most of the material is…"
+    },
+    {
+      "id": "mythology__plato-timaeus",
+      "filename": "plato-timaeus.txt",
+      "path": "mythology/plato-timaeus.txt",
+      "category": "mythology",
+      "tradition": "Mythology",
+      "title": "Timaeus",
+      "size_bytes": 448938,
+      "size_human": "438KB",
+      "word_count": 72747,
+      "sha256": "0031c171d327b3573ac27df3e9195b91f7d46acb0c92755f8fda62885416b5f9",
+      "preview": "TIMAEUS by Plato Translated by Benjamin Jowett Contents INTRODUCTION AND ANALYSIS. Section 1. Section 2. Section 3. Section 4. Section 5. Section 6. Section 7. Section 8. TIMAEUS INTRODUCTION AND ANALYSIS. Of all the…"
+    },
+    {
+      "id": "mythology__plato-critias",
+      "filename": "plato-critias.txt",
+      "path": "mythology/plato-critias.txt",
+      "category": "mythology",
+      "tradition": "Mythology",
+      "title": "Critias",
+      "size_bytes": 55139,
+      "size_human": "53KB",
+      "word_count": 9844,
+      "sha256": "c57c1ccfa8fda09a7eecf974c1a461d7ba5f4c5423d87b70eb659f3a2e99a4e8",
+      "preview": "CRITIAS by Plato Translated by Benjamin Jowett INTRODUCTION AND ANALYSIS. The Critias is a fragment which breaks off in the middle of a sentence. It was designed to be the second part of a trilogy, which, like the other…"
+    },
+    {
+      "id": "abrahamic__2-enoch-secrets",
+      "filename": "2-enoch-secrets.txt",
+      "path": "abrahamic/2-enoch-secrets.txt",
+      "category": "abrahamic",
+      "tradition": "Abrahamic",
+      "title": "2 Enoch (Secrets of Enoch)",
+      "size_bytes": 359339,
+      "size_human": "350KB",
+      "word_count": 63241,
+      "sha256": "cd17ff031aae6f5045562d9b013aba80a8597f1498c6049c78af6b704382df1e",
+      "preview": "ЕЕ » зо тизретта pate cee 1830 ще IB9G BARNES REFERENCE LIBRARY THE GIFT OF ALFRED C. BARNES ETA URS CORNELL UNIVERSITY . LIBRARY UNDERGRADUATE LIBRARY aa 3 1924 014 633 568 у Lib! г Cornell University Library The…"
+    },
+    {
+      "id": "mythology__prescott-conquest-of-peru",
+      "filename": "prescott-conquest-of-peru.txt",
+      "path": "mythology/prescott-conquest-of-peru.txt",
+      "category": "mythology",
+      "tradition": "Mythology",
+      "title": "History of the Conquest of Peru",
+      "size_bytes": 1784619,
+      "size_human": "1.7MB",
+      "word_count": 307368,
+      "sha256": "79befe905f6ef48e81d7f6c26344a2e450e7e4b8b81ccd47d07bc75d16f9a153",
+      "preview": "The Conquest Of Peru by William H. Prescott \"Congestae cumulantur opes, orbisque rapinas Accipit.\" Claudian, In Ruf., lib. i., v. 194. \"So color de religion Van a buscar plata y oro Del encubierto tesoro.\" Lope De Vega,…"
     }
   ]
 }
