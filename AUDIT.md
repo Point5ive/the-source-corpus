@@ -160,3 +160,20 @@ No `vercel.json` — Vercel uses defaults. Text files (77MB total) are served wi
 23. Add favicon
 24. Remove unused --violet CSS variable
 25. Add service worker for offline access
+
+## 2026-08-07 integrity pass (Grok)
+- Corpus Hermeticum replaced with Mead PD (was Finnish Flood 1884).
+- Catalog: 155 → **166** texts; 13.3M → **14.25M** words; Abrahamic share 60% → **54.8%**.
+- Added title-verified: Secret Doctrine v1, Art of War, Gospel of Buddha, Dhammapada Müller, Beowulf, Kalevala, Republic, Seneca Benefits, Nibelungenlied, Epictetus×2.
+- Picatrix tagged quarantine (Greer/Warnock OCR copyright).
+- New files untracked in git until principal commit (verify reports 404-on-host until tracked).
+- Details: ~/research-discography/INTEGRITY-PASS-2026-08-07.md
+
+
+## 2026-08-07 item-3 fills
+- Kabbalah Unveiled (Mathers 1887) IA OCR
+- Zend-Avesta Part 1 Darmesteter SBE4 IA OCR
+- Picatrix Arabic Ghāyat OCR (IA picatrix-arabic)
+- Secret Doctrine vols 2–4 (PG 54488/56880/61626)
+- Latin Alfonso Picatrix OCR rejected (unusable garble)
+- Catalog now 172 texts / 15.6M words; Abrahamic share 52.9%

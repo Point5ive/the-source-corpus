@@ -1,3 +1,9 @@
+*** QUARANTINE NOTE (2026-08-07) ***
+This file is a Greer & Warnock (2010–11) English Picatrix OCR dump — copyrighted modern translation,
+front matter heavily OCR-garbled. NOT a clean Arabic/Latin scholarly primary.
+Do not use for high-stakes lexical pattern density. Prefer PD Latin/Arabic editions.
+*** END NOTE ***
+
 The PicatrixX 
 
 
