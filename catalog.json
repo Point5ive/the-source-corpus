@@ -1,25 +1,29 @@
 {
   "name": "The Source Corpus",
   "description": "The world's wisdom traditions as unmediated primary sources. 151 texts spanning every major tradition — from the Rig Veda to the Nag Hammadi codices, from Gilgamesh to the Zohar. Decentralized. Forkable. Free.",
-  "total_texts": 172,
-  "total_words": 15578182,
-  "total_size_mb": 93.3,
+  "total_texts": 199,
+  "total_words": 18852106,
+  "total_size_mb": 112.5,
   "categories": {
     "abrahamic": {
       "count": 91,
       "label": "Abrahamic"
     },
     "eastern": {
-      "count": 31,
+      "count": 36,
       "label": "Eastern"
     },
     "esoteric": {
-      "count": 17,
+      "count": 20,
       "label": "Esoteric/Western Occult"
     },
     "mythology": {
-      "count": 33,
+      "count": 40,
       "label": "Mythology/Classical"
+    },
+    "science": {
+      "count": 12,
+      "label": "Science History"
     }
   },
   "texts": [
@@ -1207,6 +1211,19 @@
       "preview": "CRIME AND PUNISHMENT By Fyodor Dostoevsky Translated By Constance Garnett TRANSLATOR’S PREFACE A few words about Dostoevsky himself may help the English reader to understand his work. Dostoevsky was the son of a doctor.…"
     },
     {
+      "id": "eastern__goddard-buddhist-bible-1938",
+      "filename": "goddard-buddhist-bible-1938.txt",
+      "path": "eastern/goddard-buddhist-bible-1938.txt",
+      "category": "eastern",
+      "tradition": "Eastern",
+      "title": "A Buddhist Bible (Goddard 1938 rev.; US PD claim — 1932 non-renewal lineage)",
+      "size_bytes": 1545703,
+      "size_human": "1.5MB",
+      "word_count": 258550,
+      "sha256": "64928035168b02465aeafbb3997b26d1782c3dc2b1802646117995b21e7ff524",
+      "preview": "A BUDDHIST BIBLE jSJTO ^/NG A BUDDHIST BIBLE Revised and Enlarged Edited by Dwight Goddard E. P. DUTTON & CO., INC. New York Copyright , 1938, by E. P . Dutton & Co „ Inc . All rights reserved . Printed in the USA . 2Vo…"
+    },
+    {
       "id": "eastern__all-vedas-combined",
       "filename": "all-vedas-combined.txt",
       "path": "eastern/all-vedas-combined.txt",
@@ -1402,6 +1419,19 @@
       "preview": "THE MAHABHARATA of Krishna-Dwaipayana Vyasa BOOK 4 VIRATA PARVA Translated into English Prose from the Original Sanskrit Text by Kisari Mohan Ganguli [1883-1896] Scanned at sacred-texts.com, 2003. Proofed at Distributed…"
     },
     {
+      "id": "eastern__masnavi-whinfield-1898-abridged",
+      "filename": "masnavi-whinfield-1898-abridged.txt",
+      "path": "eastern/masnavi-whinfield-1898-abridged.txt",
+      "category": "eastern",
+      "tradition": "Eastern",
+      "title": "Masnavi i Ma'navi (Rumi; Whinfield 1898 abridged)",
+      "size_bytes": 785423,
+      "size_human": "767KB",
+      "word_count": 123800,
+      "sha256": "20019aa0629ee1c1701f1a9800caac5e3cfdd7859ab650500a6df8059de09a3a",
+      "preview": "b^ Zj Division Sect ion P\\A<c4S0 A 2 vy 57 Digitized by the Internet Archive in 2016 https://archive.org/details/masnaviimanavisp00jala_0 TRUBNER’S ORIENTAL SERIES MASNAYI I MA’NAVI i THE SPIRITUAL COUPLETS Jalal txl -…"
+    },
+    {
       "id": "eastern__mencius",
       "filename": "mencius.txt",
       "path": "eastern/mencius.txt",
@@ -1493,6 +1523,19 @@
       "preview": "# 10 - TECHNIQUES Can you keep your soul in its body, hold fast to the one, and so learn to be whole? Can you center your energy, be soft, tender, and so learn to be a baby? Can you keep the deep water still and clear,…"
     },
     {
+      "id": "eastern__liezi-giles-1912",
+      "filename": "liezi-giles-1912.txt",
+      "path": "eastern/liezi-giles-1912.txt",
+      "category": "eastern",
+      "tradition": "Eastern",
+      "title": "Taoist Teachings from the Book of Lieh Tzŭ (Giles 1912)",
+      "size_bytes": 178590,
+      "size_human": "174KB",
+      "word_count": 27527,
+      "sha256": "f664649fddad309e9052da5d4cb445707d10d2c936f64bdc65f26511b2464053",
+      "preview": "Ubc TKHte&om of tbe East Series Edited by L. CRANMER-BYNG Dr. S. A. KAPADIA TAOIST TEACHINGS WISDOM OF THE EAST TAOIST TEACHINGS FROM THE BOOK OF LIEH TZtt TRANSLATED FROM THE CHINESE, WITH INTRODUCTION AND NOTES, BY…"
+    },
+    {
       "id": "eastern__art-of-war-sun-tzu",
       "filename": "art-of-war-sun-tzu.txt",
       "path": "eastern/art-of-war-sun-tzu.txt",
@@ -1530,6 +1573,32 @@
       "word_count": 144523,
       "sha256": "2d35893f776e430e85452ed90275a0f3e40fd79aef4b04359e389ce27fb2235c",
       "preview": "Google This is a digital copy of a book that was preserved for generations on library shelves before it was carefully scanned by Google as part of a project to make the world’s books discoverable online. It has survived…"
+    },
+    {
+      "id": "eastern__zend-avesta-sbe23-part2",
+      "filename": "zend-avesta-sbe23-part2.txt",
+      "path": "eastern/zend-avesta-sbe23-part2.txt",
+      "category": "eastern",
+      "tradition": "Eastern",
+      "title": "The Zend-Avesta Part 2 (Darmesteter / SBE 23)",
+      "size_bytes": 600879,
+      "size_human": "586KB",
+      "word_count": 108779,
+      "sha256": "49741fef78f5514ba28c16810658510458e02245b9513073f7aad9ec9fae2c1b",
+      "preview": "THE SACRED BOOKS OF THE EAST HENRY FROWDE, M.A. PUBLISHER TO THE UNIVERSITY OF OXFORD LONDON, EDINBURGH NEW YORK THE SACRED BOOKS OF THE EAST TRANSLATED BY VARIOUS ORIENTAL SCHOLARS AND EDITED BY F. MAX HOLLER VOL.…"
+    },
+    {
+      "id": "eastern__zend-avesta-sbe31-part3",
+      "filename": "zend-avesta-sbe31-part3.txt",
+      "path": "eastern/zend-avesta-sbe31-part3.txt",
+      "category": "eastern",
+      "tradition": "Eastern",
+      "title": "The Zend-Avesta Part 3 (Mills / SBE 31)",
+      "size_bytes": 858708,
+      "size_human": "838KB",
+      "word_count": 148227,
+      "sha256": "30e8fc6200f2648f0a326b72d2d392fb99b52be1e49d3c35cdd59917d689f1a3",
+      "preview": "THE SACRED BOOKS OF THE EAST [31] a bonbon HENRY FROWDE Oxford University Press Warehouse Amen Corner, E.C. THE SACRED BOOKS OF THE EAST TRANSLATED BY VARIOUS ORIENTAL SCHOLARS AND EDITED BY F. MAX MOLLER VOL. XXXI AT…"
     },
     {
       "id": "eastern__tibetan-book-of-dead",
@@ -1816,6 +1885,45 @@
       "word_count": 296528,
       "sha256": "dc9fb13ba38a99e151e1225549c61d45837a4bcd862641a912bf7ca38ebeeae8",
       "preview": "THE SECRET DOCTRINE The Secret Doctrine: The Synthesis Of SCIENCE, RELIGION, AND PHILOSOPHY. By H. P. Blavatsky, Author Of “Isis Unveiled.” Third And Revised Edition. Satvât Nâsti Paro Dharmah, “There is no Religion…"
+    },
+    {
+      "id": "esoteric__mead-thrice-greatest-hermes-v1",
+      "filename": "mead-thrice-greatest-hermes-v1.txt",
+      "path": "esoteric/mead-thrice-greatest-hermes-v1.txt",
+      "category": "esoteric",
+      "tradition": "Esoteric/Western Occult",
+      "title": "Thrice-Greatest Hermes vol. I (Mead 1906) — Prolegomena / Asclepius",
+      "size_bytes": 1015835,
+      "size_human": "992KB",
+      "word_count": 154401,
+      "sha256": "4599f9ff0865b0f1a3e16af0a406d17d1ee498c550af34f46a4a41112939e826",
+      "preview": "Thrice-Greatest Hermes Thrice-Greatest Hermes Studies in Hellenistic Theosophy and Gnosis Being a Translation of the Extant Sermons and Fragments of the Trismegistic Literature, with Prolegomena, Commentaries, and Notes…"
+    },
+    {
+      "id": "esoteric__mead-thrice-greatest-hermes-v2",
+      "filename": "mead-thrice-greatest-hermes-v2.txt",
+      "path": "esoteric/mead-thrice-greatest-hermes-v2.txt",
+      "category": "esoteric",
+      "tradition": "Esoteric/Western Occult",
+      "title": "Thrice-Greatest Hermes vol. II (Mead 1906) — Sermons",
+      "size_bytes": 668021,
+      "size_human": "652KB",
+      "word_count": 103627,
+      "sha256": "132101baef13c76a8480fa24c9ed8b71cda8699fdcc651e297910e6976ace8e0",
+      "preview": "I I wlis] mm Thrice-Greatest Hermes Thrice-Greatest Hermes Studies in Hellenistic Theosophy and Gnosis Being a Translation of the Extant Sermons and Fragments of the Trismegistic Literature, with Prolegomena,…"
+    },
+    {
+      "id": "esoteric__mead-thrice-greatest-hermes-v3",
+      "filename": "mead-thrice-greatest-hermes-v3.txt",
+      "path": "esoteric/mead-thrice-greatest-hermes-v3.txt",
+      "category": "esoteric",
+      "tradition": "Esoteric/Western Occult",
+      "title": "Thrice-Greatest Hermes vol. III (Mead 1906) — Stobaeus excerpts & fragments",
+      "size_bytes": 734526,
+      "size_human": "717KB",
+      "word_count": 113048,
+      "sha256": "0582c78819abf92f8bae776b12d2a0dc7c86c30bd006278b624ee32b1a194da7",
+      "preview": "r M '• i- Thrice-Greatest Hermes Thrice-Greatest Hermes Studies in Hellenistic Theosophy and Gnosis Being a Translation of the Extant Sermons and Fragments of the Trismegistic Literature, with Prolegomena, Commentaries,…"
     },
     {
       "id": "esoteric__zohar-full",
@@ -2156,6 +2264,71 @@
       "preview": "THE REPUBLIC By Plato Translated by Benjamin Jowett Note: See also “The Republic” by Plato, Jowett, eBook #150 Contents INTRODUCTION AND ANALYSIS. THE REPUBLIC. PERSONS OF THE DIALOGUE. BOOK I. BOOK II. BOOK III. BOOK…"
     },
     {
+      "id": "mythology__plotinus-enneads-v1-ethical-1917",
+      "filename": "plotinus-enneads-v1-ethical-1917.txt",
+      "path": "mythology/plotinus-enneads-v1-ethical-1917.txt",
+      "category": "mythology",
+      "tradition": "Mythology/Classical",
+      "title": "Plotinus Enneads vol. 1 — Ethical Treatises (MacKenna 1917)",
+      "size_bytes": 357144,
+      "size_human": "348KB",
+      "word_count": 63168,
+      "sha256": "ed9c656b1532e73107fa9122d9336ee4df8c3e5451ccb8c9fd336e9e4d7fbd0b",
+      "preview": "~ ‘ ™ ν + ᾿ AY te ἊΣ ἢ ‘ a) ᾿ bi ἅ ‘ 4 - ὁ ‘ : : δ : * 1 a ὲ ᾽ Ὺ Ἰ ἂν ζ é beat A\" λ * hes ἘΣ, vy oe ® Ὧν» ᾿ + ~ ak δ᾽ ; 7 ἢ ᾿ Ἂν 4 ἢ Φ ὶ ΕΝ > 7 Tt. 4 be A = fx) — < 4 ᾿ wie bath Re bo eg ent \\ - \" \" ts a ae 7 “ < “i Z.…"
+    },
+    {
+      "id": "mythology__plotinus-enneads-v2-psychic-1921",
+      "filename": "plotinus-enneads-v2-psychic-1921.txt",
+      "path": "mythology/plotinus-enneads-v2-psychic-1921.txt",
+      "category": "mythology",
+      "tradition": "Mythology/Classical",
+      "title": "Plotinus Enneads vol. 2 — Psychic & Physical Treatises (MacKenna 1921)",
+      "size_bytes": 619472,
+      "size_human": "604KB",
+      "word_count": 94448,
+      "sha256": "11bfb81f041f0061834417f3b5b40f8976c30c82cc90f736a671954313cc3ce5",
+      "preview": "TFIE LIBRARY OF PHILOSOPHICAL TRANSLATIONS. PLOTINUS; PSYCHIC Cf PHYSICAL TREATISES, VOLUME IL TRANSLATED BY STEPHEN MACKENNA NUNC COCNOSCO EX PARTE TRENT UNIVERSITY EIBRARY IBMCJSSI ,4 *'A.s. .,2— ^‘ -. ^ A»7* • •…"
+    },
+    {
+      "id": "mythology__plotinus-enneads-v3-soul-1924",
+      "filename": "plotinus-enneads-v3-soul-1924.txt",
+      "path": "mythology/plotinus-enneads-v3-soul-1924.txt",
+      "category": "mythology",
+      "tradition": "Mythology/Classical",
+      "title": "Plotinus Enneads vol. 3 — On the Nature of the Soul (MacKenna 1924)",
+      "size_bytes": 404922,
+      "size_human": "395KB",
+      "word_count": 62174,
+      "sha256": "4844098fabe4eff6dff784106821e58052b834df4adab0000df67fef6275d73d",
+      "preview": "THE LIBRARY OF PHILOSOPHICAL TRANSLATIONS. PLOTINUS: ON THE NATURE OF THE SOUL, VOLUME III. TRANSLATED BY STEPHEN MACKENNA NUNC COGNOSCO EX PARTE TRENT UNIVERSITY LIBRARY . ' Digitized by the Internet Archive in 2019…"
+    },
+    {
+      "id": "mythology__plotinus-enneads-v4-divine-mind-1926",
+      "filename": "plotinus-enneads-v4-divine-mind-1926.txt",
+      "path": "mythology/plotinus-enneads-v4-divine-mind-1926.txt",
+      "category": "mythology",
+      "tradition": "Mythology/Classical",
+      "title": "Plotinus Enneads vol. 4 — The Divine Mind (MacKenna 1926)",
+      "size_bytes": 260003,
+      "size_human": "253KB",
+      "word_count": 39488,
+      "sha256": "3b19a07682c87025297d27df522beaf5767ace7689c5ae7e49a57e6069f467fa",
+      "preview": "THE LIBRARY OF PHILOSOPHICAL TRANSLATIONS. PLOTINUS : THE DIVINE MIND, VOLUME IV. TRANSLATED BY STEPHEN MACKENNA NUNC COCNOSCO EX PARTE TRENT UNIVERSITY LIBRARY Of this Edition 1000 copies have been printed on pure rag…"
+    },
+    {
+      "id": "mythology__plotinus-enneads-v5-one-good-1930",
+      "filename": "plotinus-enneads-v5-one-good-1930.txt",
+      "path": "mythology/plotinus-enneads-v5-one-good-1930.txt",
+      "category": "mythology",
+      "tradition": "Mythology/Classical",
+      "title": "Plotinus Enneads vol. 5 — On the One and Good (MacKenna & Page 1930)",
+      "size_bytes": 648252,
+      "size_human": "633KB",
+      "word_count": 99253,
+      "sha256": "d60f1b7487ce43f7604f300d5b6c57332657d048d72c77ead2efbdb038642d4d",
+      "preview": "THE LIBRARY OF PHILOSOPHICAL TRANSLATIONS. PLOTINUS: ON THE ONE AND GOOD, VOLUME V. TRANSLATED BY STEPHEN MACKENNA AND B. S. PAGE >A. V'tV ■ ■ A. kt ■.'» hptr, r ' i' j Lf •; XH'Vv ^ kS- : k ! • •' /$b. T;V''kv^‘V;.M;…"
+    },
+    {
       "id": "mythology__poetic-edda",
       "filename": "poetic-edda.txt",
       "path": "mythology/poetic-edda.txt",
@@ -2234,6 +2407,19 @@
       "preview": "THE CATTLE-RAID OF CUALNGE (TAIN BO CUAILNGE) An Old Irish Prose-Epic Translated for the first time from Leabhar na h-Uidhri and the Yellow Book of Lecan by L. WINIFRED FARADAY, M. A. London Published by David Nutt At…"
     },
     {
+      "id": "mythology__ptahhotep-gunn-pg30508",
+      "filename": "ptahhotep-gunn-pg30508.txt",
+      "path": "mythology/ptahhotep-gunn-pg30508.txt",
+      "category": "mythology",
+      "tradition": "Mythology/Classical",
+      "title": "The Instruction of Ptah-Hotep and Ke'Gemni (Gunn 1906)",
+      "size_bytes": 107971,
+      "size_human": "105KB",
+      "word_count": 15078,
+      "sha256": "ab44a94aea2afad982291ee4eb74bb3cd803c3d27d0ff5e06871c91e2d59281a",
+      "preview": "THE WISDOM OF THE EAST THE INSTRUCTION OF PTAH-HOTEP AND THE INSTRUCTION OF KE'GEMNI: THE OLDEST BOOKS IN THE WORLD. TRANSLATED FROM THE EGYPTIAN WITH AN INTRODUCTION AND APPENDIX BY BATTISCOMBE G. GUNN LONDON JOHN…"
+    },
+    {
       "id": "mythology__nibelungenlied",
       "filename": "nibelungenlied.txt",
       "path": "mythology/nibelungenlied.txt",
@@ -2247,6 +2433,19 @@
       "preview": "THE NIBELUNGENLIED By An Unknown Author Translated by Daniel B. Shumway Originally written in Middle High German (M.H.G.), sometime around 1200 A.D., although this dating is by no means certain. Author unknown. The text…"
     },
     {
+      "id": "mythology__amenemope-budge-1924",
+      "filename": "amenemope-budge-1924.txt",
+      "path": "mythology/amenemope-budge-1924.txt",
+      "category": "mythology",
+      "tradition": "Mythology/Classical",
+      "title": "The Teaching of Amen-Em-Apt (Budge 1924)",
+      "size_bytes": 338314,
+      "size_human": "330KB",
+      "word_count": 60654,
+      "sha256": "55f1316814599c1d01d6bef8ae66944c8dd76fd0a0dfb6bf79c5a2a0806beb44",
+      "preview": "i aan 5 be ah PLATE I. The Admonitions or Teaching of Amen From Brit. Mus. Papyrus No. 10474, col. XVII. emapt, the son of Kanekht, THE TEACHING OF AMEN- EM-APT, SON OF KANEKHT THE EGYPTIAN HIEROGLYPHIC TEXT AND AN…"
+    },
+    {
       "id": "mythology__volsung_saga",
       "filename": "volsung_saga.txt",
       "path": "mythology/volsung_saga.txt",
@@ -2258,6 +2457,162 @@
       "word_count": 57183,
       "sha256": "f81e9ee996cf84899c6f142eabfef158d0e882b0a3a1e5e33d688fa6550e98bb",
       "preview": "THE STORY OF THE VOLSUNGS, (VOLSUNGA SAGA) WITH EXCERPTS FROM THE POETIC EDDA By Anonymous Originally written in Icelandic (Old Norse) in the thirteenth century A.D., by an unknown hand. However, most of the material is…"
+    },
+    {
+      "id": "science__aristotle-works-vol2-1930",
+      "filename": "aristotle-works-vol2-1930.txt",
+      "path": "science/aristotle-works-vol2-1930.txt",
+      "category": "science",
+      "tradition": "Science History",
+      "title": "Aristotle Works vol. II — Physica/De Caelo/De Gen. (Ross ed. 1930; US-PD 2026, EU note)",
+      "size_bytes": 1169793,
+      "size_human": "1.1MB",
+      "word_count": 211865,
+      "sha256": "7e7f9f0c46dcead7ea2d8721aa3e698f31dce9416562e7ee8479a9539ee4f570",
+      "preview": "THE WORKS OF ARISTOTLE TRANSLATED INTO ENGLISH UNDER THE EDITORSHIP OF W. D. ROSS, M.A., Hon. LL.D. (Edin.) PROVOST OF ORIbL COLLBGB FELl OW OF THE RRIllSK ACADEMY VOLUME II PHYSICA By R. P. HARDIE and R. K. GAVE DE…"
+    },
+    {
+      "id": "science__copernicus-de-revolutionibus-1543-latin",
+      "filename": "copernicus-de-revolutionibus-1543-latin.txt",
+      "path": "science/copernicus-de-revolutionibus-1543-latin.txt",
+      "category": "science",
+      "tradition": "Science History",
+      "title": "Copernicus De revolutionibus (1543 Latin; citation-grade OCR)",
+      "size_bytes": 839070,
+      "size_human": "819KB",
+      "word_count": 120858,
+      "sha256": "0432dab6f35f0cef191c419d5abee7ce4addf44a725a004d1fe696bd60ad4634",
+      "preview": "l Digitized by the Internet Archive in 2017 with funding from Boston Public Library https://archive.org/details/nicolaicopernici00cope_1 NiqOLAI CO PERNICI TORINENSIS ^ PE REVOLVtiONiBVS OR»l* um coekftium, Libri vu…"
+    },
+    {
+      "id": "science__darwin-origin-pg1228",
+      "filename": "darwin-origin-pg1228.txt",
+      "path": "science/darwin-origin-pg1228.txt",
+      "category": "science",
+      "tradition": "Science History",
+      "title": "Darwin On the Origin of Species (1st ed.; PG 1228)",
+      "size_bytes": 970612,
+      "size_human": "947KB",
+      "word_count": 155526,
+      "sha256": "ededa9c0bf8761efed092c303b46c1c92de956838cba6249a33bedfd6d7363b4",
+      "preview": "Click on any of the filenumbers below to quickly view each ebook. 1228 1859, First Edition 22764 1860, Second Edition 2009 1872, Sixth Edition, considered the definitive edition. On the Origin of Species BY MEANS OF…"
+    },
+    {
+      "id": "science__euclid-elements-heath-v1-1908",
+      "filename": "euclid-elements-heath-v1-1908.txt",
+      "path": "science/euclid-elements-heath-v1-1908.txt",
+      "category": "science",
+      "tradition": "Science History",
+      "title": "Euclid Elements vol. 1 (Heath 1908)",
+      "size_bytes": 1240967,
+      "size_human": "1.2MB",
+      "word_count": 197177,
+      "sha256": "47df1049c255859ba1157208e8dcbb42575ee8430549d2e6441f4c5d969e9bbe",
+      "preview": "This is a digital copy of a book that was preserved for generations on library shelves before it was carefully scanned by Google as part of a project to make the world's books discoverable online. It has survived long…"
+    },
+    {
+      "id": "science__euclid-elements-heath-v2-1908",
+      "filename": "euclid-elements-heath-v2-1908.txt",
+      "path": "science/euclid-elements-heath-v2-1908.txt",
+      "category": "science",
+      "tradition": "Science History",
+      "title": "Euclid Elements vol. 2 (Heath 1908)",
+      "size_bytes": 1272730,
+      "size_human": "1.2MB",
+      "word_count": 224064,
+      "sha256": "7ca42588e23771b324e11c271f7d9f4d54943e57d50470a9f04c28fb0e88b7fc",
+      "preview": "This is a digital copy of a book that was preserved for generations on library shelves before it was carefully scanned by Google as part of a project to make the world's books discoverable online. It has survived long…"
+    },
+    {
+      "id": "science__euclid-elements-heath-v3-1908",
+      "filename": "euclid-elements-heath-v3-1908.txt",
+      "path": "science/euclid-elements-heath-v3-1908.txt",
+      "category": "science",
+      "tradition": "Science History",
+      "title": "Euclid Elements vol. 3 (Heath 1908)",
+      "size_bytes": 1231725,
+      "size_human": "1.2MB",
+      "word_count": 195594,
+      "sha256": "f6da150497652ee9e6017b8c286b1cd134d8cd59236f7c5c89eb80e635ab9b1d",
+      "preview": "This is a digital copy of a book that was preserved for generations on library shelves before it was carefully scanned by Google as part of a project to make the world's books discoverable online. It has survived long…"
+    },
+    {
+      "id": "science__faraday-candle-pg14474",
+      "filename": "faraday-candle-pg14474.txt",
+      "path": "science/faraday-candle-pg14474.txt",
+      "category": "science",
+      "tradition": "Science History",
+      "title": "Faraday The Chemical History of a Candle (PG 14474)",
+      "size_bytes": 246914,
+      "size_human": "241KB",
+      "word_count": 41712,
+      "sha256": "c053ca4ae7880585a15001cd3ffdaf5f09cd08c3329b828ffd8c90ce335482b9",
+      "preview": "A COURSE OF LECTURES DELIVERED BEFORE A JUVENILE AUDIENCE AT THE ROYAL INSTITUTION BY MICHAEL FARADAY, D.C.L., F.R.S. EDITED BY WILLIAM CROOKES, F.C.S. A NEW IMPRESSION, WITH ILLUSTRATIONS LONDON CHATTO & WINDUS 1908…"
+    },
+    {
+      "id": "science__galileo-two-new-sciences-1914",
+      "filename": "galileo-two-new-sciences-1914.txt",
+      "path": "science/galileo-two-new-sciences-1914.txt",
+      "category": "science",
+      "tradition": "Science History",
+      "title": "Galileo Two New Sciences (Crew & de Salvio 1914)",
+      "size_bytes": 735430,
+      "size_human": "718KB",
+      "word_count": 114467,
+      "sha256": "18171a28fa35405e34a5e46321be05e8f9d2462d3167a15f5bb0e044f08e3695",
+      "preview": "TWO NEW SCIENCES BY GALILEO THE MACMILLAN COMPANY KEW YORK • BOSTON • CHICAGO • DALLAS ATLANTA • SAN FRANCISCO MACMILLAN & CO., LIMITED LONDON • BOMBAY • CALCUTTA MELBOURNE THE MACMILLAN CO. OF CANADA, LTD. TORONTO…"
+    },
+    {
+      "id": "science__newton-opticks-1730",
+      "filename": "newton-opticks-1730.txt",
+      "path": "science/newton-opticks-1730.txt",
+      "category": "science",
+      "tradition": "Science History",
+      "title": "Newton Opticks (4th ed. 1730)",
+      "size_bytes": 687230,
+      "size_human": "671KB",
+      "word_count": 108067,
+      "sha256": "3b488f8c1b6ec5a7f810fc2a3bc0f6bffa0c51bc6c9c58401030f74c70e3021f",
+      "preview": "^Vr THE LIBRARY OF THE UNIVERSITY OF CALIFORNIA LOS ANGELES GIFT Dr. K. R. Beigelman '•k. ». oPTiCKs: O R, A TREATISE O F T H E Reflections, Refradiqns^ InfieBions and Colours O F LIGHT. ne Fourth Edition, correSied, By…"
+    },
+    {
+      "id": "science__newton-principia-motte-1846",
+      "filename": "newton-principia-motte-1846.txt",
+      "path": "science/newton-principia-motte-1846.txt",
+      "category": "science",
+      "tradition": "Science History",
+      "title": "Newton Principia (Motte English 1846)",
+      "size_bytes": 1766098,
+      "size_human": "1.7MB",
+      "word_count": 277659,
+      "sha256": "e4636e9a10971026430ab70dd6210dc7fe02f4af8b5e308de8f1b2596820fc1d",
+      "preview": "MATH.-STAT. SIM ISAAC MIBWf OM« NEWTON'S PRINCIPIA. THE MATHEMATICAL PRINCIPLES OF NATURAL PHILOSOPHY, BY SIR ISAAC NEWTON; TRANSLATED INTO ENGLISH BY ANDREW MOTTE. TO WHICH IS ADDKTV NEWTON'S SYSTEM OF THE WORLD ; With…"
+    },
+    {
+      "id": "science__archimedes-method-heiberg-1912",
+      "filename": "archimedes-method-heiberg-1912.txt",
+      "path": "science/archimedes-method-heiberg-1912.txt",
+      "category": "science",
+      "tradition": "Science History",
+      "title": "The Method of Archimedes (Heiberg/Heath 1912)",
+      "size_bytes": 79343,
+      "size_human": "77KB",
+      "word_count": 14419,
+      "sha256": "c01971668dd9ded69ea9ac0223c183c8536e0554374ab02abf2d1a16c75609e9",
+      "preview": "CORNELL UNIVERSITY LIBRARY THE METHOD OF ARCHIMEDES RECENTLY DISCOVERED BY HEIBERG A SUPPLEMENT TO rUE WORKS OF ARCHIMEDES 1897 EDITED BY Sir THOMAS L. HEATH, K.C.B., Sc.D., F.R.S. SOMETIME FELLOW OF TRINITY COLLEGE,…"
+    },
+    {
+      "id": "science__archimedes-works-heath-1897",
+      "filename": "archimedes-works-heath-1897.txt",
+      "path": "science/archimedes-works-heath-1897.txt",
+      "category": "science",
+      "tradition": "Science History",
+      "title": "The Works of Archimedes (Heath 1897)",
+      "size_bytes": 822316,
+      "size_human": "803KB",
+      "word_count": 140294,
+      "sha256": "04a4a8b6a8baede1aacf325b9fceba65610f76b3192387be9b50723afb0bcabc",
+      "preview": "UNIVERSAL LIBRARY OU_ 166404 AYVAYA! | IWSYSAINN OSMANIA UNIVERSITY LIBRARY Call No. δ μία WAccession No. aja Author He a i | , TL . ‘Title (er ΓΦ GA Chios book should beRreturned on or before the dat last marked helaw…"
     }
   ]
 }

@@ -1,3 +1,14 @@
+# World Scour Wave 5–5.5 — 2026-08-07 (Grok)
+
+**Catalog:** 172 → **199** texts · **18.85M** words · **112.5 MB** · Abrahamic **45.7%**
+**New category:** `science/` (Science History) — Euclid×3, Archimedes×2, Copernicus Latin, Galileo, Newton×2, Darwin, Faraday, Aristotle vol.II (US-PD 2026 note)
+**Also installed:** Mead TGH I–III, Whinfield Masnavi abridged, Avesta SBE 23+31, Liezi, Ptahhotep, Amenemope, Plotinus Enneads ×5, Goddard Buddhist Bible 1938 (US PD claim)
+**UI:** `index.html` CATS + `--bind-science`; `search-index.json` rebuilt (77k words, 199 docs)
+**Verify:** content PASS; untracked cleared by this commit
+**Goddard residual:** sacred-texts documents 1932 non-renewal; 1938 Dutton rev. Stanford DB not re-queried (CAPTCHA); title carries US-PD claim
+
+---
+
 # The Source Corpus — Full Audit Report
 ## July 24, 2026
 
